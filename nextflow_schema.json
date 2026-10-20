@@ -192,11 +192,30 @@
                     "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
                 }
             }
+        },
+        "caller_options": {
+            "title": "Caller options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Options for the driver callers.",
+            "properties": {
+                "adwgs_shard_size": {
+                    "type": "integer",
+                    "default": 5000,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-layer-group",
+                    "description": "Elements per ActiveDriverWGS shard.",
+                    "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
+                }
+            }
         }
     },
     "allOf": [
         {
             "$ref": "#/$defs/input_output_options"
+        },
+        {
+            "$ref": "#/$defs/caller_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

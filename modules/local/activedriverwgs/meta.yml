@@ -1,0 +1,104 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "activedriverwgs"
+description: Element-level mutation-burden test (local-background Poisson GLM with trinucleotide context) for candidate non-coding driver elements in a cohort
+keywords:
+  - cancer
+  - driver
+  - noncoding
+  - mutation burden
+tools:
+  - "activedriverwgs":
+      description: "ActiveDriverWGS: driver discovery from whole-genome mutation burden in coding and non-coding elements"
+      homepage: "https://github.com/reimandlab/ActiveDriverWGSR"
+      documentation: "https://cran.r-project.org/package=ActiveDriverWGS"
+      tool_dev_url: "https://github.com/reimandlab/ActiveDriverWGSR"
+      doi: "10.1016/j.molcel.2019.12.027"
+      licence: ["GPL-3.0-only"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - mutations:
+        type: file
+        description: Canonical cohort mutation table (sample, chrom, pos, ref, alt, vtype; GRCh38, chr-prefixed, 1-based)
+        pattern: "*.{tsv,tsv.gz}"
+        ontologies: []
+  - - meta2:
+        type: map
+        description: |
+          Element-catalogue meta map, e.g. `[ id:'regbuild110_v50' ]`
+    - elements:
+        type: file
+        description: CDS-excluded regulatory element catalogue, headerless BED (chrom, start, end, element id, ...)
+        pattern: "*.bed"
+        ontologies: []
+
+output:
+  results:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.activedriverwgs.tsv":
+          type: file
+          description: Per-element ActiveDriverWGS results (pooled across shards; FDR recomputed over all elements)
+          pattern: "*.activedriverwgs.tsv"
+          ontologies: []
+  untested:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.activedriverwgs.untested.txt":
+          type: file
+          description: Ids of supplied elements that could not be tested (coverage report; one id per line)
+          pattern: "*.activedriverwgs.untested.txt"
+          ontologies: []
+  versions_activedriverwgs:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "activedriverwgs":
+          type: string
+          description: The name of the tool
+      - "cat activedriverwgs.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_r:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "r-base":
+          type: string
+          description: The name of the tool
+      - "cat r.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "activedriverwgs":
+          type: string
+          description: The name of the tool
+      - "cat activedriverwgs.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "r-base":
+          type: string
+          description: The name of the tool
+      - "cat r.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@khalofx"
+maintainers:
+  - "@khalofx"

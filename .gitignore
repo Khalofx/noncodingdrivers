@@ -8,3 +8,9 @@ testing*
 *.pyc
 null/
 .lineage/
+
+# nf-test working files
+.nf-test/
+.nf-test.log
+# committed module fixtures (the template ignores every data/ folder)
+!tests/data/

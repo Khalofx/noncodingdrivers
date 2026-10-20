@@ -163,3 +163,27 @@ If you update images or graphics, follow the nf-core [style guidelines](https://
 ## Pipeline specific contribution guidelines
 
 <!-- TODO nf-core: Add any pipeline specific contribution guidelines here, such as coding styles, procedures, checklists etc. -->
+
+## Module standard (noncodingdrivers)
+
+Every process follows one recipe, so later steps are mechanical. The full rules are R0–R10 in the build guide, Step 2.
+
+1. **Choose the component.** Prefer an installed nf-core module (`nf-core modules install <tool/subtool>`), configured only through `ext.args` / `ext.prefix` in `conf/modules.config`. Otherwise write a local module around a packaged tool (Bioconda, conda-forge or CRAN), reusing the container of the closest nf-core module. Glue between tools is a format adapter (an inline `awk` or an aliased nf-core `gawk` with `ext.args2`) that never computes a statistic. Anything else is pipeline-owned code and needs an entry in the provenance exception table.
+2. **Layout and naming.** Local modules are flat, `modules/local/<name>/{main.nf,meta.yml,environment.yml,tests/}`, `<name>` without punctuation, process `<NAME>`. Aliased nf-core modules get descriptive include names (`GAWK as COHORT_DEDUP`).
+3. **Versions through topic channels.** One output per tool: `tuple val("${task.process}"), val('<tool>'), eval('<cmd>'), topic: versions, emit: versions_<tool>`, each listed under `topics: versions:` in `meta.yml`. No `versions.yml`. Version commands avoid `$` and double quotes; write a `<tool>.version.txt` and `cat` it when needed. MultiQC never emits on the topic.
+4. **Inputs and options.** `tuple val(meta), path(x)`; references get `meta2`, `meta3`. Optional files are `[]`. Modules read no `params` and no non-standard meta keys; options travel in `task.ext.args`, output names in `task.ext.prefix`.
+5. **Software.** `conda "${moduleDir}/environment.yml"` with channel- and version-pinned, build-free specs. No conda package means no conda directive; `environment.yml` then documents the runtime.
+6. **Containers.** Pipeline-owned images are built by `.github/workflows/build-containers.yml` from `containers/<name>/Dockerfile` and published as `ghcr.io/khalofx/noncodingdrivers-<name>:<version>`. Docker Hub images are written with their registry (`docker.io/...`). Every image has `ps` (procps). Digests are pinned before release.
+7. **Scripts.** `bin/` holds only the adapters listed in the guide; each has a shebang, is executable and is called by name from PATH. No `${projectDir}` inside a process.
+8. **Stub, when, labels.** A `stub:` block that creates every output; `when: task.ext.when == null || task.ext.when`; exactly one standard label.
+9. **Strict syntax.** Lower-case `channel` factories, `def` for workflow-local variables, explicit closure parameters (never `it`).
+10. **Tests.** `tests/main.nf.test` tagged `modules`, `modules_local`, `<name>`, with a stub test that snapshots `process.out` and a real test on committed fixtures. Float-heavy outputs are asserted in Groovy (header, row count, planted elements); only versions and file names are snapshotted.
+
+Checks before every commit:
+
+```bash
+nextflow lint .
+nf-core modules lint --all --local --registry ghcr.io,quay.io,community.wave.seqera.io/library,docker.io
+nf-test test modules/local/<name>/tests/main.nf.test --profile +singularity
+pre-commit run --all-files
+```
