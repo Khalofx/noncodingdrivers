@@ -1,0 +1,6 @@
+R version 4.5.3 (2026-03-11) 
+Package	Version
+ActiveDriverWGS	1.2.1
+BiocManager	1.30.27
+BiocVersion	3.22.0
+BSgenome.Hsapiens.UCSC.hg38	1.4.5

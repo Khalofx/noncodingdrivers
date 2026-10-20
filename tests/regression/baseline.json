@@ -1,0 +1,119 @@
+{
+  "description": "Regression baseline for khalofx/noncodingdrivers: frozen release consensus tables (Liver-HCC-public, LIRI-JP, PACA-CA) and the package re-implementation of their combination. Inputs, tools and table checksums are in PROVENANCE.md.",
+  "zenodo_doi": null,
+  "liver_hcc_public": {
+    "significant_annotations_acat": 28,
+    "loci": 23,
+    "tert": {
+      "element": "promoter_ENSR00000746745",
+      "rank": 5,
+      "snvs": 11,
+      "patients": 11,
+      "acat_q": 9.544685537221654e-06,
+      "adwgs_p": 4.4030442256054895e-11,
+      "ofml_p": 0.18765,
+      "vote_count": 1,
+      "patient_rows": 11
+    },
+    "candidate_mutation_rows": 266
+  },
+  "liri_jp": {
+    "candidates_acat": 33,
+    "loci": 27,
+    "min_acat_q": 7.22273e-10
+  },
+  "paca_ca": {
+    "candidates_acat": 0,
+    "min_acat_q": 0.360948
+  },
+  "synth_nc": {
+    "donors": 60,
+    "planted_drivers": 5,
+    "planted_decoys": 1,
+    "acat": {
+      "recovered": 5,
+      "decoy_significant": true,
+      "non_planted_significant": 2
+    },
+    "ebm": {
+      "recovered": 4,
+      "decoy_significant": true,
+      "non_planted_significant": 1,
+      "missed": [
+        "E5 enhancer_ENSR00001173236 (3 donors)"
+      ]
+    },
+    "note": "E6 enhancer_ENSR00001022568 is a spectrum decoy; with the A/T spectrum control removed it is significant and unflagged under both methods."
+  },
+  "liftover_liver_hcc_hg19_maf": {
+    "variants_in": 3380218,
+    "mapped": 3379254,
+    "failed": 875,
+    "unmapped": 176,
+    "split_mapping": 2,
+    "ref_mismatch": 697,
+    "ref_unvalidated_insertions": 65116
+  },
+  "combination_check_2026_10_06": {
+    "acat_package_significant": {
+      "liver_hcc_public": 28,
+      "liri_jp": 33,
+      "paca_ca": 0
+    },
+    "ebm_significant": {
+      "liver_hcc_public": 31,
+      "liri_jp": 36,
+      "paca_ca": 1
+    },
+    "ebm_shared_with_acat": {
+      "liver_hcc_public": 25,
+      "liri_jp": 28,
+      "paca_ca": 0
+    },
+    "acat_only": {
+      "liver_hcc_public": 3,
+      "liri_jp": 5,
+      "paca_ca": 0
+    },
+    "ebm_only": {
+      "liver_hcc_public": 6,
+      "liri_jp": 8,
+      "paca_ca": 1
+    },
+    "tert_liver_hcc": {
+      "ebm_q": 3.07e-05,
+      "ebm_rank": 5,
+      "acat_q": 9.54e-06,
+      "acat_rank": 5
+    }
+  },
+  "deposit": "none: frozen tables kept in noncodingdrivers/data/baseline on Karakoram (user decision 2026-10-20)",
+  "recovered_semantics": "recovered = planted true drivers (E1-E5) at q < 0.1; the decoy E6 is reported separately",
+  "canonical_table": {
+    "rows": 3379254,
+    "columns": [
+      "sample",
+      "chrom",
+      "pos",
+      "ref",
+      "alt",
+      "vtype"
+    ],
+    "vtype_labels": [
+      "DEL",
+      "DNP",
+      "INS",
+      "ONP",
+      "SNP",
+      "TNP"
+    ],
+    "vtype_counts": {
+      "SNP": 3151863,
+      "DEL": 129518,
+      "INS": 65116,
+      "DNP": 32377,
+      "TNP": 361,
+      "ONP": 19
+    }
+  }
+}

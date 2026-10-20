@@ -48,3 +48,10 @@ repos:
         name: Prevent committing output from pipeline test runs to the pipeline code itself
         entry: ./.hooks/block_pipeline_outdir.sh
         language: script
+      # Clean-break rule: the repository never names the earlier project. The character
+      # classes ([d], [e]) keep this definition from matching itself.
+      - id: no-earlier-project-names
+        name: Block names of the earlier project
+        language: pygrep
+        entry: "(?i)nf-nc[d]river|\\bnc[d]river\\b|NR[d]river|v0\\.1-l[e]gacy"
+        types: [text]

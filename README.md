@@ -14,6 +14,13 @@
 
 ## Introduction
 
+
+**khalofx/noncodingdrivers** finds and explains candidate non-coding regulatory driver elements in cancer cohorts. It starts from pre-called somatic variants: VCF (including nf-core/sarek output) or MAF. FASTQ/BAM calling is out of scope.
+
+- Inference is element-level and SNV-only: ActiveDriverWGS (default) and OncodriveFML (opt-in, user-supplied CADD) test a CDS-excluded Ensembl Regulatory Build catalogue; their p-values are combined with the empirical Brown method (ACAT as a sensitivity analysis) and Benjamini–Hochberg.
+- Candidates are explained, never filtered, by established tools: bedtools (nearest gene, regulatory context), Ensembl VEP, and motifbreakR.
+- GRCh38 is native; hg19 input is accepted only through an explicit, labelled liftover (`--allow_hg19_liftover`).
+
 **khalofx/noncodingdrivers** is a bioinformatics pipeline that ...
 
 <!-- TODO nf-core:

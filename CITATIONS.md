@@ -10,7 +10,27 @@
 
 ## Pipeline tools
 
-
+- ActiveDriverWGS — Zhu H, et al. Mol Cell 2020. doi:10.1016/j.molcel.2019.12.027
+- OncodriveFML — Mularoni L, et al. Genome Biol 2016. doi:10.1186/s13059-016-0994-0
+- MutEnricher — Soltis AR, et al. BMC Bioinformatics 2020. doi:10.1186/s12859-020-03695-z
+- Empirical Brown's method — Poole W, et al. Bioinformatics 2016. doi:10.1093/bioinformatics/btw438; Brown MB. Biometrics 1975. doi:10.2307/2529826
+- ACAT — Liu Y, et al. Am J Hum Genet 2019. doi:10.1016/j.ajhg.2019.01.002; Liu Y, Xie J. J Am Stat Assoc 2020. doi:10.1080/01621459.2018.1554485
+- RobustRankAggreg — Kolde R, et al. Bioinformatics 2012. doi:10.1093/bioinformatics/btr709
+- Benjamini–Hochberg FDR — Benjamini Y, Hochberg Y. J R Stat Soc B 1995. doi:10.1111/j.2517-6161.1995.tb02031.x
+- BCFtools — Danecek P, et al. GigaScience 2021. doi:10.1093/gigascience/giab008
+- BEDTools — Quinlan AR, Hall IM. Bioinformatics 2010. doi:10.1093/bioinformatics/btq033
+- BEDOPS — Neph S, et al. Bioinformatics 2012. doi:10.1093/bioinformatics/bts277
+- csvtk — https://github.com/shenwei356/csvtk
+- Picard — https://broadinstitute.github.io/picard/
+- vcf2maf / maf2vcf — https://github.com/mskcc/vcf2maf
+- GNU Awk — https://www.gnu.org/software/gawk/
+- Ensembl VEP — McLaren W, et al. Genome Biol 2016. doi:10.1186/s13059-016-0974-4
+- motifbreakR — Coetzee SG, et al. Bioinformatics 2015. doi:10.1093/bioinformatics/btv470
+- universalmotif — https://bioconductor.org/packages/universalmotif/
+- JASPAR — Rauluseviciute I, et al. Nucleic Acids Res 2024. doi:10.1093/nar/gkad1059
+- PCAWG non-coding drivers — Rheinbay E, et al. Nature 2020. doi:10.1038/s41586-020-1965-x
+- Ensembl Regulatory Build — https://www.ensembl.org/info/genome/funcgen/regulatory_build.html
+- GENCODE — https://www.gencodegenes.org/
 
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
 

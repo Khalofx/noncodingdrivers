@@ -4,6 +4,8 @@ nf_core_version: 4.1.0
 
 lint:
   files_unchanged:
+    # copyright holder set to the author, not the template's team line (build guide Step 1.4)
+    - LICENSE
     - CODE_OF_CONDUCT.md
     - assets/nf-core-noncodingdrivers_logo_light.png
     - docs/images/nf-core-noncodingdrivers_logo_light.png
