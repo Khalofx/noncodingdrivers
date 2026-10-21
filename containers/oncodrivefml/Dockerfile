@@ -1,6 +1,8 @@
-# FALLBACK ONLY (build guide Step 2, R5): the pipeline uses the rights-holder image
-# docker.io/bbglab/oncodrivefml:2.5.0 unless the S2.3 check fails. This recipe rebuilds the
-# image that produced the regression baseline: the upstream image below plus procps.
+# OncodriveFML 2.5.0 image of the pipeline: the image that produced the regression baseline,
+# rebuilt from the same base digest plus procps. The rights-holder image
+# docker.io/bbglab/oncodrivefml:2.5.0 (sha256:de44996a...) was checked on 2026-10-21 (build guide
+# Step 2.3): it has no `ps` and installs OncodriveFML from source; its numerical packages
+# (numpy 1.24.4, pandas 1.5.3, scipy 1.10.1, bg* libraries) equal the baseline image's.
 #
 # Nextflow's task wrapper runs `ps` inside the task container to record CPU and
 # memory use. The upstream image has no `ps`, so every task fails before its
