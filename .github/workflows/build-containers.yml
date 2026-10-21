@@ -60,14 +60,12 @@ jobs:
         run: |
           repository="ghcr.io/${OWNER,,}/noncodingdrivers-${IMAGE}"
           publish=false
-          if [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == main ]]; then
+          # Merges into dev or main and manual runs publish the version tag, so modules on dev can
+          # pull the image they name. Version tags are immutable (see "Keep version tags immutable").
+          if [[ "$GITHUB_EVENT_NAME" == push && ( "$GITHUB_REF_NAME" == main || "$GITHUB_REF_NAME" == dev ) ]] \
+             || [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
             tags="${repository}:${VERSION},${repository}:sha-${GITHUB_SHA}"
-            publish=true
-          elif [[ "$GITHUB_EVENT_NAME" == push && "$GITHUB_REF_NAME" == dev ]]; then
-            tags="${repository}:${VERSION}-dev,${repository}:dev,${repository}:sha-${GITHUB_SHA}"
-            publish=true
-          elif [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
-            tags="${repository}:${VERSION},${repository}:sha-${GITHUB_SHA}"
+            if [[ "$GITHUB_REF_NAME" == dev ]]; then tags="${tags},${repository}:dev"; fi
             publish=true
           else
             tags="${repository}:sha-${GITHUB_SHA}"
@@ -124,6 +122,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Keep version tags immutable
+        id: guard
+        if: steps.image.outputs.publish == 'true'
+        env:
+          REPOSITORY: ${{ steps.image.outputs.repository }}
+          VERSION: ${{ matrix.version }}
+          TAGS: ${{ steps.image.outputs.tags }}
+        run: |
+          tags="$TAGS"
+          if docker buildx imagetools inspect "${REPOSITORY}:${VERSION}" > /dev/null 2>&1; then
+            echo "::warning::${REPOSITORY}:${VERSION} already exists and is not overwritten. Bump this image's version in the matrix when its recipe changes."
+            tags=$(echo "$tags" | tr ',' '\n' | grep -v ":${VERSION}$" | paste -sd, -)
+          fi
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+
       - name: Publish tested image
         if: steps.image.outputs.publish == 'true'
         uses: docker/build-push-action@v6
@@ -132,7 +145,7 @@ jobs:
           file: containers/${{ matrix.image }}/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ steps.image.outputs.tags }}
+          tags: ${{ steps.guard.outputs.tags }}
           cache-from: type=gha,scope=${{ matrix.image }}
           provenance: mode=min
 
