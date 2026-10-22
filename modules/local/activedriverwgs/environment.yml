@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/environment-schema.json
+# Documentation of the runtime only: ActiveDriverWGS itself is CRAN-only, so the module has no
+# conda directive and `-profile conda` is not supported for it until an r-activedriverwgs
+# conda-forge recipe exists (Step 8 upstreaming). The container installs the same pins.
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.5
+  - conda-forge::r-base=4.5.3

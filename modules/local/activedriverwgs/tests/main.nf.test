@@ -1,0 +1,73 @@
+nextflow_process {
+
+    name "Test Process ACTIVEDRIVERWGS"
+    script "../main.nf"
+    process "ACTIVEDRIVERWGS"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "activedriverwgs"
+
+    test("homo_sapiens - mutations.tsv - elements.bed - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'elements', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    // Real run on the committed synthetic fixture. Needs the ActiveDriverWGS image (R + BSgenome hg38);
+    // the docker/singularity CI jobs pull it; the conda job cannot run it (no conda package).
+    // On Karakoram before the image exists: tests/nextflow.config honours NCD_ADWGS_RBIN / NCD_ADWGS_RLIB.
+    test("homo_sapiens - mutations.tsv - elements.bed") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'elements', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            // p-values are not compared by md5: assert the table shape and the versions only.
+            def header = path(process.out.results[0][1]).readLines()[0].tokenize('\t')
+            assert process.success
+            assertAll(
+                { assert header.containsAll(['id', 'pp_element', 'fdr_element']) },
+                { assert path(process.out.results[0][1]).readLines().any { line -> line.startsWith('TERT_promoter_fixture\t') } },
+                { assert path(process.out.results[0][1]).readLines().size() > 1 },
+                { assert snapshot(
+                    process.out.findAll { key, val -> key.startsWith('versions') }
+                ).match() }
+            )
+        }
+    }
+}
