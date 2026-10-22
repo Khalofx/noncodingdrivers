@@ -16,7 +16,15 @@ case "${name}" in
     activedriverwgs)
         Rscript --vanilla -e "options(error = function() { traceback(2); quit(status = 1) }); library(ActiveDriverWGS); library(BSgenome.Hsapiens.UCSC.hg38); stopifnot(as.character(packageVersion('ActiveDriverWGS')) == '1.2.1'); stopifnot(as.character(packageVersion('BSgenome.Hsapiens.UCSC.hg38')) == '1.4.5'); stopifnot(length(BSgenome.Hsapiens.UCSC.hg38::Hsapiens[['chr1']]) == 248956422)"
         # the adapter must load and reject a call without arguments with its usage line
-        { Rscript /pipeline/bin/run_activedriverwgs.R 2>&1 || true; } | grep -q 'usage: run_activedriverwgs.R'
+        if adapter_output=$(Rscript /pipeline/bin/run_activedriverwgs.R 2>&1); then
+            echo 'Adapter unexpectedly accepted a call without arguments' >&2
+            exit 1
+        fi
+        if ! grep -Fq 'usage: run_activedriverwgs.R' <<< "$adapter_output"; then
+            printf '%s\n' "$adapter_output" >&2
+            echo 'Adapter did not report the expected usage message' >&2
+            exit 1
+        fi
         ;;
     mutenricher)
         python /opt/MutEnricher/mutEnricher.py --version

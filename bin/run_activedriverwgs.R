@@ -21,7 +21,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 usage <- paste("usage: run_activedriverwgs.R --mutations F --elements F --out F",
                "[--ref-genome hg38] [--cores N] [--shard-size N] [--rlib DIR]")
-if (length(args) %% 2L != 0L || !all(startsWith(args[c(TRUE, FALSE)], "--"))) stop(usage)
+if (length(args) == 0L || length(args) %% 2L != 0L || !all(startsWith(args[c(TRUE, FALSE)], "--"))) stop(usage)
 opt <- setNames(as.list(args[c(FALSE, TRUE)]), sub("^--", "", args[c(TRUE, FALSE)]))
 known <- c("mutations", "elements", "out", "ref-genome", "cores", "shard-size", "rlib")
 if (length(setdiff(names(opt), known))) stop("unknown option(s): ", paste(setdiff(names(opt), known), collapse = ", "), "\n", usage)
