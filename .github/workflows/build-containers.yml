@@ -1,0 +1,172 @@
+name: build-containers
+# Builds the pipeline-owned images from containers/<name>/Dockerfile, smoke-tests each one
+# inside the image, and only then publishes it as ghcr.io/khalofx/noncodingdrivers-<name>.
+# OncodriveFML: the rights-holder image docker.io/bbglab/oncodrivefml:2.5.0 has no `ps`
+# (checked 2026-10-21), so the pipeline uses containers/oncodrivefml/, the baseline image recipe.
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - "containers/**"
+      - ".github/workflows/build-containers.yml"
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - "containers/**"
+      - "bin/**"
+      - ".github/workflows/build-containers.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: containers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: utils
+            version: "1.0.0"
+          - image: activedriverwgs
+            version: "1.2.1"
+          - image: mutenricher
+            version: "1.3.3"
+          - image: combinepvalues
+            version: "1.0.0"
+          - image: oncodrivefml
+            version: "2.5.0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Compute image tags
+        id: image
+        env:
+          OWNER: ${{ github.repository_owner }}
+          IMAGE: ${{ matrix.image }}
+          VERSION: ${{ matrix.version }}
+        run: |
+          repository="ghcr.io/${OWNER,,}/noncodingdrivers-${IMAGE}"
+          publish=false
+          # Merges into dev or main and manual runs publish the version tag, so modules on dev can
+          # pull the image they name. Version tags are immutable (see "Keep version tags immutable").
+          if [[ "$GITHUB_EVENT_NAME" == push && ( "$GITHUB_REF_NAME" == main || "$GITHUB_REF_NAME" == dev ) ]] \
+             || [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            tags="${repository}:${VERSION},${repository}:sha-${GITHUB_SHA}"
+            if [[ "$GITHUB_REF_NAME" == dev ]]; then tags="${tags},${repository}:dev"; fi
+            publish=true
+          else
+            tags="${repository}:sha-${GITHUB_SHA}"
+          fi
+          {
+            echo "repository=${repository}"
+            echo "tags=${tags}"
+            echo "publish=${publish}"
+          } >> "$GITHUB_OUTPUT"
+
+      # Per-image contexts: a build can never send cohort data or credentials to the builder.
+      - name: Build for testing
+        uses: docker/build-push-action@v6
+        with:
+          context: containers/${{ matrix.image }}
+          file: containers/${{ matrix.image }}/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: noncodingdrivers-test:${{ matrix.image }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+      - name: Smoke-test the image
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          docker run --rm --platform linux/amd64 --network none --entrypoint bash \
+            -v "$PWD:/pipeline:ro" "noncodingdrivers-test:${IMAGE}" \
+            /pipeline/containers/smoke-test.sh "$IMAGE"
+
+      - name: Record installed packages
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: |
+          case "$IMAGE" in
+            utils|mutenricher|oncodrivefml) cmd='pip freeze' ;;
+            *) cmd="Rscript -e 'ip <- installed.packages()[, c(\"Package\", \"Version\")]; write.table(ip, sep = \"\\t\", quote = FALSE, row.names = FALSE)'" ;;
+          esac
+          docker run --rm --network none --entrypoint bash "noncodingdrivers-test:${IMAGE}" -c "$cmd" > "${IMAGE}.packages.txt"
+          { echo "### ${IMAGE} packages"; echo '```'; cat "${IMAGE}.packages.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload package list
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.image }}.packages
+          path: ${{ matrix.image }}.packages.txt
+
+      # Login and publish only after the image has passed its runtime checks.
+      - name: Log in to GHCR
+        if: steps.image.outputs.publish == 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Keep version tags immutable
+        id: guard
+        if: steps.image.outputs.publish == 'true'
+        env:
+          REPOSITORY: ${{ steps.image.outputs.repository }}
+          VERSION: ${{ matrix.version }}
+          TAGS: ${{ steps.image.outputs.tags }}
+        run: |
+          tags="$TAGS"
+          if docker buildx imagetools inspect "${REPOSITORY}:${VERSION}" > /dev/null 2>&1; then
+            echo "::warning::${REPOSITORY}:${VERSION} already exists and is not overwritten. Bump this image's version in the matrix when its recipe changes."
+            tags=$(echo "$tags" | tr ',' '\n' | grep -v ":${VERSION}$" | paste -sd, -)
+          fi
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish tested image
+        if: steps.image.outputs.publish == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: containers/${{ matrix.image }}
+          file: containers/${{ matrix.image }}/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.guard.outputs.tags }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          provenance: mode=min
+
+      # GHCR creates new packages as private. Visibility must be changed once in the package
+      # settings (and the package linked to this repository); GITHUB_TOKEN cannot make it public.
+      - name: Check anonymous access
+        if: steps.image.outputs.publish == 'true'
+        env:
+          REPOSITORY: ${{ steps.image.outputs.repository }}
+        run: |
+          path="${REPOSITORY#ghcr.io/}"
+          token=$(curl --fail --silent --show-error --get \
+            --data-urlencode service=ghcr.io \
+            --data-urlencode "scope=repository:${path}:pull" \
+            https://ghcr.io/token | jq -r '.token // empty') || token=''
+          if [[ -n "$token" ]] && curl --fail --silent --show-error --head \
+            -H "Authorization: Bearer ${token}" \
+            -H 'Accept: application/vnd.oci.image.index.v1+json,application/vnd.docker.distribution.manifest.v2+json' \
+            "https://ghcr.io/v2/${path}/manifests/sha-${GITHUB_SHA}" > /dev/null; then
+            echo "Anonymous pull verified: ${REPOSITORY}:sha-${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::${REPOSITORY} is not yet anonymously accessible. Set the package visibility to Public in its settings."
+            echo "Public access requires attention: ${REPOSITORY}. Set visibility to Public, then re-run." >> "$GITHUB_STEP_SUMMARY"
+          fi
