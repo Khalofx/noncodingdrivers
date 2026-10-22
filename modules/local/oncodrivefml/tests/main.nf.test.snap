@@ -1,0 +1,85 @@
+{
+    "homo_sapiens - mutations.tsv - elements.bed - cadd_subset - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.oncodrivefml.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.oncodrivefml.status.txt:md5,9e5c99b6ce65607b2349275cf96775da"
+                    ]
+                ],
+                "2": [
+                    [
+                        "ONCODRIVEFML",
+                        "oncodrivefml",
+                        "2.5.0"
+                    ]
+                ],
+                "results": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.oncodrivefml.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "status": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.oncodrivefml.status.txt:md5,9e5c99b6ce65607b2349275cf96775da"
+                    ]
+                ],
+                "versions_oncodrivefml": [
+                    [
+                        "ONCODRIVEFML",
+                        "oncodrivefml",
+                        "2.5.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-22T16:37:08.273061137",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "homo_sapiens - mutations.tsv - elements.bed - cadd_subset": {
+        "content": [
+            {
+                "versions_oncodrivefml": [
+                    [
+                        "ONCODRIVEFML",
+                        "oncodrivefml",
+                        "2.5.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-22T16:37:15.335158748",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}
