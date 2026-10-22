@@ -1,0 +1,106 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "oncodrivefml"
+description: Element-level functional-impact bias test (OncodriveFML) for candidate non-coding driver elements in a cohort
+keywords:
+  - cancer
+  - driver
+  - noncoding
+  - functional impact
+tools:
+  - "oncodrivefml":
+      description: "OncodriveFML: a general framework to identify coding and non-coding regions with cancer driver mutations"
+      homepage: "https://bbglab.irbbarcelona.org/oncodrivefml"
+      documentation: "https://oncodrivefml.readthedocs.io"
+      tool_dev_url: "https://github.com/bbglab/oncodrivefml"
+      doi: "10.1186/s13059-016-0994-0"
+      licence: ["AGPL-3.0-or-later"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - mutations:
+        type: file
+        description: Canonical cohort mutation table (sample, chrom, pos, ref, alt, vtype; GRCh38, chr-prefixed, 1-based)
+        pattern: "*.{tsv,tsv.gz}"
+        ontologies: []
+  - - meta2:
+        type: map
+        description: |
+          Element-catalogue meta map, e.g. `[ id:'regbuild110_v50' ]`
+    - elements:
+        type: file
+        description: CDS-excluded regulatory element catalogue, headerless BED (chrom, start, end, element id, ...)
+        pattern: "*.bed"
+        ontologies: []
+  - - meta3:
+        type: map
+        description: |
+          Score meta map, e.g. `[ id:'cadd_v1.7_grch38' ]`
+    - score:
+        type: file
+        description: Per-substitution functional-impact score track (CADD GRCh38 v1.7 whole-genome SNVs), bgzip-compressed
+        pattern: "*.tsv.gz"
+        ontologies: []
+    - score_tbi:
+        type: file
+        description: Tabix index of the score track
+        pattern: "*.tbi"
+        ontologies: []
+  - config:
+      type: file
+      description: OncodriveFML configuration naming the score file by basename (score columns, sampling, cores, seed)
+      pattern: "*.conf"
+      ontologies: []
+  - bgdata_genome:
+      type: directory
+      description: Optional offline bgdata hg38 genome directory (chr*.txt); `[]` uses bgdata's own cache
+
+output:
+  results:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.oncodrivefml.tsv":
+          type: file
+          description: Per-element OncodriveFML results (native columns, decompressed)
+          pattern: "*.oncodrivefml.tsv"
+          ontologies: []
+  status:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.oncodrivefml.status.txt":
+          type: file
+          description: OncodriveFML exit code (it can exit non-zero after writing a complete table)
+          pattern: "*.oncodrivefml.status.txt"
+          ontologies: []
+  versions_oncodrivefml:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "oncodrivefml":
+          type: string
+          description: The name of the tool
+      - "cat oncodrivefml.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "oncodrivefml":
+          type: string
+          description: The name of the tool
+      - "cat oncodrivefml.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"
