@@ -208,6 +208,34 @@
                     "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
                 }
             }
+        },
+        "consensus_options": {
+            "title": "Consensus options",
+            "type": "object",
+            "fa_icon": "fas fa-balance-scale",
+            "description": "P-value combination (COMBINEPVALUES): EBM, ACAT, RRA and votes are always published; --combination_method selects consensus_q.",
+            "properties": {
+                "combination_method": {
+                    "type": "string",
+                    "enum": ["ebm", "acat"],
+                    "default": "ebm",
+                    "fa_icon": "fas fa-code-branch",
+                    "description": "Combination that sets consensus_q and is_consensus: empirical Brown (ebm, default) or ACAT (acat)."
+                },
+                "fdr_threshold": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-filter",
+                    "description": "BH q-value threshold for consensus candidates."
+                },
+                "skip_acat": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-forward",
+                    "description": "Do not compute ACAT (use when the ACAT package is unavailable, e.g. -profile conda). Not allowed with --combination_method acat."
+                }
+            }
         }
     },
     "allOf": [
@@ -216,6 +244,9 @@
         },
         {
             "$ref": "#/$defs/caller_options"
+        },
+        {
+            "$ref": "#/$defs/consensus_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

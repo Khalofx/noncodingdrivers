@@ -1,0 +1,146 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "combinepvalues"
+description: Combine per-caller element p-values with published R packages (empirical Brown's method, ACAT, robust rank aggregation) and BH-FDR; select consensus calls by one declared method
+keywords:
+  - p-value combination
+  - empirical brown
+  - acat
+  - driver
+tools:
+  - "empiricalbrownsmethod":
+      description: "Empirical Brown's method for combining dependent p-values"
+      homepage: "https://bioconductor.org/packages/EmpiricalBrownsMethod"
+      documentation: "https://bioconductor.org/packages/EmpiricalBrownsMethod"
+      doi: "10.1093/bioinformatics/btw438"
+      licence: ["MIT"]
+      identifier: ""
+  - "acat":
+      description: "Aggregated Cauchy association test (authors' package)"
+      homepage: "https://github.com/yaowuliu/ACAT"
+      documentation: "https://github.com/yaowuliu/ACAT"
+      doi: "10.1080/01621459.2018.1554485"
+      licence: ["GPL-3.0-only"]
+      identifier: ""
+  - "robustrankaggreg":
+      description: "Robust rank aggregation (rho scores)"
+      homepage: "https://cran.r-project.org/package=RobustRankAggreg"
+      documentation: "https://cran.r-project.org/package=RobustRankAggreg"
+      doi: "10.1093/bioinformatics/btr709"
+      licence: ["GPL-2.0-only"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - matched:
+        type: file
+        description: Element-anchored table with element_id and one p_<caller> (and q_<caller>) column per primary caller
+        pattern: "*.tsv"
+        ontologies: []
+
+output:
+  consensus:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.consensus.tsv":
+          type: file
+          description: Per-element ebm_p/q, acat_p/q, rra_score/q, vote_count, consensus_q, consensus_rank, is_consensus
+          pattern: "*.consensus.tsv"
+          ontologies: []
+  ebm_parameters:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.consensus.ebm_parameters.tsv":
+          type: file
+          description: Empirical Brown covariance sum, scale factor c and degrees of freedom
+          pattern: "*.ebm_parameters.tsv"
+          ontologies: []
+  versions_empiricalbrownsmethod:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "empiricalbrownsmethod":
+          type: string
+          description: The name of the tool
+      - "grep '^EmpiricalBrownsMethod' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_robustrankaggreg:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "robustrankaggreg":
+          type: string
+          description: The name of the tool
+      - "grep '^RobustRankAggreg' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_acat:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "acat":
+          type: string
+          description: The name of the tool
+      - "grep '^ACAT' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_r:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "r-base":
+          type: string
+          description: The name of the tool
+      - "grep '^r-base' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "empiricalbrownsmethod":
+          type: string
+          description: The name of the tool
+      - "grep '^EmpiricalBrownsMethod' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "robustrankaggreg":
+          type: string
+          description: The name of the tool
+      - "grep '^RobustRankAggreg' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "acat":
+          type: string
+          description: The name of the tool
+      - "grep '^ACAT' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "r-base":
+          type: string
+          description: The name of the tool
+      - "grep '^r-base' combinepvalues.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@khalofx"
+maintainers:
+  - "@khalofx"
