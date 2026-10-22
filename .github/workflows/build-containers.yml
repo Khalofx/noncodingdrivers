@@ -38,7 +38,7 @@ jobs:
       matrix:
         include:
           - image: utils
-            version: "1.0.0"
+            version: "1.0.1"
           - image: activedriverwgs
             version: "1.2.1"
           - image: mutenricher
