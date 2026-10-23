@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "driver_discovery"
+description: Runs the element-level driver callers on a cohort mutation table, harmonises and anchors their results, and combines the per-caller p-values
+keywords:
+  - cancer
+  - noncoding
+  - driver discovery
+  - p-value combination
+components:
+  - activedriverwgs
+  - oncodrivefml
+  - harmonizecalls
+  - gawk
+  - csvtk/join
+  - combinepvalues
+input:
+  - ch_mutations:
+      type: file
+      description: "[ val(meta), path(mutations) ] canonical cohort mutation table (sample, chrom, pos, ref, alt, vtype)"
+      pattern: "*.tsv"
+  - ch_elements:
+      type: file
+      description: "[ val(meta2), path(elements) ] element catalogue, headerless BED; value channel"
+      pattern: "*.bed"
+  - ch_ofml_score:
+      type: file
+      description: "[ val(meta3), path(score), path(score_tbi) ] functional-impact score track for OncodriveFML; value channel"
+      pattern: "*.tsv.gz"
+  - ofml_config:
+      type: file
+      description: OncodriveFML configuration, or [] when OncodriveFML is not run
+      pattern: "*.conf"
+  - ofml_genome:
+      type: directory
+      description: Offline bgdata hg38 genome directory, or []
+  - callers:
+      type: list
+      description: Callers to run, e.g. [ 'activedriverwgs', 'oncodrivefml' ]
+output:
+  - coords:
+      type: file
+      description: "[ val(meta2), path(coords) ] element_id, chrom, start, end, n_fragments"
+      pattern: "*.tsv"
+  - harmonized:
+      type: file
+      description: "[ val(meta), path(harmonized) ] element_id, p_<caller>, q_<caller> per caller"
+      pattern: "*.harmonized.tsv"
+  - matched:
+      type: file
+      description: "[ val(meta), path(matched) ] per-caller tables joined with the element coordinates"
+      pattern: "*.matched.*"
+  - consensus:
+      type: file
+      description: "[ val(meta), path(consensus) ] combined p-values, q-values, ranks and consensus calls"
+      pattern: "*.consensus.tsv"
+  - ebm_parameters:
+      type: file
+      description: "[ val(meta), path(tsv) ] empirical Brown's method parameters per cohort"
+      pattern: "*.ebm_parameters.tsv"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"
