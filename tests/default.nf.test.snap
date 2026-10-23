@@ -2,11 +2,57 @@
     "-profile test": {
         "content": [
             {
+                "ACTIVEDRIVERWGS": {
+                    "activedriverwgs": "1.2.1",
+                    "r-base": "4.5.3"
+                },
+                "ANCHOR_JOIN": {
+                    "csvtk": "0.37.0"
+                },
+                "COHORT_CONCAT": {
+                    "csvtk": "0.37.0"
+                },
+                "COHORT_DEDUP": {
+                    "gawk": "5.3.1"
+                },
+                "COMBINEPVALUES": {
+                    "acat": 0.91,
+                    "empiricalbrownsmethod": "1.34.0",
+                    "r-base": "4.4.3",
+                    "robustrankaggreg": "1.2.1"
+                },
+                "ELEMENT_COORDS": {
+                    "gawk": "5.3.1"
+                },
+                "HARMONIZECALLS": {
+                    "csvtk": "0.37.0"
+                },
+                "ONCODRIVEFML": {
+                    "oncodrivefml": "2.5.0"
+                },
+                "UNTAR_ONCODRIVEFML_GENOME": {
+                    "untar": 1.34
+                },
                 "Workflow": {
                     "khalofx/noncodingdrivers": "v1.0.0dev"
                 }
             },
             [
+                "callers",
+                "callers/activedriverwgs",
+                "callers/activedriverwgs/SYNTH-TERT.activedriverwgs.tsv",
+                "callers/activedriverwgs/SYNTH-TERT.activedriverwgs.untested.txt",
+                "callers/oncodrivefml",
+                "callers/oncodrivefml/SYNTH-TERT.oncodrivefml.status.txt",
+                "callers/oncodrivefml/SYNTH-TERT.oncodrivefml.tsv",
+                "consensus",
+                "consensus/SYNTH-TERT.consensus.ebm_parameters.tsv",
+                "consensus/SYNTH-TERT.consensus.tsv",
+                "consensus/intermediate",
+                "consensus/intermediate/SYNTH-TERT.activedriverwgs.harmonized.tsv",
+                "consensus/intermediate/SYNTH-TERT.matched.tsv",
+                "consensus/intermediate/SYNTH-TERT.oncodrivefml.harmonized.tsv",
+                "consensus/intermediate/elements.coords.tsv",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/llms-full.txt",
@@ -17,14 +63,18 @@
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
                 "multiqc/multiqc_report.html",
+                "mutations",
+                "mutations/SYNTH-TERT.mutations.tsv",
                 "pipeline_info",
                 "pipeline_info/noncodingdrivers_software_mqc_versions.yml"
             ],
             [
-                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f"
+                "elements.coords.tsv:md5,1fa6cb43382b95781f15bc2e4a3ae6a5",
+                "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "SYNTH-TERT.mutations.tsv:md5,edff7ae46f6b8967d77dac216e307d23"
             ]
         ],
-        "timestamp": "2026-10-21T10:16:13.659256941",
+        "timestamp": "2026-10-23T14:46:20.673776157",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

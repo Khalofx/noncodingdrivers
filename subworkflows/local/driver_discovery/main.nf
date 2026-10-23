@@ -16,7 +16,7 @@ workflow DRIVER_DISCOVERY {
     ch_elements   // channel: [ val(meta2), path(elements) ]              value channel; element catalogue (headerless BED)
     ch_ofml_score // channel: [ val(meta3), path(score), path(score_tbi) ] value channel; used only by OncodriveFML
     ofml_config   // path: OncodriveFML configuration, or [] when OncodriveFML is not run
-    ofml_genome   // path: offline bgdata hg38 genome directory, or []
+    ofml_genome   // path or value channel: offline bgdata hg38 genome directory, or []
     callers       // list: callers to run, e.g. [ 'activedriverwgs', 'oncodrivefml' ]
 
     main:

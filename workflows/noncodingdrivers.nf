@@ -8,6 +8,10 @@ include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { CSVTK_CONCAT as COHORT_CONCAT     } from '../modules/nf-core/csvtk/concat/main'
+include { GAWK as COHORT_DEDUP              } from '../modules/nf-core/gawk/main'
+include { UNTAR as UNTAR_ONCODRIVEFML_GENOME } from '../modules/nf-core/untar/main'
+include { DRIVER_DISCOVERY                  } from '../subworkflows/local/driver_discovery'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -18,7 +22,7 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_nonc
 workflow NONCODINGDRIVERS {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+    ch_samplesheet // channel: [ val(meta), mutations, vcf, index, maf ] read in from --input
     multiqc_config
     multiqc_logo
     multiqc_methods_description
@@ -28,6 +32,61 @@ workflow NONCODINGDRIVERS {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+
+    //
+    // One canonical mutation table per cohort. csvtk concat aligns the tables by column name;
+    // a gawk program (conf/modules.config) then drops exact duplicate rows. Every row keeps its
+    // sample column, so donors stay distinct after the merge. Only the mutations entry tier
+    // reaches this point (PIPELINE_INITIALISATION rejects vcf, sarek and maf rows for now).
+    //
+    def ch_cohort_tables = ch_samplesheet
+        .map { meta, mutations, _vcf, _index, _maf -> [ meta.cohort, mutations ] }
+        .groupTuple()
+        .map { cohort, tables -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], tables.sort { table -> table.toString() } ] }
+    COHORT_CONCAT(ch_cohort_tables, 'tsv', 'tsv')
+    COHORT_DEDUP(COHORT_CONCAT.out.csv.map { meta, tsv -> [ meta, tsv, 'mutations.tsv' ] }, [], false)
+    def ch_mutations = COHORT_DEDUP.out.output
+
+    //
+    // References for the callers
+    //
+    def ch_elements = channel.value([ [ id: 'elements', assembly: 'GRCh38' ], file(params.elements_bed, checkIfExists: true) ])
+
+    def ch_ofml_score = channel.empty()
+    def ofml_config   = []
+    def ofml_genome   = []
+    if (params.run_oncodrivefml) {
+        ch_ofml_score = channel.value([
+            [ id: 'oncodrivefml_score' ],
+            file(params.oncodrivefml_score, checkIfExists: true),
+            file("${params.oncodrivefml_score}.tbi", checkIfExists: true)
+        ])
+        ofml_config = file(params.oncodrivefml_conf ?: "${projectDir}/assets/oncodrivefml.CADD_GRCh38.conf", checkIfExists: true)
+        // Offline bgdata genome: a directory, or a .tar.gz of it unpacked by the nf-core untar module
+        if (params.oncodrivefml_genome && params.oncodrivefml_genome.toString().endsWith('.tar.gz')) {
+            UNTAR_ONCODRIVEFML_GENOME(channel.of([ [ id: 'oncodrivefml_genome' ], file(params.oncodrivefml_genome, checkIfExists: true) ]))
+            ofml_genome = UNTAR_ONCODRIVEFML_GENOME.out.untar.map { _meta, genome -> genome }.first()
+        } else if (params.oncodrivefml_genome) {
+            ofml_genome = file(params.oncodrivefml_genome, checkIfExists: true)
+        }
+    }
+
+    def callers = [
+        params.run_activedriverwgs ? 'activedriverwgs' : null,
+        params.run_oncodrivefml    ? 'oncodrivefml'    : null
+    ].findAll { caller -> caller != null }
+
+    //
+    // SUBWORKFLOW: callers -> harmonised calls -> anchored on element_id -> combined p-values
+    //
+    DRIVER_DISCOVERY(
+        ch_mutations,
+        ch_elements,
+        ch_ofml_score,
+        ofml_config,
+        ofml_genome,
+        callers
+    )
 
     //
     // Collate and save software versions
@@ -84,8 +143,11 @@ workflow NONCODINGDRIVERS {
             ]
         }
     )
-    emit:multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
+    emit:
+    mutations      = ch_mutations                      // channel: [ val(meta), path(mutations) ] one table per cohort
+    consensus      = DRIVER_DISCOVERY.out.consensus    // channel: [ val(meta), path(consensus) ]
+    multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
+    versions       = ch_versions                       // channel: [ path(versions.yml) ]
 }
 
 /*

@@ -23,6 +23,12 @@ env:
   NXF_ANSI_LOG: false
   NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/.singularity
   NXF_SINGULARITY_LIBRARYDIR: ${{ github.workspace }}/.singularity
+  # The OncodriveFML image is private (not redistributed, DECISIONS.md D17): Singularity/Apptainer
+  # pull it with the workflow token
+  SINGULARITY_DOCKER_USERNAME: ${{ github.actor }}
+  SINGULARITY_DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+  APPTAINER_DOCKER_USERNAME: ${{ github.actor }}
+  APPTAINER_DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   nf-test-changes:
@@ -62,6 +68,9 @@ jobs:
     if: ${{ needs.nf-test-changes.outputs.total_shards != '0' }}
     runs-on: # use GitHub runners
       - "ubuntu-latest"
+    permissions:
+      contents: read
+      packages: read # private OncodriveFML image (D17)
     strategy:
       fail-fast: false
       matrix:
@@ -86,6 +95,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
+
+      - name: Log in to GHCR for the private OncodriveFML image
+        if: ${{ matrix.profile == 'docker' }}
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
       - name: Run nf-test
         id: run_nf_test
