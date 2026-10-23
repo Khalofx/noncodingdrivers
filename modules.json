@@ -5,6 +5,21 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "csvtk/concat": {
+                        "branch": "master",
+                        "git_sha": "2f74af306499775ab48db1ed4077d2fa5aecf9c4",
+                        "installed_by": ["modules"]
+                    },
+                    "csvtk/join": {
+                        "branch": "master",
+                        "git_sha": "b5803eb47964c7fa2c455b6c1e60d408ead4f2b3",
+                        "installed_by": ["modules"]
+                    },
+                    "gawk": {
+                        "branch": "master",
+                        "git_sha": "7844e96252d0693fb2331969a1c9790eb831b0f6",
+                        "installed_by": ["modules"]
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
