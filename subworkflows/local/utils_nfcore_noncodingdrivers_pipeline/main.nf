@@ -93,6 +93,10 @@ workflow PIPELINE_INITIALISATION {
     //
     def rows = samplesheetToList(input, "${projectDir}/assets/schema_input.json")
     validateInputRows(rows)
+    if (params.run_mutenricher && rows.every { row -> row[0].entry == 'mutations' }) {
+        log.warn("--run_mutenricher: MutEnricher reads per-sample VCFs (vcf, sarek or maf rows); " +
+                 "this samplesheet has only mutations rows, so MutEnricher is not run.")
+    }
     channel
         .fromList(rows)
         .map { meta, mutations, vcf, index, maf ->
@@ -190,6 +194,10 @@ def validateDriverParameters() {
     if (params.run_oncodrivefml && !params.oncodrivefml_score) {
         error("--run_oncodrivefml needs --oncodrivefml_score: a bgzip-compressed, tabix-indexed functional-impact score track " +
               "(CADD GRCh38 v1.7 whole-genome SNVs, free for non-commercial use) with its .tbi beside it.")
+    }
+    if (params.run_mutenricher && !params.mutenricher_mappable_regions) {
+        error("--run_mutenricher needs --mutenricher_mappable_regions: a GRCh38 callable/mappable regions BED, " +
+              "BGZF-compressed and tabix-indexed (.tbi beside it).")
     }
     if (params.combination_method == 'acat' && params.skip_acat) {
         error("--combination_method acat cannot be used with --skip_acat true: ACAT would not be computed.")

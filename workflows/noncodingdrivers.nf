@@ -12,6 +12,7 @@ include { CSVTK_CONCAT as COHORT_CONCAT     } from '../modules/nf-core/csvtk/con
 include { GAWK as COHORT_DEDUP              } from '../modules/nf-core/gawk/main'
 include { UNTAR as UNTAR_ONCODRIVEFML_GENOME } from '../modules/nf-core/untar/main'
 include { DRIVER_DISCOVERY                  } from '../subworkflows/local/driver_discovery'
+include { RUNSUMMARYMQC                     } from '../modules/local/runsummarymqc'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,22 +72,47 @@ workflow NONCODINGDRIVERS {
         }
     }
 
+    // MutEnricher (QC-only) reads per-sample PASS VCFs, which only the vcf, sarek and maf entry
+    // tiers provide; mutations-tier cohorts have no VCF and are not run through MutEnricher.
+    // Until those tiers are added, the per-sample VCF channel is empty and MutEnricher has no task.
+    def ch_cohort_vcfs = channel.empty()
+    def ch_mappable = params.run_mutenricher
+        ? channel.value([
+            [ id: 'mappable' ],
+            file(params.mutenricher_mappable_regions, checkIfExists: true),
+            file("${params.mutenricher_mappable_regions}.tbi", checkIfExists: true)
+        ])
+        : channel.empty()
+
     def callers = [
         params.run_activedriverwgs ? 'activedriverwgs' : null,
-        params.run_oncodrivefml    ? 'oncodrivefml'    : null
+        params.run_oncodrivefml    ? 'oncodrivefml'    : null,
+        params.run_mutenricher     ? 'mutenricher'     : null
     ].findAll { caller -> caller != null }
+    def combined_callers = callers.findAll { caller -> caller != 'mutenricher' }
 
     //
     // SUBWORKFLOW: callers -> harmonised calls -> anchored on element_id -> combined p-values
     //
     DRIVER_DISCOVERY(
         ch_mutations,
+        ch_cohort_vcfs,
         ch_elements,
         ch_ofml_score,
         ofml_config,
         ofml_genome,
+        ch_mappable,
         callers
     )
+
+    //
+    // MODULE: run summary for MultiQC (counts describing the run; no candidate ranking)
+    //
+    RUNSUMMARYMQC(
+        DRIVER_DISCOVERY.out.consensus
+            .join(DRIVER_DISCOVERY.out.raw.groupTuple(size: combined_callers.size()))
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(RUNSUMMARYMQC.out.sections.map { _meta, sections -> sections })
 
     //
     // Collate and save software versions

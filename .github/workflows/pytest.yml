@@ -1,0 +1,47 @@
+name: pytest (bin/ adapters and benchmarks)
+# Pipeline-owned workflow (not in the nf-core template, so template sync never touches it).
+# Unit tests for the few scripts the pipeline owns (thin adapters in bin/, gate tooling in
+# benchmarks/); every other step is a packaged tool tested by nf-test.
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    name: pytest (bin/ adapters and benchmarks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies (same list a laptop or Karakoram user installs)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r tests/requirements.txt
+
+      - name: Run test suite
+        run: pytest tests/ benchmarks/tests/ -v --tb=short -p no:cacheprovider
+
+  ruff:
+    name: ruff (pinned rule set from ruff.toml)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.11"
+      - run: python -m pip install ruff
+      - run: ruff check bin/ tests/ benchmarks/

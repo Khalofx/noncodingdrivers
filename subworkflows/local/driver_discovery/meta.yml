@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
 name: "driver_discovery"
-description: Runs the element-level driver callers on a cohort mutation table, harmonises and anchors their results, and combines the per-caller p-values
+description: Runs the element-level driver callers on a cohort mutation table, harmonises and anchors their results, and combines the per-caller p-values; MutEnricher runs as a QC caller whose native table is never combined
 keywords:
   - cancer
   - noncoding
@@ -9,6 +9,7 @@ keywords:
 components:
   - activedriverwgs
   - oncodrivefml
+  - mutenricher
   - harmonizecalls
   - gawk
   - csvtk/join
@@ -18,6 +19,10 @@ input:
       type: file
       description: "[ val(meta), path(mutations) ] canonical cohort mutation table (sample, chrom, pos, ref, alt, vtype)"
       pattern: "*.tsv"
+  - ch_cohort_vcfs:
+      type: file
+      description: "[ val(meta), [ vcf.gz ], [ tbi ] ] per-sample PASS VCFs of each cohort; used only by MutEnricher"
+      pattern: "*.vcf.gz"
   - ch_elements:
       type: file
       description: "[ val(meta2), path(elements) ] element catalogue, headerless BED; value channel"
@@ -32,15 +37,27 @@ input:
       pattern: "*.conf"
   - ofml_genome:
       type: directory
-      description: Offline bgdata hg38 genome directory, or []
+      description: Offline bgdata hg38 genome directory (path or value channel), or []
+  - ch_mappable:
+      type: file
+      description: "[ val(meta4), path(bed.gz), path(tbi) ] callable/mappable regions for MutEnricher; value channel"
+      pattern: "*.bed.gz"
   - callers:
       type: list
-      description: Callers to run, e.g. [ 'activedriverwgs', 'oncodrivefml' ]
+      description: Callers to run, e.g. [ 'activedriverwgs', 'oncodrivefml' ]; 'mutenricher' adds the QC caller
 output:
   - coords:
       type: file
       description: "[ val(meta2), path(coords) ] element_id, chrom, start, end, n_fragments"
       pattern: "*.tsv"
+  - raw:
+      type: file
+      description: "[ val(meta), path(table) ] each combined caller's own output table"
+      pattern: "*.tsv"
+  - mutenricher:
+      type: file
+      description: "[ val(meta), path(table) ] MutEnricher's native region table (QC-only)"
+      pattern: "*.mutenricher.tsv"
   - harmonized:
       type: file
       description: "[ val(meta), path(harmonized) ] element_id, p_<caller>, q_<caller> per caller"

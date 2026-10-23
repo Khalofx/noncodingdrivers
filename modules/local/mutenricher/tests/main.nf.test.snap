@@ -1,0 +1,82 @@
+{
+    "homo_sapiens - synthetic TERT cohort - per-sample vcfs - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.mutenricher.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        "MUTENRICHER",
+                        "mutenricher",
+                        "1.3.3"
+                    ]
+                ],
+                "results": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.mutenricher.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "versions_mutenricher": [
+                    [
+                        "MUTENRICHER",
+                        "mutenricher",
+                        "1.3.3"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T15:31:14.469286725",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "homo_sapiens - synthetic TERT cohort - per-sample vcfs": {
+        "content": [
+            [
+                "Region",
+                "region_name",
+                "num_mutations",
+                "length",
+                "effective_length",
+                "bg_type",
+                "bg_prob",
+                "region_pval",
+                "WAP",
+                "WAP_pval",
+                "hotspot_pvals",
+                "Fisher_pval",
+                "Fisher_FDR",
+                "num_samples",
+                "position_counts",
+                "mutation_counts",
+                "samples"
+            ],
+            [
+                [
+                    "MUTENRICHER",
+                    "mutenricher",
+                    "1.3.3"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-23T15:31:19.66025134",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

@@ -264,6 +264,20 @@
                     "fa_icon": "fas fa-layer-group",
                     "description": "Elements per ActiveDriverWGS shard.",
                     "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
+                },
+                "run_mutenricher": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-play",
+                    "description": "Run MutEnricher as a QC caller (mutation burden). Its native table is published and never enters the p-value combination.",
+                    "help_text": "MutEnricher reads per-sample PASS VCFs, which the vcf, sarek and maf entry tiers provide; mutations-tier cohorts are not run through it. Its element p-values correlate with ActiveDriverWGS, so it replicates the burden test rather than adding independent evidence."
+                },
+                "mutenricher_mappable_regions": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed\\.gz$",
+                    "fa_icon": "fas fa-map-marked",
+                    "description": "GRCh38 callable/mappable regions BED for MutEnricher, BGZF-compressed, with its .tbi beside it."
                 }
             }
         },

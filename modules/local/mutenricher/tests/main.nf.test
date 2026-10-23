@@ -1,0 +1,86 @@
+nextflow_process {
+
+    name "Test Process MUTENRICHER"
+    script "../main.nf"
+    process "MUTENRICHER"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "mutenricher"
+
+    // 30 synthetic donors on chr5:1.2-1.4 Mb (tests/data/activedriverwgs/mutations.tsv projected
+    // to per-sample PASS VCFs with benchmarks/table_to_vcfs.py); TERT C228T planted in 10 donors.
+    test("homo_sapiens - synthetic TERT cohort - per-sample vcfs - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz", checkIfExists: true),
+                    file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz.tbi", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'elements', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true)
+                ]
+                input[2] = [
+                    [ id:'mappable' ],
+                    file("${projectDir}/tests/data/mutenricher/mappable.bed.gz", checkIfExists: true),
+                    file("${projectDir}/tests/data/mutenricher/mappable.bed.gz.tbi", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    // The native table is published unmodified: assert its 17 native columns and the planted element
+    test("homo_sapiens - synthetic TERT cohort - per-sample vcfs") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz", checkIfExists: true),
+                    file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz.tbi", checkIfExists: true)
+                ]
+                input[1] = [
+                    [ id:'elements', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true)
+                ]
+                input[2] = [
+                    [ id:'mappable' ],
+                    file("${projectDir}/tests/data/mutenricher/mappable.bed.gz", checkIfExists: true),
+                    file("${projectDir}/tests/data/mutenricher/mappable.bed.gz.tbi", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            def table = path(process.out.results[0][1]).readLines()
+            def cols  = table[0].tokenize('\t')
+            def tert  = table.drop(1).collect { line -> line.split('\t', -1) }
+                             .find { row -> row[cols.indexOf('region_name')] == 'TERT_promoter_fixture' }
+            assert process.success
+            assertAll(
+                { assert cols == [ 'Region', 'region_name', 'num_mutations', 'length', 'effective_length', 'bg_type',
+                                   'bg_prob', 'region_pval', 'WAP', 'WAP_pval', 'hotspot_pvals', 'Fisher_pval',
+                                   'Fisher_FDR', 'num_samples', 'position_counts', 'mutation_counts', 'samples' ] },
+                { assert tert != null && tert[cols.indexOf('num_samples')] == '10' },
+                { assert snapshot(cols, process.out.versions_mutenricher).match() }
+            )
+        }
+    }
+}

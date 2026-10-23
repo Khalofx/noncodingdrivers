@@ -1,0 +1,10 @@
+# Rule selection is pinned explicitly rather than left to ruff's defaults, which
+# widen between releases: ruff 0.16 enables ~413 rules by default where 0.9
+# enabled ~40, so an unpinned `ruff check` turns a green CI red on an unrelated
+# upgrade. E4/E7/E9/F is the classic pycodestyle-error + pyflakes set.
+[lint]
+select = ["E4", "E7", "E9", "F"]
+
+# E501 (line length) is not in this set by design: several scripts carry long
+# explanatory comments recording why a design choice was made, and wrapping them
+# would hurt readability more than it helps.

@@ -30,6 +30,9 @@
                 "ONCODRIVEFML": {
                     "oncodrivefml": "2.5.0"
                 },
+                "RUNSUMMARYMQC": {
+                    "python": "3.11.14"
+                },
                 "UNTAR_ONCODRIVEFML_GENOME": {
                     "untar": 1.34
                 },
@@ -60,8 +63,30 @@
                 "multiqc/multiqc_data/multiqc.parquet",
                 "multiqc/multiqc_data/multiqc_citations.txt",
                 "multiqc/multiqc_data/multiqc_data.json",
+                "multiqc/multiqc_data/multiqc_noncodingdrivers_caller_coverage_plot.txt",
+                "multiqc/multiqc_data/multiqc_noncodingdrivers_caller_rows_plot.txt",
+                "multiqc/multiqc_data/multiqc_noncodingdrivers_overview_plot.txt",
                 "multiqc/multiqc_data/multiqc_software_versions.txt",
                 "multiqc/multiqc_data/multiqc_sources.txt",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/pdf",
+                "multiqc/multiqc_plots/pdf/noncodingdrivers_caller_coverage_plot-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/noncodingdrivers_caller_coverage_plot-pct.pdf",
+                "multiqc/multiqc_plots/pdf/noncodingdrivers_caller_rows_plot-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/noncodingdrivers_caller_rows_plot-pct.pdf",
+                "multiqc/multiqc_plots/pdf/noncodingdrivers_overview_plot.pdf",
+                "multiqc/multiqc_plots/png",
+                "multiqc/multiqc_plots/png/noncodingdrivers_caller_coverage_plot-cnt.png",
+                "multiqc/multiqc_plots/png/noncodingdrivers_caller_coverage_plot-pct.png",
+                "multiqc/multiqc_plots/png/noncodingdrivers_caller_rows_plot-cnt.png",
+                "multiqc/multiqc_plots/png/noncodingdrivers_caller_rows_plot-pct.png",
+                "multiqc/multiqc_plots/png/noncodingdrivers_overview_plot.png",
+                "multiqc/multiqc_plots/svg",
+                "multiqc/multiqc_plots/svg/noncodingdrivers_caller_coverage_plot-cnt.svg",
+                "multiqc/multiqc_plots/svg/noncodingdrivers_caller_coverage_plot-pct.svg",
+                "multiqc/multiqc_plots/svg/noncodingdrivers_caller_rows_plot-cnt.svg",
+                "multiqc/multiqc_plots/svg/noncodingdrivers_caller_rows_plot-pct.svg",
+                "multiqc/multiqc_plots/svg/noncodingdrivers_overview_plot.svg",
                 "multiqc/multiqc_report.html",
                 "mutations",
                 "mutations/SYNTH-TERT.mutations.tsv",
@@ -71,10 +96,13 @@
             [
                 "elements.coords.tsv:md5,1fa6cb43382b95781f15bc2e4a3ae6a5",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
+                "multiqc_noncodingdrivers_caller_coverage_plot.txt:md5,5281cceacf45db03dbf7df0a88ee7192",
+                "multiqc_noncodingdrivers_caller_rows_plot.txt:md5,5281cceacf45db03dbf7df0a88ee7192",
+                "multiqc_noncodingdrivers_overview_plot.txt:md5,0fc098fdac3c04843c039f5e4e76c14a",
                 "SYNTH-TERT.mutations.tsv:md5,edff7ae46f6b8967d77dac216e307d23"
             ]
         ],
-        "timestamp": "2026-10-23T14:46:20.673776157",
+        "timestamp": "2026-10-23T15:47:10.540938029",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

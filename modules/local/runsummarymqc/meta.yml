@@ -1,0 +1,71 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "runsummarymqc"
+description: MultiQC custom-content sections that describe a driver-discovery run (elements tested, per-caller coverage, caller output rows), without ranking candidates
+keywords:
+  - multiqc
+  - custom content
+  - qc
+  - noncoding
+tools:
+  - "run_summary_mqc.py":
+      description: "Pipeline-owned adapter (bin/run_summary_mqc.py) that writes MultiQC custom-content YAML from the consensus and caller tables"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - consensus:
+        type: file
+        description: Consensus table of COMBINEPVALUES
+        pattern: "*.consensus.tsv"
+        ontologies: []
+    - caller_tables:
+        type: file
+        description: The callers' own output tables, named <cohort>.<caller>.tsv
+        pattern: "*.tsv"
+        ontologies: []
+
+output:
+  sections:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*_mqc.yaml":
+          type: file
+          description: MultiQC custom-content sections
+          pattern: "*_mqc.yaml"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"
