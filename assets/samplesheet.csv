@@ -1,3 +1,4 @@
-sample,fastq_1,fastq_2
-SAMPLE_PAIRED_END,/path/to/fastq/files/AEG588A1_S1_L002_R1_001.fastq.gz,/path/to/fastq/files/AEG588A1_S1_L002_R2_001.fastq.gz
-SAMPLE_SINGLE_END,/path/to/fastq/files/AEG588A4_S4_L003_R1_001.fastq.gz,
+sample,entry,cohort,cancer_type,assembly,mutations,vcf,index,maf
+liver_cohort,mutations,Liver-HCC,Liver-HCC,GRCh38,/path/to/Liver-HCC.mutations.tsv,,,
+donor_01,vcf,PACA,Panc-AdenoCA,GRCh38,,/path/to/donor_01.somatic.vcf.gz,/path/to/donor_01.somatic.vcf.gz.tbi,
+cohort_maf,maf,LIRI,Liver-HCC,GRCh38,,,,/path/to/LIRI.maf.gz

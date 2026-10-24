@@ -1,0 +1,67 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "harmonizecalls"
+description: Format adapter that reduces one driver caller's native result table to element_id, p_<caller> and q_<caller>
+keywords:
+  - format adapter
+  - driver calls
+  - csvtk
+tools:
+  - "csvtk":
+      description: "A cross-platform, efficient and practical CSV/TSV toolkit"
+      homepage: "https://bioinf.shenwei.me/csvtk"
+      documentation: "https://bioinf.shenwei.me/csvtk"
+      tool_dev_url: "https://github.com/shenwei356/csvtk"
+      licence: ["MIT"]
+      identifier: "biotools:csvtk"
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public' ]`
+    - tool:
+        type: string
+        description: Caller name (activedriverwgs or oncodrivefml); names the output columns
+    - raw:
+        type: file
+        description: Native result table of that caller (tab-separated, with header)
+        pattern: "*.tsv"
+        ontologies: []
+
+output:
+  harmonized:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.${tool}.harmonized.tsv":
+          type: file
+          description: Three-column table element_id, p_<caller>, q_<caller>
+          pattern: "*.harmonized.tsv"
+          ontologies: []
+  versions_csvtk:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "csvtk":
+          type: string
+          description: The name of the tool
+      - "csvtk version | sed -e 's/csvtk v//g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "csvtk":
+          type: string
+          description: The name of the tool
+      - "csvtk version | sed -e 's/csvtk v//g'":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

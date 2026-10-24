@@ -4,6 +4,8 @@ nextflow_pipeline {
     script "../main.nf"
     tag "pipeline"
 
+    // Synthetic TERT-window cohort (Khalofx/noncodingdrivers-test-datasets): 30 donors, TERT
+    // promoter C228T planted in 10, six chr5 elements plus one unplaced element.
     test("-profile test") {
 
         when {
@@ -17,8 +19,21 @@ nextflow_pipeline {
             def stable_path = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}'])
             // stable_content: All files in ${params.outdir}/ with stable content
             def stable_content = getAllFilesFromDir(params.outdir, ignoreFile: 'tests/.nftignore')
+            // Caller p-values are floating point (BLAS builds, Monte Carlo sampling): assert content, not md5
+            def consensus = path("$outputDir/consensus/SYNTH-TERT.consensus.tsv").readLines()
+            def cols      = consensus[0].tokenize('\t')
+            def rows      = consensus.drop(1).collect { line -> line.split('\t', -1) }
+            def tert      = rows.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
+            def mutations = path("$outputDir/mutations/SYNTH-TERT.mutations.tsv").readLines()
             assert workflow.success
             assertAll(
+                { assert mutations[0] == 'sample\tchrom\tpos\tref\talt\tvtype' && mutations.size() == 464 },
+                { assert [ 'element_id', 'p_activedriverwgs', 'p_oncodrivefml', 'chrom', 'start', 'end', 'n_fragments',
+                           'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count', 'consensus_q',
+                           'consensus_rank', 'is_consensus' ].every { c -> c in cols } },
+                { assert rows.size() == 6 },
+                { assert !rows.any { row -> row[cols.indexOf('element_id')] == 'elem_unplaced' } },
+                { assert tert != null && tert[cols.indexOf('is_consensus')] == 'True' && tert[cols.indexOf('consensus_rank')] == '1' },
                 { assert snapshot(
                     // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
                     removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml"),
@@ -27,6 +42,25 @@ nextflow_pipeline {
                     // All files with stable contents
                     stable_content
                 ).match() }
+            )
+        }
+    }
+
+    // The licence gate stops the run before any task when OncodriveFML is requested without consent
+    test("-profile test - OncodriveFML without licence acceptance") {
+
+        when {
+            params {
+                outdir                      = "$outputDir"
+                accept_oncodrivefml_licence = false
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('OncodriveFML is licence-gated') } }
             )
         }
     }

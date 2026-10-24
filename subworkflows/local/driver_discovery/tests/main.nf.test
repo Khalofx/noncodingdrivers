@@ -1,0 +1,132 @@
+nextflow_workflow {
+
+    name "Test Subworkflow DRIVER_DISCOVERY"
+    script "../main.nf"
+    workflow "DRIVER_DISCOVERY"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/driver_discovery"
+    tag "activedriverwgs"
+    tag "oncodrivefml"
+    tag "harmonizecalls"
+    tag "gawk"
+    tag "csvtk/join"
+    tag "combinepvalues"
+    tag "mutenricher"
+
+    test("synthetic TERT cohort - activedriverwgs + oncodrivefml - stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.empty()
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.empty()
+                input[7] = [ 'activedriverwgs', 'oncodrivefml' ]
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert snapshot(workflow.out).match() }
+            )
+        }
+    }
+
+    // OncodriveFML p-values are Monte-Carlo estimates: assert content, not md5.
+    test("synthetic TERT cohort - activedriverwgs + oncodrivefml") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.empty()
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.empty()
+                input[7] = [ 'activedriverwgs', 'oncodrivefml' ]
+                """
+            }
+        }
+
+        then {
+            def consensus = path(workflow.out.consensus[0][1]).readLines()
+            def cols      = consensus[0].tokenize('\t')
+            def rows      = consensus.drop(1).collect { line -> line.split('\t', -1) }
+            def tert      = rows.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
+            def coords    = path(workflow.out.coords[0][1]).readLines()
+            assert workflow.success
+            assertAll(
+                { assert [ 'element_id', 'p_activedriverwgs', 'p_oncodrivefml', 'chrom', 'start', 'end', 'n_fragments',
+                           'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count', 'consensus_q',
+                           'consensus_rank', 'is_consensus' ].every { c -> c in cols } },
+                { assert rows.size() == 6 },
+                { assert !rows.any { row -> row[cols.indexOf('element_id')] == 'elem_unplaced' } },
+                { assert tert != null && tert[cols.indexOf('is_consensus')] == 'True' && tert[cols.indexOf('consensus_rank')] == '1' },
+                { assert coords[0] == 'element_id\tchrom\tstart\tend\tn_fragments' && coords.size() == 8 },
+                { assert snapshot(
+                    workflow.out.harmonized.collect { _meta, f -> file(f).name }.sort(),
+                    cols
+                ).match() }
+            )
+        }
+    }
+
+    // MutEnricher is QC-only: its native table is emitted; the anchor join waits for the two combined callers only
+    test("synthetic TERT cohort - activedriverwgs + oncodrivefml + mutenricher (QC) - stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz", checkIfExists: true),
+                                        file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz.tbi", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.value([ [ id:'mappable' ],
+                                           file("${projectDir}/tests/data/mutenricher/mappable.bed.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/mutenricher/mappable.bed.gz.tbi", checkIfExists: true) ])
+                input[7] = [ 'activedriverwgs', 'oncodrivefml', 'mutenricher' ]
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert workflow.out.mutenricher.size() == 1 },
+                { assert workflow.out.harmonized.size() == 2 },
+                { assert workflow.out.consensus.size() == 1 }
+            )
+        }
+    }
+}

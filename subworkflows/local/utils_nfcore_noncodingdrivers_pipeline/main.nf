@@ -83,26 +83,25 @@ workflow PIPELINE_INITIALISATION {
     )
 
     //
-    // Create channel from input file provided through params.input
+    // Licence and parameter gates for the callers (before any task runs)
     //
+    validateDriverParameters()
 
+    //
+    // Create channel from input file provided through params.input:
+    // one [ meta, mutations, vcf, index, maf ] tuple per samplesheet row
+    //
+    def rows = samplesheetToList(input, "${projectDir}/assets/schema_input.json")
+    validateInputRows(rows)
+    if (params.run_mutenricher && rows.every { row -> row[0].entry == 'mutations' }) {
+        log.warn("--run_mutenricher: MutEnricher reads per-sample VCFs (vcf, sarek or maf rows); " +
+                 "this samplesheet has only mutations rows, so MutEnricher is not run.")
+    }
     channel
-        .fromList(samplesheetToList(input, "${projectDir}/assets/schema_input.json"))
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-                }
-        }
-        .groupTuple()
-        .map { samplesheet ->
-            validateInputSamplesheet(samplesheet)
-        }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
+        .fromList(rows)
+        .map { meta, mutations, vcf, index, maf ->
+            // An empty cohort makes the row its own cohort; GRCh38 and hg38 are the same assembly
+            [ meta + [ cohort: meta.cohort ?: meta.id, assembly: 'GRCh38' ], mutations, vcf, index, maf ]
         }
         .set { ch_samplesheet }
 
@@ -163,19 +162,48 @@ workflow PIPELINE_COMPLETION {
 */
 
 //
-// Validate channels from input samplesheet
+// Validate samplesheet rows: this version reads canonical GRCh38 mutation tables only
 //
-def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
-
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
+def validateInputRows(rows) {
+    rows.each { row ->
+        def meta = row[0]
+        if (meta.entry != 'mutations') {
+            error("Samplesheet row '${meta.id}': entry '${meta.entry}' is not available in this version of the pipeline. " +
+                  "Supply a canonical mutation table (columns sample chrom pos ref alt vtype) with entry 'mutations'.")
+        }
+        def assembly = meta.assembly_declared ?: 'GRCh38'
+        if (!(assembly in [ 'GRCh38', 'hg38' ])) {
+            error("Samplesheet row '${meta.id}': assembly '${assembly}' is not supported. " +
+                  "This version analyses GRCh38 (hg38) inputs only; lift GRCh37/hg19 calls to GRCh38 first.")
+        }
     }
-
-    return [ metas[0], fastqs ]
 }
+
+//
+// Licence and parameter gates for the driver callers
+//
+def validateDriverParameters() {
+    if (!params.run_activedriverwgs && !params.run_oncodrivefml) {
+        error("No driver caller selected: set --run_activedriverwgs true and/or --run_oncodrivefml true.")
+    }
+    if (params.run_oncodrivefml && !params.accept_oncodrivefml_licence) {
+        error("OncodriveFML is licence-gated: it is AGPL-3.0 software whose rights holder, Universitat Pompeu Fabra, " +
+              "permits academic, non-commercial and personal use only without a separate licence. " +
+              "Set --accept_oncodrivefml_licence true to confirm that your use complies, or --run_oncodrivefml false.")
+    }
+    if (params.run_oncodrivefml && !params.oncodrivefml_score) {
+        error("--run_oncodrivefml needs --oncodrivefml_score: a bgzip-compressed, tabix-indexed functional-impact score track " +
+              "(CADD GRCh38 v1.7 whole-genome SNVs, free for non-commercial use) with its .tbi beside it.")
+    }
+    if (params.run_mutenricher && !params.mutenricher_mappable_regions) {
+        error("--run_mutenricher needs --mutenricher_mappable_regions: a GRCh38 callable/mappable regions BED, " +
+              "BGZF-compressed and tabix-indexed (.tbi beside it).")
+    }
+    if (params.combination_method == 'acat' && params.skip_acat) {
+        error("--combination_method acat cannot be used with --skip_acat true: ACAT would not be computed.")
+    }
+}
+
 //
 // Generate methods description for MultiQC
 //
