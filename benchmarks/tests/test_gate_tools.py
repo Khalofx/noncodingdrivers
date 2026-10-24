@@ -96,6 +96,20 @@ def test_compare_discordant_pattern_fails(tmp_path):
     assert rep.at["ebm_only_all_both_callers_p_lt_0.05", "status"] == "FAIL"
 
 
+def test_compare_acat_q_tolerance(tmp_path):
+    # The package ACAT reproduces the release in-house ACAT q within --acat-q-rtol, not exactly
+    for factor, expected_rc in ((1 - 3.1e-7, 0), (1.001, 1)):
+        t = tmp_path / f"v1_{factor}.tsv"
+        _v1_table(t)
+        d = pd.read_csv(t, sep="\t")
+        tert = json.load(open(BASELINE))["liver_hcc_public"]["tert"]
+        d.loc[d["element_id"] == tert["element"], "acat_q"] = tert["acat_q"] * factor
+        d.to_csv(t, sep="\t", index=False)
+        rc = compare_to_baseline.main(["--baseline", BASELINE, "--cohort", "liver_hcc_public", "--method", "acat",
+                                       "--v1", str(t), "--out", str(tmp_path / f"r_{factor}.tsv")])
+        assert rc == expected_rc, pd.read_csv(tmp_path / f"r_{factor}.tsv", sep="\t").to_string()
+
+
 def test_table_to_vcfs(tmp_path):
     src = os.path.join(ROOT, "tests", "data", "cohort_mutations.tsv")
     fai = os.path.join(ROOT, "tests", "data", "tiny.fa.fai")

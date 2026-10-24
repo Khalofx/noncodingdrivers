@@ -15,6 +15,7 @@ Checks, one row each in the report:
     OncodriveFML p > 0.05; every EBM-only element has both callers at p < 0.05).
 
 Significance is q < --fdr (default 0.1: the release threshold, and the pipeline's --fdr_threshold).
+The release's ACAT values came from an in-house ACAT; the package ACAT matches them to --acat-q-rtol.
 
 Exit status 0 if every check passes, 1 otherwise. The report is tab-separated.
 """
@@ -53,6 +54,10 @@ def parse_args(argv=None):
     ap.add_argument("--p-rtol", type=float, default=1e-9, help="relative tolerance for deterministic p-values")
     ap.add_argument("--ofml-rtol", type=float, default=0.0,
                     help="relative tolerance for OncodriveFML p (0 = exact; raise only if the seed is not fixed)")
+    ap.add_argument("--acat-q-rtol", type=float, default=1e-5,
+                    help="relative tolerance for the TERT ACAT q of baseline.json, which the release computed with its "
+                         "in-house ACAT; the package ACAT (p = 1 inputs removed, not clamped) differs from it by at most "
+                         "3.81e-06 in log10 on Liver-HCC-public (combination_method_comparison.csv)")
     ap.add_argument("--q-rtol", type=float, default=1e-2,
                     help="relative tolerance for q values recorded rounded in baseline.json")
     ap.add_argument("--frozen", help="frozen consensus table (TSV) for set and per-element comparison")
@@ -96,7 +101,7 @@ def main(argv=None):
             exp_rank = tert["rank"] if a.method == "acat" else cc.get("tert_liver_hcc", {}).get("ebm_rank", tert["rank"])
             check(f"tert_rank_{a.method}", exp_rank, int(r["_rank"]), int(r["_rank"]) == exp_rank)
             if a.method == "acat":
-                check("tert_acat_q", tert["acat_q"], r[qcol], close(r[qcol], tert["acat_q"], a.p_rtol))
+                check("tert_acat_q", tert["acat_q"], r[qcol], close(r[qcol], tert["acat_q"], a.acat_q_rtol))
             else:
                 exp_q = cc.get("tert_liver_hcc", {}).get("ebm_q")
                 check("tert_ebm_q", exp_q, r[qcol], close(r[qcol], exp_q, a.q_rtol))
