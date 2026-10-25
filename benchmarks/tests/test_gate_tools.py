@@ -110,6 +110,24 @@ def test_compare_acat_q_tolerance(tmp_path):
         assert rc == expected_rc, pd.read_csv(tmp_path / f"r_{factor}.tsv", sep="\t").to_string()
 
 
+def test_compare_acat_q_uses_recorded_cohort_bound(tmp_path):
+    # A 4% package-vs-in-house ACAT difference passes only within the bound recorded for the cohort
+    t = tmp_path / "v1.tsv"
+    _v1_table(t)
+    d = pd.read_csv(t, sep="\t")
+    tert = json.load(open(BASELINE))["liver_hcc_public"]["tert"]
+    d.loc[d["element_id"] == tert["element"], "acat_q"] = tert["acat_q"] / 1.04
+    d.loc[d["element_id"].isin(["el28", "el29", "el30"]), "p_oncodrivefml"] = 0.01
+    d.to_csv(t, sep="\t", index=False)
+    for dl, expected_rc in ((0.0181, 0), (0.001, 1)):
+        pd.DataFrame([{"cohort": "Liver-HCC-public", "elements": 41, "shared_ebm": 28, "acat_only": 0, "ebm_only": 3,
+                       "acat_pkg_vs_custom_max_dlog10": dl}]).to_csv(tmp_path / "comparison.csv", index=False)
+        rc = compare_to_baseline.main(["--baseline", BASELINE, "--cohort", "liver_hcc_public", "--method", "acat",
+                                       "--v1", str(t), "--comparison", str(tmp_path / "comparison.csv"),
+                                       "--out", str(tmp_path / "r.tsv")])
+        assert rc == expected_rc, pd.read_csv(tmp_path / "r.tsv", sep="\t").to_string()
+
+
 def test_table_to_vcfs(tmp_path):
     src = os.path.join(ROOT, "tests", "data", "cohort_mutations.tsv")
     fai = os.path.join(ROOT, "tests", "data", "tiny.fa.fai")

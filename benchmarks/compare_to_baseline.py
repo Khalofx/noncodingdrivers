@@ -64,7 +64,8 @@ def parse_args(argv=None):
     ap.add_argument("--map", action="append", default=[],
                     help="v1col=frozencol column mapping for --frozen (repeatable); identity if omitted")
     ap.add_argument("--frozen-q", default="consensus_q", help="q column of the frozen table for its significant set")
-    ap.add_argument("--comparison", help="combination_method_comparison.csv (tested elements, EBM/ACAT overlap counts)")
+    ap.add_argument("--comparison", help="combination_method_comparison.csv (tested elements, EBM/ACAT overlap counts, "
+                    "and the package-vs-in-house ACAT bound used for the ACAT q checks)")
     ap.add_argument("--discordant", help="combination_discordant_elements.csv (ACAT-only and EBM-only elements)")
     ap.add_argument("--out", default="-", help="report path (default stdout)")
     return ap.parse_args(argv)
@@ -80,6 +81,18 @@ def main(argv=None):
             sys.exit(f"column {col} missing from {a.v1}")
     v1 = v1.assign(_rank=v1[pcol].rank(method="min"))
     rows = []
+
+    # The release ACAT values come from an in-house ACAT; the package ACAT matches them within --acat-q-rtol, or,
+    # with --comparison, within the per-cohort bound recorded by the combination check of the frozen tables
+    # (acat_pkg_vs_custom_max_dlog10, three significant digits, so half a unit in the last digit is allowed).
+    acat_rtol = a.acat_q_rtol
+    if a.comparison:
+        cmp_all = pd.read_csv(a.comparison)
+        crow = cmp_all[cmp_all["cohort"] == COHORT_NAMES[a.cohort]]
+        if not crow.empty and "acat_pkg_vs_custom_max_dlog10" in crow.columns:
+            dl = float(crow.iloc[0]["acat_pkg_vs_custom_max_dlog10"])
+            if dl > 0:
+                acat_rtol = max(acat_rtol, 10 ** (dl + 0.5 * 10 ** (math.floor(math.log10(dl)) - 2)) - 1)
 
     def check(name, expected, observed, ok):
         rows.append({"check": name, "expected": expected, "observed": observed, "status": "PASS" if ok else "FAIL"})
@@ -101,7 +114,7 @@ def main(argv=None):
             exp_rank = tert["rank"] if a.method == "acat" else cc.get("tert_liver_hcc", {}).get("ebm_rank", tert["rank"])
             check(f"tert_rank_{a.method}", exp_rank, int(r["_rank"]), int(r["_rank"]) == exp_rank)
             if a.method == "acat":
-                check("tert_acat_q", tert["acat_q"], r[qcol], close(r[qcol], tert["acat_q"], a.acat_q_rtol))
+                check("tert_acat_q", tert["acat_q"], r[qcol], close(r[qcol], tert["acat_q"], acat_rtol))
             else:
                 exp_q = cc.get("tert_liver_hcc", {}).get("ebm_q")
                 check("tert_ebm_q", exp_q, r[qcol], close(r[qcol], exp_q, a.q_rtol))
@@ -115,7 +128,7 @@ def main(argv=None):
     if "min_acat_q" in base[a.cohort] and a.method == "acat":
         exp = base[a.cohort]["min_acat_q"]
         obs = float(v1[qcol].min())
-        check("min_acat_q", exp, obs, close(obs, exp, a.q_rtol))
+        check("min_acat_q", exp, obs, close(obs, exp, max(a.q_rtol, acat_rtol)))
 
     if a.frozen:
         fr = pd.read_csv(a.frozen, sep="\t", dtype=str)
