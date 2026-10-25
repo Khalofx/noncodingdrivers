@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "mutenricher"
+description: Element-level somatic mutation-burden test (MutEnricher, noncoding mode), run as a QC caller whose native table is published unmodified
+keywords:
+  - cancer
+  - driver
+  - noncoding
+  - mutation burden
+tools:
+  - "mutenricher":
+      description: "MutEnricher: a flexible toolset for somatic mutation enrichment analysis of tumor whole genomes"
+      homepage: "https://github.com/asoltis/MutEnricher"
+      documentation: "https://github.com/asoltis/MutEnricher"
+      tool_dev_url: "https://github.com/asoltis/MutEnricher"
+      doi: "10.1186/s12859-020-03695-z"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'PACA-CA', cohort:'PACA-CA', assembly:'GRCh38' ]`
+    - vcfs:
+        type: file
+        description: Per-sample somatic VCFs, bgzip-compressed, FILTER=PASS on every record; the sample name is the file name without .vcf.gz
+        pattern: "*.vcf.gz"
+        ontologies: []
+    - tbis:
+        type: file
+        description: Tabix indexes of the VCFs
+        pattern: "*.vcf.gz.tbi"
+        ontologies: []
+  - - meta2:
+        type: map
+        description: |
+          Element-catalogue meta map, e.g. `[ id:'elements', assembly:'GRCh38' ]`
+    - elements:
+        type: file
+        description: Regulatory element catalogue, headerless BED (chrom, start, end, element id, ...)
+        pattern: "*.bed"
+        ontologies: []
+  - - meta3:
+        type: map
+        description: |
+          Mappable-regions meta map, e.g. `[ id:'mappable' ]`
+    - mappable:
+        type: file
+        description: Callable/mappable regions BED, BGZF-compressed
+        pattern: "*.bed.gz"
+        ontologies: []
+    - mappable_tbi:
+        type: file
+        description: Tabix index of the mappable-regions BED
+        pattern: "*.bed.gz.tbi"
+        ontologies: []
+
+output:
+  results:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.mutenricher.tsv":
+          type: file
+          description: MutEnricher's native region table (<prefix>_region_WAP_hotspot_Fisher_enrichments.txt), unmodified
+          pattern: "*.mutenricher.tsv"
+          ontologies: []
+  versions_mutenricher:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - mutenricher:
+          type: string
+          description: The name of the tool
+      - cat mutenricher.version.txt:
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - mutenricher:
+          type: string
+          description: The name of the tool
+      - cat mutenricher.version.txt:
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

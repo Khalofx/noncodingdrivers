@@ -20,7 +20,7 @@
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
-                    "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row.",
+                    "help_text": "Comma-separated file with a header row and the columns sample, entry, cohort, cancer_type, assembly, mutations, vcf, index and maf (see the usage documentation). Rows sharing a cohort are merged into one cohort table.",
                     "fa_icon": "fas fa-file-csv"
                 },
                 "outdir": {
@@ -40,6 +40,24 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                }
+            }
+        },
+        "reference_options": {
+            "title": "Reference options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Element catalogue the callers test (GRCh38).",
+            "required": ["elements_bed"],
+            "properties": {
+                "elements_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-map",
+                    "description": "Element catalogue: headerless BED with chrom, start, end and element id (>= 4 columns), GRCh38 chr-named.",
+                    "help_text": "Use the coding-sequence-excluded catalogue (Ensembl Regulatory Build with GENCODE CDS removed); a CDS-included catalogue leaks coding selection into the non-coding test. Rows sharing an element id are fragments of one element: they are tested together and reported as one span with n_fragments."
                 }
             }
         },
@@ -197,8 +215,48 @@
             "title": "Caller options",
             "type": "object",
             "fa_icon": "fas fa-dna",
-            "description": "Options for the driver callers.",
+            "description": "Driver callers and their inputs.",
             "properties": {
+                "run_activedriverwgs": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-play",
+                    "description": "Run ActiveDriverWGS (mutation-burden test)."
+                },
+                "run_oncodrivefml": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-play",
+                    "description": "Run OncodriveFML (functional-impact bias). Licence-gated: also set --accept_oncodrivefml_licence.",
+                    "help_text": "OncodriveFML is AGPL-3.0 software whose rights holder, Universitat Pompeu Fabra, permits academic, non-commercial and personal use only without a separate licence (see the OncodriveFML README). It also needs a user-supplied functional-impact score track (--oncodrivefml_score)."
+                },
+                "accept_oncodrivefml_licence": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-file-signature",
+                    "description": "Confirm that your use of OncodriveFML and of the score track complies with their licence terms."
+                },
+                "oncodrivefml_score": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.gz$",
+                    "fa_icon": "fas fa-chart-bar",
+                    "description": "bgzip-compressed, tabix-indexed functional-impact score track (CADD GRCh38 v1.7 whole-genome SNVs); the .tbi must sit beside it.",
+                    "help_text": "CADD scores are free for non-commercial use only and are never bundled with the pipeline. The OncodriveFML configuration (--oncodrivefml_conf) names this file by its basename."
+                },
+                "oncodrivefml_conf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-cog",
+                    "description": "OncodriveFML configuration file (score columns, sampling, seed, cores). Default: assets/oncodrivefml.CADD_GRCh38.conf (CADD GRCh38 v1.7 PHRED)."
+                },
+                "oncodrivefml_genome": {
+                    "type": "string",
+                    "pattern": "^\\S+$",
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Offline bgdata hg38 genome for OncodriveFML: a directory or a .tar.gz of it. Empty means bgdata downloads its own copy.",
+                    "help_text": "Compute nodes without internet access need this (bgdata hg38-20161209). A .tar.gz is unpacked by the nf-core untar module."
+                },
                 "adwgs_shard_size": {
                     "type": "integer",
                     "default": 5000,
@@ -206,6 +264,48 @@
                     "fa_icon": "fas fa-layer-group",
                     "description": "Elements per ActiveDriverWGS shard.",
                     "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
+                },
+                "run_mutenricher": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-play",
+                    "description": "Run MutEnricher as a QC caller (mutation burden). Its native table is published and never enters the p-value combination.",
+                    "help_text": "MutEnricher reads per-sample PASS VCFs, which the vcf, sarek and maf entry tiers provide; mutations-tier cohorts are not run through it. Its element p-values correlate with ActiveDriverWGS, so it replicates the burden test rather than adding independent evidence."
+                },
+                "mutenricher_mappable_regions": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed\\.gz$",
+                    "fa_icon": "fas fa-map-marked",
+                    "description": "GRCh38 callable/mappable regions BED for MutEnricher, BGZF-compressed, with its .tbi beside it."
+                }
+            }
+        },
+        "consensus_options": {
+            "title": "Consensus options",
+            "type": "object",
+            "fa_icon": "fas fa-balance-scale",
+            "description": "P-value combination (COMBINEPVALUES): EBM, ACAT, RRA and votes are always published; --combination_method selects consensus_q.",
+            "properties": {
+                "combination_method": {
+                    "type": "string",
+                    "enum": ["ebm", "acat"],
+                    "default": "ebm",
+                    "fa_icon": "fas fa-code-branch",
+                    "description": "Combination that sets consensus_q and is_consensus: empirical Brown (ebm, default) or ACAT (acat)."
+                },
+                "fdr_threshold": {
+                    "type": "number",
+                    "default": 0.1,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-filter",
+                    "description": "BH q-value threshold for consensus candidates."
+                },
+                "skip_acat": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-forward",
+                    "description": "Do not compute ACAT (use when the ACAT package is unavailable, e.g. -profile conda). Not allowed with --combination_method acat."
                 }
             }
         }
@@ -215,7 +315,13 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
+            "$ref": "#/$defs/reference_options"
+        },
+        {
             "$ref": "#/$defs/caller_options"
+        },
+        {
+            "$ref": "#/$defs/consensus_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

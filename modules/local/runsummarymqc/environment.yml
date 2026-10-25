@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/environment-schema.json
+# Runtime of bin/run_summary_mqc.py (python standard library only). The container is the
+# pipeline's utils image; -profile conda uses this environment.
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - conda-forge::python=3.11

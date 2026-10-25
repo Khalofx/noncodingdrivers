@@ -1,0 +1,9 @@
+# Python packages for the unit tests of bin/ and benchmarks/ (pytest.yml):
+#     python3 -m pip install -r tests/requirements.txt
+#     pytest tests/ benchmarks/tests/ -q -p no:cacheprovider
+# bin/run_summary_mqc.py and the COSMIC audits use only the standard library; the gate tools
+# (benchmarks/compare_to_baseline.py, table_to_vcfs.py) need pandas. pyliftover is needed only to
+# run benchmarks/rheinbay_concordance.py itself, not for its tests.
+pandas==2.3.3
+numpy==1.26.4
+pytest>=8

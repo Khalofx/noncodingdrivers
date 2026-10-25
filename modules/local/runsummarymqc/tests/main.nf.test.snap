@@ -1,0 +1,100 @@
+{
+    "synthetic consensus - two caller tables - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test_noncodingdrivers_overview_mqc.yaml:md5,1b5a87932f9ce4e2c830f944005f7717"
+                    ]
+                ],
+                "1": [
+                    [
+                        "RUNSUMMARYMQC",
+                        "python",
+                        "3.11.14"
+                    ]
+                ],
+                "sections": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test_noncodingdrivers_overview_mqc.yaml:md5,1b5a87932f9ce4e2c830f944005f7717"
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "RUNSUMMARYMQC",
+                        "python",
+                        "3.11.14"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T15:46:05.533920769",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "synthetic consensus - two caller tables": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        [
+                            "test_noncodingdrivers_caller_coverage_mqc.yaml:md5,7d47bad6ca935fadcfbac663016e4b60",
+                            "test_noncodingdrivers_caller_rows_mqc.yaml:md5,9bd2b6b7a83f156037c8b72327689560",
+                            "test_noncodingdrivers_overview_mqc.yaml:md5,d2da9850c1447306183a58e46d34e145"
+                        ]
+                    ]
+                ],
+                "1": [
+                    [
+                        "RUNSUMMARYMQC",
+                        "python",
+                        "3.11.14"
+                    ]
+                ],
+                "sections": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        [
+                            "test_noncodingdrivers_caller_coverage_mqc.yaml:md5,7d47bad6ca935fadcfbac663016e4b60",
+                            "test_noncodingdrivers_caller_rows_mqc.yaml:md5,9bd2b6b7a83f156037c8b72327689560",
+                            "test_noncodingdrivers_overview_mqc.yaml:md5,d2da9850c1447306183a58e46d34e145"
+                        ]
+                    ]
+                ],
+                "versions_python": [
+                    [
+                        "RUNSUMMARYMQC",
+                        "python",
+                        "3.11.14"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T15:46:10.070283058",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

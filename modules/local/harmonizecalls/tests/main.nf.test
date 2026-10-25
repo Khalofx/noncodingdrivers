@@ -1,0 +1,81 @@
+nextflow_process {
+
+    name "Test Process HARMONIZECALLS"
+    script "../main.nf"
+    process "HARMONIZECALLS"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "harmonizecalls"
+
+    test("activedriverwgs native table") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test' ], 'activedriverwgs', file("${projectDir}/tests/data/harmonizecalls/test.activedriverwgs.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def out    = path(process.out.harmonized[0][1]).readLines()
+            def rawLines = path("${projectDir}/tests/data/harmonizecalls/test.activedriverwgs.tsv").readLines()
+            def ncols  = rawLines[0].tokenize('\t')
+            def rawP = rawLines.drop(1).collect { line -> line.split('\t', -1)[ncols.indexOf('pp_element')] }
+            assert process.success
+            assertAll(
+                { assert out[0] == 'element_id\tp_activedriverwgs\tq_activedriverwgs' },
+                { assert out.size() == rawLines.size() },
+                { assert out.drop(1).collect { line -> line.split('\t', -1)[1] } == rawP },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("oncodrivefml native table") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test' ], 'oncodrivefml', file("${projectDir}/tests/data/harmonizecalls/test.oncodrivefml.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def out    = path(process.out.harmonized[0][1]).readLines()
+            def rawLines = path("${projectDir}/tests/data/harmonizecalls/test.oncodrivefml.tsv").readLines()
+            def ncols  = rawLines[0].tokenize('\t')
+            def rawP = rawLines.drop(1).collect { line -> line.split('\t', -1)[ncols.indexOf('P_VALUE')] }
+            assert process.success
+            assertAll(
+                { assert out[0] == 'element_id\tp_oncodrivefml\tq_oncodrivefml' },
+                { assert out.size() == rawLines.size() },
+                { assert out.drop(1).collect { line -> line.split('\t', -1)[1] } == rawP },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("activedriverwgs native table - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test' ], 'activedriverwgs', file("${projectDir}/tests/data/harmonizecalls/test.activedriverwgs.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

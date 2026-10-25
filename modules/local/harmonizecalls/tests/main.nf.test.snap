@@ -1,0 +1,125 @@
+{
+    "activedriverwgs native table": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.activedriverwgs.harmonized.tsv:md5,4f731f0790e42f17312053fa151ab154"
+                    ]
+                ],
+                "1": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ],
+                "harmonized": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.activedriverwgs.harmonized.tsv:md5,4f731f0790e42f17312053fa151ab154"
+                    ]
+                ],
+                "versions_csvtk": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T12:08:06.186229396",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "oncodrivefml native table": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.oncodrivefml.harmonized.tsv:md5,444d92a5575adb97efe61dd8b6bc03d1"
+                    ]
+                ],
+                "1": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ],
+                "harmonized": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.oncodrivefml.harmonized.tsv:md5,444d92a5575adb97efe61dd8b6bc03d1"
+                    ]
+                ],
+                "versions_csvtk": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T12:08:10.068976807",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "activedriverwgs native table - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.activedriverwgs.harmonized.tsv:md5,15e00bbf2a92622e533bd388850597eb"
+                    ]
+                ],
+                "1": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ],
+                "harmonized": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.activedriverwgs.harmonized.tsv:md5,15e00bbf2a92622e533bd388850597eb"
+                    ]
+                ],
+                "versions_csvtk": [
+                    [
+                        "HARMONIZECALLS",
+                        "csvtk",
+                        "0.37.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T12:08:14.032117672",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

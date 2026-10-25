@@ -1,0 +1,6 @@
+element_id	chrom	start	end	p_activedriverwgs	q_activedriverwgs	p_oncodrivefml	q_oncodrivefml
+promoter_ENSR00000746745	chr5	1294989	1295601	4.4e-11	1.1e-09	0.18765	0.9
+el2	chr1	100	200	0.01	0.2	0.02	0.3
+el3	chr1	300	400	0.5	0.9	1	1
+el4	chr1	500	600	0.9	0.95	NA	NA
+el5	chr1	700	800	0.001	0.05	0.004	0.1

@@ -1,0 +1,205 @@
+{
+    "synthetic TERT cohort - activedriverwgs + oncodrivefml - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "elements",
+                            "assembly": "GRCh38"
+                        },
+                        "elements.coords.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.activedriverwgs.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ],
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.oncodrivefml.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.activedriverwgs.harmonized.tsv:md5,15e00bbf2a92622e533bd388850597eb"
+                    ],
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.oncodrivefml.harmonized.tsv:md5,127bffe011f21da7b37261605a53f8ff"
+                    ]
+                ],
+                "4": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.matched.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "5": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.consensus.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "6": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.consensus.ebm_parameters.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "consensus": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.consensus.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "coords": [
+                    [
+                        {
+                            "id": "elements",
+                            "assembly": "GRCh38"
+                        },
+                        "elements.coords.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "ebm_parameters": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.consensus.ebm_parameters.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "harmonized": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.activedriverwgs.harmonized.tsv:md5,15e00bbf2a92622e533bd388850597eb"
+                    ],
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.oncodrivefml.harmonized.tsv:md5,127bffe011f21da7b37261605a53f8ff"
+                    ]
+                ],
+                "matched": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.matched.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "mutenricher": [
+                    
+                ],
+                "raw": [
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.activedriverwgs.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ],
+                    [
+                        {
+                            "id": "SYNTH-TERT",
+                            "cohort": "SYNTH-TERT",
+                            "assembly": "GRCh38"
+                        },
+                        "SYNTH-TERT.oncodrivefml.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-23T15:32:06.380689277",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "synthetic TERT cohort - activedriverwgs + oncodrivefml": {
+        "content": [
+            [
+                "SYNTH-TERT.activedriverwgs.harmonized.tsv",
+                "SYNTH-TERT.oncodrivefml.harmonized.tsv"
+            ],
+            [
+                "element_id",
+                "p_activedriverwgs",
+                "q_activedriverwgs",
+                "p_oncodrivefml",
+                "q_oncodrivefml",
+                "chrom",
+                "start",
+                "end",
+                "n_fragments",
+                "n_tested_callers",
+                "ebm_p",
+                "ebm_q",
+                "acat_p",
+                "acat_q",
+                "rra_score",
+                "rra_q",
+                "vote_count",
+                "combination_method",
+                "consensus_q",
+                "consensus_rank",
+                "is_consensus"
+            ]
+        ],
+        "timestamp": "2026-10-23T15:32:22.885931618",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}
