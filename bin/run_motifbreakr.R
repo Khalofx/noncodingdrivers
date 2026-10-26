@@ -91,11 +91,14 @@ if (nrow(snv)) {
 raw <- NULL
 if (nrow(snv)) {
   # ---- motifs: JASPAR PFMs -> PPMs (universalmotif) -> MotifDb MotifList ------------------
+  # read_jaspar() returns a bare motif, not a list, for a file with one motif
   um  <- read_jaspar(motif_file)
+  if (!is.list(um)) um <- list(um)
   um  <- convert_type(um, "PPM", pseudocount = 4 * pseudocount)
-  ids <- vapply(lapply(seq_along(um), function(i) um[[i]]), function(m) m@name, "")
-  tfs <- vapply(lapply(seq_along(um), function(i) um[[i]]), function(m) m@altname, "")
-  mlen <- setNames(vapply(lapply(seq_along(um), function(i) um[[i]]), function(m) ncol(m@motif), 0L), ids)
+  if (!is.list(um)) um <- list(um)
+  ids <- vapply(um, function(m) m@name, "")
+  tfs <- vapply(um, function(m) m@altname, "")
+  mlen <- setNames(vapply(um, function(m) ncol(m@motif), 0L), ids)
   ml  <- convert_motifs(um, "MotifDb-MotifList")
   names(ml) <- paste0("Hsapiens-JASPAR-", tfs, "-", ids)
   mcols(ml)$providerId <- ids; mcols(ml)$providerName <- tfs; mcols(ml)$geneSymbol <- tfs
