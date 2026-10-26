@@ -1,0 +1,88 @@
+nextflow_process {
+
+    name "Test Process ASSEMBLYCHECK"
+    script "../main.nf"
+    process "ASSEMBLYCHECK"
+
+    tag "modules"
+    tag "modules_local"
+    tag "assemblycheck"
+
+    // 451 GRCh38 SNVs of the SYNTH-TERT cohort (one sites VCF) against the GRCh38 and hg19
+    // chr5 windows of Khalofx/noncodingdrivers-test-datasets
+
+    test("GRCh38 SNVs against the GRCh38 FASTA - pass") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id: 'synth_tert_all', entry: 'vcf', assembly_declared: 'GRCh38' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/vcf/synth_tert_all.vcf.gz', checkIfExists: true) ]
+                input[1] = [ [ id: 'GRCh38' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa', checkIfExists: true),
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa.fai', checkIfExists: true) ]
+                input[2] = 0.99
+                input[3] = 50
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert path(process.out.summary[0][1]).readLines()[1].tokenize('\t')[4..9] == [ '451', '451', '1.000000', '0', '0.99', 'pass' ] },
+                { assert snapshot(process.out.summary, process.out.mismatches, process.out.findAll { key, val -> key.startsWith('versions') }).match() }
+            )
+        }
+    }
+
+    test("GRCh38 SNVs declared hg19 - ASSEMBLY_MISMATCH") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id: 'synth_tert_all', entry: 'vcf', assembly_declared: 'hg19' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/vcf/synth_tert_all.vcf.gz', checkIfExists: true) ]
+                input[1] = [ [ id: 'hg19' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa', checkIfExists: true),
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa.fai', checkIfExists: true) ]
+                input[2] = 0.99
+                input[3] = 50
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.failed },
+                { assert process.stderr.any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_all (entry vcf): 122 of 451') } }
+            )
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id: 'stub', entry: 'vcf', assembly_declared: 'GRCh38' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/vcf/synth_tert_all.vcf.gz', checkIfExists: true) ]
+                input[1] = [ [ id: 'GRCh38' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa', checkIfExists: true),
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa.fai', checkIfExists: true) ]
+                input[2] = 0.99
+                input[3] = 50
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

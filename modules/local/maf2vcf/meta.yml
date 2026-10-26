@@ -1,0 +1,81 @@
+name: "maf2vcf"
+description: Convert the MAF rows of one tumour to VCF with maf2vcf.pl (vcf2maf), anchoring indels on the FASTA of the declared build
+keywords:
+  - maf
+  - vcf
+  - conversion
+  - somatic
+tools:
+  - "vcf2maf":
+      description: "Convert between VCF and MAF; maf2vcf.pl writes MAF rows as VCF records"
+      homepage: "https://github.com/mskcc/vcf2maf"
+      documentation: "https://github.com/mskcc/vcf2maf"
+      tool_dev_url: "https://github.com/mskcc/vcf2maf"
+      doi: "10.5281/zenodo.593251"
+      licence: ["Apache-2.0"]
+      identifier: biotools:vcf2maf
+input:
+  - - meta:
+        type: map
+        description: One tumour of a MAF row (id = sanitised Tumor_Sample_Barcode)
+    - maf:
+        type: file
+        description: MAF rows of one tumour with UCSC contig names (assets/awk/maf_split.awk)
+        pattern: "*.maf"
+  - - meta2:
+        type: map
+        description: Reference meta map (id = assembly)
+    - fasta:
+        type: file
+        description: FASTA of the declared build
+        pattern: "*.{fa,fasta,fna}"
+        ontologies:
+          - edam: http://edamontology.org/format_1929
+    - fai:
+        type: file
+        description: samtools faidx index of the FASTA
+        pattern: "*.fai"
+output:
+  vcf:
+    - - meta:
+          type: map
+          description: One tumour
+      - ${prefix}.vcf:
+          type: file
+          description: Unsorted VCF with the tumour column only; missing FILTER set to PASS
+          pattern: "*.vcf"
+          ontologies:
+            - edam: http://edamontology.org/format_3016
+  skipped:
+    - - meta:
+          type: map
+          description: One tumour
+      - ${prefix}.skipped.tsv:
+          type: file
+          description: MAF rows dropped by maf2vcf.pl because their Reference_Allele disagrees with the FASTA
+          pattern: "*.skipped.tsv"
+  versions_vcf2maf:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - vcf2maf:
+          type: string
+          description: The tool name
+      - echo 1.6.22:
+          type: eval
+          description: Version string (maf2vcf.pl does not report one)
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - vcf2maf:
+          type: string
+          description: The tool name
+      - echo 1.6.22:
+          type: eval
+          description: Version string (maf2vcf.pl does not report one)
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

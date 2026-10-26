@@ -1,0 +1,87 @@
+name: "assemblycheck"
+description: Check that the REF alleles of a VCF match the FASTA of the declared genome build (EBI vcf_assembly_checker); stop the row with ASSEMBLY_MISMATCH below a match threshold
+keywords:
+  - vcf
+  - assembly
+  - reference
+  - genome build
+  - validation
+tools:
+  - "vcf-validator":
+      description: "EBI vcf-validator suite; vcf_assembly_checker compares the REF allele of every record with a FASTA"
+      homepage: "https://github.com/EBIvariation/vcf-validator"
+      documentation: "https://github.com/EBIvariation/vcf-validator#assembly-checker"
+      tool_dev_url: "https://github.com/EBIvariation/vcf-validator"
+      licence: ["Apache-2.0"]
+      identifier: biotools:vcf-validator
+input:
+  - - meta:
+        type: map
+        description: Samplesheet row (id, entry, assembly_declared)
+    - vcf:
+        type: file
+        description: VCF or bgzipped VCF; for MAF rows the SNV projection written by assets/awk/maf_split.awk (mode=check)
+        pattern: "*.{vcf,vcf.gz}"
+        ontologies:
+          - edam: http://edamontology.org/format_3016
+  - - meta2:
+        type: map
+        description: Reference meta map (id = assembly)
+    - fasta:
+        type: file
+        description: FASTA of the declared build (uncompressed)
+        pattern: "*.{fa,fasta,fna}"
+        ontologies:
+          - edam: http://edamontology.org/format_1929
+    - fai:
+        type: file
+        description: samtools faidx index of the FASTA
+        pattern: "*.fai"
+  - min_match:
+      type: float
+      description: Minimum fraction of checked REF alleles that must match (e.g. 0.99)
+  - min_records:
+      type: integer
+      description: Rows with fewer checked records pass with status low_evidence (e.g. 50)
+output:
+  summary:
+    - - meta:
+          type: map
+          description: Samplesheet row
+      - ${prefix}.assembly_check.tsv:
+          type: file
+          description: One-row summary (records checked, matching, match fraction, off-reference records, status)
+          pattern: "*.assembly_check.tsv"
+  mismatches:
+    - - meta:
+          type: map
+          description: Samplesheet row
+      - ${prefix}.assembly_mismatches.txt:
+          type: file
+          description: First 1,000 lines of the vcf_assembly_checker text report (mismatching records)
+          pattern: "*.assembly_mismatches.txt"
+  versions_vcfvalidator:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - vcf-validator:
+          type: string
+          description: The tool name
+      - vcf_assembly_checker --version 2>&1 | sed -n 's/.*version //p':
+          type: eval
+          description: The expression to obtain the version of the tool
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - vcf-validator:
+          type: string
+          description: The tool name
+      - vcf_assembly_checker --version 2>&1 | sed -n 's/.*version //p':
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

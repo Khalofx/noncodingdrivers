@@ -1,0 +1,60 @@
+# Reference datasheet for --genome GRCh38: a one-entry list parsed with samplesheetToList
+# against assets/schema_references.json. Values are the validated reference set of the
+# regression baseline (checksums also in tests/regression/PROVENANCE.md).
+#
+# Paths starting with ${reference_base} are completed with --reference_base (the Karakoram
+# profile sets it); without --reference_base those entries stay unset. Relative paths
+# (assets/...) are resolved against the pipeline directory. An explicit parameter always
+# wins over the datasheet value (--fasta, --elements_bed, --vep_cache, ...).
+# Asset recipes for every derived file: docs/references.md.
+- genome: GRCh38
+  assembly: GRCh38
+  datasheet_version: "1.0.0"
+  species: homo_sapiens
+  chr_style: ucsc
+  native: true
+  source: "GRCh38 primary assembly, UCSC contig names (25 contigs: chr1-22, chrX, chrY, chrM)"
+  fasta: ${reference_base}/hg38.chr.fa
+  fasta_md5: 838cd9f56ca7d7dd345cb025d188c991
+  fasta_fai: ${reference_base}/hg38.chr.fa.fai
+  fasta_fai_md5: 963c862ff26b0d914956faaf7192e54b
+  fasta_dict: ${reference_base}/derived/hg38.chr.dict
+  fasta_dict_md5: eee72059c0f8b6407202baa38ba3be8a
+  contig_count: 25
+  rename_map: assets/references/GRCh38.rename_chrs.map
+  element_catalogue: ${reference_base}/GRCh38_regulatory_build.ccre.noncoding.v50.bed
+  element_catalogue_md5: 39f838e6c81fdb0b152504f2d51939b5
+  element_catalogue_rows: 595725
+  element_catalogue_ids: 544737
+  element_catalogue_source: "Ensembl Regulatory Build release 110 (build 20221007), CDS removed against GENCODE v50 basic, fragments >= 50 bp"
+  element_catalogue_provenance: native
+  regbuild_url: https://ftp.ensembl.org/pub/release-110/regulation/homo_sapiens/homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20221007.gff.gz
+  regbuild_md5: ee3b05c9020f7da4244d563995a579bb
+  gtf: ${reference_base}/gencode/gencode.v50.basic.annotation.gtf.gz
+  gtf_md5: 11e77cf1d4b78b43f57d608e3f7f2202
+  gtf_source: "GENCODE v50 basic (Ensembl 116)"
+  jaspar_motifs: assets/motifs/jaspar_core_vertebrates_2026.pfm
+  jaspar_md5: c63218acf88eb5fe10255b7c8ef23d48
+  vep_cache: ${reference_base}/vep_cache_116
+  vep_cache_version: 116
+  vep_genome: GRCh38
+  vep_species: homo_sapiens
+  vep_cache_url: https://ftp.ebi.ac.uk/ensemblorg/pub/release-116/variation/indexed_vep_cache/homo_sapiens_vep_116_GRCh38.tar.gz
+  vep_cache_bsd_sum: "56036 26996736"
+  vep_cache_archive_md5: 6e10959391069a9eebb8d8d165fd29be
+  oncodrivefml_genome: ${reference_base}/oncodrivefml_genome/datasets/genomereference/hg38-20161209
+  oncodrivefml_genome_note: "official bgdata dataset genomereference/hg38-20161209 (bgdata get datasets/genomereference/hg38), copied unchanged with its .downloaded marker"
+  regulatory_peaks_dir: ${reference_base}/encode
+  regulatory_peaks_note: "49 ENCODE peak BEDs, 12 tissues, <tissue>/<layer>.<accession>.bed.gz; per-file checksums in encode/PROVENANCE.tsv"
+  liftover_chain_from_hg19: ${reference_base}/liftover/hg19ToHg38.over.chain.gz
+  liftover_chain_md5: 35887f73fe5e2231656504d1f6430900
+  liftover_source_assembly: hg19
+  liftover_source_fasta: ${reference_base}/hg19/hg19.fa
+  liftover_source_fasta_md5: 530d89d3ef07fdb2a9b3c701fb4ca486
+  liftover_source_fasta_fai: ${reference_base}/hg19/hg19.fa.fai
+  liftover_source_fasta_fai_md5: e700bec606168273af0920bd1dd49eb9
+  liftover_source_fasta_url: https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
+  liftover_source_fasta_gz_md5: 806c02398f5ac5da8ffd6da2d1d5d1a9
+  cadd_snv_version: "v1.7"
+  cadd_snv_licence: "Restricted: free for non-commercial use; user-supplied via --oncodrivefml_score, never bundled"
+  licence_summary: "open, except CADD (user-supplied, non-commercial)"

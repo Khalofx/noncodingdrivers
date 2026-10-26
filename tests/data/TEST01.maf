@@ -1,3 +1,0 @@
-Hugo_Symbol	Chromosome	Start_Position	Variant_Type	Reference_Allele	Tumor_Seq_Allele1	Tumor_Seq_Allele2	Tumor_Sample_Barcode	Project_Code
-GENE1	1	5	SNP	A	A	T	SAMPLE_A	TEST-PROJECT
-GENE2	1	8	SNP	T	T	C	SAMPLE_B	TEST-PROJECT

@@ -85,23 +85,35 @@ workflow PIPELINE_INITIALISATION {
     //
     // Licence and parameter gates for the callers (before any task runs)
     //
-    validateDriverParameters()
+    def refs = resolveReferences()
+    validateDriverParameters(refs)
 
     //
     // Create channel from input file provided through params.input:
     // one [ meta, mutations, vcf, index, maf ] tuple per samplesheet row
     //
     def rows = samplesheetToList(input, "${projectDir}/assets/schema_input.json")
-    validateInputRows(rows)
+    validateInputRows(rows, refs)
     if (params.run_mutenricher && rows.every { row -> row[0].entry == 'mutations' }) {
         log.warn("--run_mutenricher: MutEnricher reads per-sample VCFs (vcf, sarek or maf rows); " +
                  "this samplesheet has only mutations rows, so MutEnricher is not run.")
     }
+    if (params.run_mutenricher) {
+        rows.groupBy { row -> row[0].cohort ?: row[0].id }.each { cohort, cohort_rows ->
+            def entries = cohort_rows.collect { row -> row[0].entry }.unique()
+            if ('mutations' in entries && entries.size() > 1) {
+                log.warn("--run_mutenricher: cohort '${cohort}' mixes mutations rows with vcf, sarek or maf rows; " +
+                         "MutEnricher (QC-only) sees only the donors of the VCF and MAF rows.")
+            }
+        }
+    }
     channel
         .fromList(rows)
         .map { meta, mutations, vcf, index, maf ->
-            // An empty cohort makes the row its own cohort; GRCh38 and hg38 are the same assembly
-            [ meta + [ cohort: meta.cohort ?: meta.id, assembly: 'GRCh38' ], mutations, vcf, index, maf ]
+            // An empty cohort makes the row its own cohort. meta.assembly is the analysis assembly
+            // (GRCh38); meta.assembly_declared keeps the samplesheet value (GRCh37/hg19 rows are lifted)
+            def declared = meta.assembly_declared ?: 'GRCh38'
+            [ meta + [ cohort: meta.cohort ?: meta.id, assembly: 'GRCh38', assembly_declared: declared ], mutations, vcf, index, maf ]
         }
         .set { ch_samplesheet }
 
@@ -162,27 +174,151 @@ workflow PIPELINE_COMPLETION {
 */
 
 //
-// Validate samplesheet rows: this version reads canonical GRCh38 mutation tables only
+// Validate samplesheet rows before any task runs: entry tiers, assembly gates and the
+// references each tier needs. GRCh38/hg38 rows are analysed as declared (the assembly check
+// of INPUT_HARMONISATION confirms it); GRCh37/hg19 rows are lifted to GRCh38 only with
+// --allow_hg19_liftover. A mutations table is the canonical GRCh38 tier and is not lifted.
 //
-def validateInputRows(rows) {
+def validateInputRows(rows, refs) {
+    def hg19 = [ 'GRCh37', 'hg19' ]
     rows.each { row ->
         def meta = row[0]
-        if (meta.entry != 'mutations') {
-            error("Samplesheet row '${meta.id}': entry '${meta.entry}' is not available in this version of the pipeline. " +
-                  "Supply a canonical mutation table (columns sample chrom pos ref alt vtype) with entry 'mutations'.")
-        }
         def assembly = meta.assembly_declared ?: 'GRCh38'
-        if (!(assembly in [ 'GRCh38', 'hg38' ])) {
-            error("Samplesheet row '${meta.id}': assembly '${assembly}' is not supported. " +
-                  "This version analyses GRCh38 (hg38) inputs only; lift GRCh37/hg19 calls to GRCh38 first.")
+        if (assembly in hg19) {
+            if (meta.entry == 'mutations') {
+                error("ASSEMBLY_NOT_SUPPORTED: samplesheet row '${meta.id}': a mutations table is the canonical GRCh38 tier and is not lifted. " +
+                      "Supply the calls as a vcf or maf row with assembly ${assembly} (and --allow_hg19_liftover true), or lift the table first.")
+            }
+            if (!params.allow_hg19_liftover) {
+                error("ASSEMBLY_NOT_ENABLED: samplesheet row '${meta.id}' declares assembly ${assembly}. The pipeline analyses GRCh38; " +
+                      "set --allow_hg19_liftover true to lift the row with Picard LiftoverVcf (rejected records are published), or supply GRCh38 calls.")
+            }
+        }
+        if (meta.entry == 'sarek' && !meta.vcf_tumour_id) {
+            error("VCF_TUMOUR_ID_MISSING: samplesheet row '${meta.id}' (entry sarek): set vcf_tumour_id to the tumour column of the tumour/normal VCF.")
+        }
+        if (meta.entry == 'vcf' && !meta.vcf_tumour_id) {
+            def samples = vcfSampleNames(row[2])
+            if (samples.size() > 1) {
+                error("VCF_TUMOUR_ID_MISSING: samplesheet row '${meta.id}': the VCF has ${samples.size()} sample columns (${samples.join(', ')}); " +
+                      "set vcf_tumour_id to the tumour column.")
+            }
+        }
+    }
+    def variant_rows = rows.findAll { row -> row[0].entry != 'mutations' }
+    if (variant_rows && !refs.fasta) {
+        error("FASTA_MISSING: vcf, sarek and maf rows are harmonised against the GRCh38 FASTA. Set --fasta (UCSC names, .fai beside it) " +
+              "or --reference_base for the datasheet assets/references/${params.genome}.yml.")
+    }
+    def lifted_rows = variant_rows.findAll { row -> (row[0].assembly_declared ?: 'GRCh38') in hg19 }
+    if (lifted_rows) {
+        def ids = lifted_rows.collect { row -> row[0].id }.join(', ')
+        if (!refs.liftover_source_fasta) {
+            error("HG19_FASTA_MISSING: rows ${ids} declare GRCh37/hg19. Their build check and MAF conversion read the hg19 FASTA: " +
+                  "set --liftover_source_fasta (UCSC hg19, chr-named, .fai beside it) or --reference_base.")
+        }
+        if (!refs.liftover_chain) {
+            error("LIFTOVER_CHAIN_MISSING: rows ${ids} declare GRCh37/hg19: set --liftover_chain (UCSC hg19ToHg38.over.chain.gz) or --reference_base.")
+        }
+        if (!refs.fasta_dict) {
+            error("FASTA_DICT_MISSING: Picard LiftoverVcf needs the sequence dictionary of the GRCh38 FASTA: set --fasta_dict or --reference_base.")
         }
     }
 }
 
 //
+// Sample column names of a VCF (plain or bgzipped), read from its #CHROM header line
+//
+def vcfSampleNames(vcf) {
+    def path = vcf instanceof Path ? vcf : file(vcf.toString())
+    def stream = path.name.endsWith('.gz') ? new java.util.zip.GZIPInputStream(path.newInputStream()) : path.newInputStream()
+    def reader = new BufferedReader(new InputStreamReader(stream))
+    def header = ''
+    try {
+        header = reader.lines().filter { line -> !line.startsWith('##') }.findFirst().orElse('')
+    } finally {
+        reader.close()
+    }
+    return header.startsWith('#CHROM') ? header.tokenize('\t').drop(9) : []
+}
+
+//
+// Reference set of the run. The datasheet assets/references/<genome>.yml (or --references) is
+// validated by samplesheetToList against assets/schema_references.json. `${reference_base}` is
+// substituted here (nf-schema 2.5 has no parameter substitution); entries that need it stay unset
+// when --reference_base is not given. Relative entries (assets/...) resolve against the pipeline
+// directory. An explicit parameter always wins over the datasheet value (pickRef); a companion
+// file (.fai, .dict) follows its primary file when only the primary is given explicitly.
+//
+def resolveReferences() {
+    def sheet = [:]
+    if (params.genome || params.references) {
+        def sheet_path = params.references ?: "${projectDir}/assets/references/${params.genome}.yml"
+        def entries = samplesheetToList(sheet_path, "${projectDir}/assets/schema_references.json")
+        def first = entries[0]
+        sheet = first instanceof Map ? first : first[0]
+    }
+    def refs = [
+        genome            : sheet.genome ?: params.genome,
+        datasheet_version : sheet.datasheet_version,
+        elements_bed      : pickRef(sheet, 'elements_bed', 'element_catalogue'),
+        gencode_gtf       : pickRef(sheet, 'gencode_gtf', 'gtf'),
+        jaspar_motifs     : pickRef(sheet, 'jaspar_motifs', 'jaspar_motifs') ?: "${projectDir}/assets/motifs/jaspar_core_vertebrates_2026.pfm",
+        vep_cache         : pickRef(sheet, 'vep_cache', 'vep_cache'),
+        oncodrivefml_genome  : pickRef(sheet, 'oncodrivefml_genome', 'oncodrivefml_genome'),
+        regulatory_peaks_dir : pickRef(sheet, 'regulatory_peaks_dir', 'regulatory_peaks_dir'),
+        rename_chrs       : pickRef(sheet, 'rename_chrs', 'rename_map'),
+        liftover_chain    : pickRef(sheet, 'liftover_chain', 'liftover_chain_from_hg19'),
+    ]
+    // FASTA and its companions
+    refs.fasta = pickRef(sheet, 'fasta', 'fasta')
+    if (params.fasta) {
+        refs.fasta_fai  = params.fasta_fai ?: "${params.fasta}.fai"
+        refs.fasta_dict = params.fasta_dict ?: params.fasta.toString().replaceAll(/\.(fa|fasta|fna)$/, '') + '.dict'
+    } else {
+        refs.fasta_fai  = pickRef(sheet, 'fasta_fai', 'fasta_fai')
+        refs.fasta_dict = pickRef(sheet, 'fasta_dict', 'fasta_dict')
+    }
+    refs.liftover_source_fasta = pickRef(sheet, 'liftover_source_fasta', 'liftover_source_fasta')
+    refs.liftover_source_fai = params.liftover_source_fasta
+        ? (params.liftover_source_fai ?: "${params.liftover_source_fasta}.fai")
+        : pickRef(sheet, 'liftover_source_fai', 'liftover_source_fasta_fai')
+    return refs
+}
+
+//
+// An explicit parameter wins; otherwise the datasheet value with ${reference_base} substituted
+//
+def pickRef(Map sheet, String param_name, String key) {
+    def explicit = params[param_name]
+    if (explicit != null && explicit.toString() != '') {
+        return explicit.toString()
+    }
+    def value = sheet[key]
+    if (value == null || value.toString() == '') {
+        return null
+    }
+    def text = value.toString()
+    def placeholder = '${reference_base}'
+    if (text.contains(placeholder)) {
+        if (!params.reference_base) {
+            return null
+        }
+        return text.replace(placeholder, params.reference_base.toString().replaceAll(/\/+$/, ''))
+    }
+    if (text.startsWith('/') || text ==~ /^[A-Za-z][A-Za-z0-9+.-]*:\/\/.*/) {
+        return text
+    }
+    return "${projectDir}/${text}"
+}
+
+//
 // Licence and parameter gates for the driver callers
 //
-def validateDriverParameters() {
+def validateDriverParameters(refs) {
+    if (!refs.elements_bed) {
+        error("No element catalogue: set --elements_bed (headerless BED: chrom start end element_id) or --reference_base for the datasheet assets/references/${params.genome}.yml.")
+    }
     if (!params.run_activedriverwgs && !params.run_oncodrivefml) {
         error("No driver caller selected: set --run_activedriverwgs true and/or --run_oncodrivefml true.")
     }
@@ -202,11 +338,11 @@ def validateDriverParameters() {
     if (params.combination_method == 'acat' && params.skip_acat) {
         error("--combination_method acat cannot be used with --skip_acat true: ACAT would not be computed.")
     }
-    if (params.run_regulatory_context && !params.regulatory_peaks_dir) {
-        error("--run_regulatory_context needs --regulatory_peaks_dir: one folder per tissue holding <layer>.<accession>.bed.gz peak files.")
+    if (params.run_regulatory_context && !refs.regulatory_peaks_dir) {
+        error("--run_regulatory_context needs --regulatory_peaks_dir (or --reference_base for the datasheet): one folder per tissue holding <layer>.<accession>.bed.gz peak files.")
     }
-    if (params.run_vep && !params.vep_cache) {
-        error("--run_vep needs --vep_cache: an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")
+    if (params.run_vep && !refs.vep_cache) {
+        error("--run_vep needs --vep_cache (or --reference_base for the datasheet): an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")
     }
 }
 
