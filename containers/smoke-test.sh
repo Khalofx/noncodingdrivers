@@ -4,7 +4,7 @@
 #       /pipeline/containers/smoke-test.sh <name>
 set -euo pipefail
 
-name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml or combinepvalues}"
+name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml, combinepvalues or motifbreakr}"
 
 # Nextflow's task wrapper runs ps inside every task container to collect CPU and memory metrics.
 command -v ps > /dev/null || { echo "ps (procps) is missing from the ${name} image" >&2; exit 1; }
@@ -38,6 +38,20 @@ case "${name}" in
         ;;
     combinepvalues)
         Rscript -e "library(EmpiricalBrownsMethod); library(RobustRankAggreg); library(ACAT)"
+        ;;
+    motifbreakr)
+        Rscript -e "library(motifbreakR); library(universalmotif); library(BSgenome.Hsapiens.UCSC.hg38); stopifnot(as.character(packageVersion('motifbreakR')) == '2.24.0', as.character(packageVersion('universalmotif')) == '1.28.0', as.character(packageVersion('BSgenome.Hsapiens.UCSC.hg38')) == '1.4.5'); stopifnot(as.character(Biostrings::getSeq(BSgenome.Hsapiens.UCSC.hg38, 'chr5', 1295113, 1295113)) == 'G')"
+        # The adapter end to end: TERT C228T (chr5:1295113 G>A) against JASPAR MA0076.3 (ELK4) must
+        # give the ETS gain of the 10 Oct 2026 pilot (ref p 9.994507e-04, alt p 2.288818e-05).
+        tmp=$(mktemp -d)
+        printf 'sample\tchrom\tpos\tref\talt\tvtype\telement_id\nS1\tchr5\t1295113\tG\tA\tSNP\tpromoter_ENSR00000746745\n' > "$tmp/cand.tsv"
+        awk '/^>/ { p = ($1 == ">MA0076.3") } p' /pipeline/assets/motifs/jaspar_core_vertebrates_2026.pfm > "$tmp/elk4.pfm"
+        (cd "$tmp" && Rscript /pipeline/bin/run_motifbreakr.R --candidates cand.tsv --motifs elk4.pfm --prefix smoke --cores 1)
+        if ! awk -F '\t' 'NR > 1 && $7 == "MA0076.3" && $12 == "gain" && sprintf("%.4g", $9) == "0.0009995" && sprintf("%.4g", $10) == "2.289e-05" { ok = 1 } END { exit ok ? 0 : 1 }' "$tmp/smoke.motifbreakr.per_tf.tsv"; then
+            cat "$tmp/smoke.motifbreakr.per_tf.tsv" >&2
+            echo 'TERT C228T ELK4 gain not reproduced' >&2
+            exit 1
+        fi
         ;;
     *)
         echo "Unknown image: ${name}" >&2

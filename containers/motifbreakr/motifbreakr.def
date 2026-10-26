@@ -1,0 +1,32 @@
+Bootstrap: docker
+From: mambaorg/micromamba:2.0.5
+
+# Apptainer recipe of the noncodingdrivers motifbreakR image, built from the same explicit conda
+# lock as the Dockerfile in this folder (identical package set). Build on a host that allows
+# unprivileged or fakeroot builds, from this folder:
+#   apptainer build --fakeroot noncodingdrivers-motifbreakr-2.24.0.sif motifbreakr.def
+# The published image is ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0 (build-containers).
+
+%files
+    conda-lock.linux-64.txt /opt/conda-lock.linux-64.txt
+
+%post
+    set -eu
+    # /opt, not /tmp: Apptainer binds the host /tmp over the image's /tmp during %post
+    micromamba install -y -p /opt/conda -f /opt/conda-lock.linux-64.txt
+    micromamba clean -a -y
+    rm /opt/conda-lock.linux-64.txt
+    /opt/conda/bin/Rscript -e "library(motifbreakR); library(universalmotif); library(BSgenome.Hsapiens.UCSC.hg38); stopifnot(as.character(packageVersion('motifbreakR')) == '2.24.0', as.character(packageVersion('universalmotif')) == '1.28.0', as.character(packageVersion('BSgenome.Hsapiens.UCSC.hg38')) == '1.4.5')"
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%test
+    /opt/conda/bin/Rscript -e "library(BSgenome.Hsapiens.UCSC.hg38); stopifnot(as.character(Biostrings::getSeq(BSgenome.Hsapiens.UCSC.hg38, 'chr5', 1295113, 1295113)) == 'G')"
+    ps --version
+
+%labels
+    Name noncodingdrivers-motifbreakr
+    Version 2.24.0
+    License MIT
+    Source https://github.com/Khalofx/noncodingdrivers
