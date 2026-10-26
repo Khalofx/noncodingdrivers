@@ -134,7 +134,7 @@ workflow NONCODINGDRIVERS {
             file("${projectDir}/assets/awk/gene_tss.awk", checkIfExists: true),
             false
         )
-        ch_gene_tss = GENE_TSS.out.output.first()
+        ch_gene_tss = GENE_TSS.out.output
     } else {
         log.warn "Neither --gene_tss_bed nor --gencode_gtf is set: the nearest-gene table is not written"
     }
@@ -183,6 +183,8 @@ workflow NONCODINGDRIVERS {
             params.sigprofiler_genome ? file(params.sigprofiler_genome, checkIfExists: true) : [],
             []
         )
+        // per-sample COSMIC SBS96 activities reach MultiQC as custom content (assets/multiqc_config.yml)
+        ch_multiqc_files = ch_multiqc_files.mix(SIGPROFILER.out.results_sigprofiler.map { _meta, results -> results })
     }
 
     //

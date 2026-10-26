@@ -90,8 +90,6 @@
                 "candidates",
                 "candidates/SYNTH-TERT.candidates.tsv",
                 "candidates/SYNTH-TERT.nearest_gene.tsv",
-                "candidates/intermediate",
-                "candidates/intermediate/SYNTH-TERT.significant.sorted.bed",
                 "consensus",
                 "consensus/SYNTH-TERT.consensus.ebm_parameters.tsv",
                 "consensus/SYNTH-TERT.consensus.tsv",
@@ -149,7 +147,6 @@
             [
                 "SYNTH-TERT.candidates.tsv:md5,94b8aa685ffb8b925b5a036741f8c373",
                 "SYNTH-TERT.nearest_gene.tsv:md5,a8f7dd15b43b255f0c5683f086571692",
-                "SYNTH-TERT.significant.sorted.bed:md5,01be0a9c02b0861685647eab77c88992",
                 "elements.coords.tsv:md5,1fa6cb43382b95781f15bc2e4a3ae6a5",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_noncodingdrivers_caller_coverage_plot.txt:md5,5281cceacf45db03dbf7df0a88ee7192",
@@ -165,7 +162,7 @@
                 "SYNTH-TERT.lung.CTCF.ENCFF144JNX.signal-c7.bed:md5,ddfc7cc91e9310bfa4d00a5a3facf146"
             ]
         ],
-        "timestamp": "2026-10-26T09:28:16.564853919",
+        "timestamp": "2026-10-26T11:21:46.325249661",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"
