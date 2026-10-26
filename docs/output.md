@@ -12,8 +12,28 @@ The directories listed below will be created in the results directory after the 
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
+- [Input harmonisation](#input-harmonisation) - Assembly checks, liftover rejects and per-sample PASS VCFs of vcf, sarek and maf rows
 - [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+
+### Input harmonisation
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `harmonisation/assembly_check/`
+  - `<row>.assembly_check.tsv`: one row per samplesheet row: records checked against the FASTA of the declared assembly, records matching, match fraction, records on contigs outside that FASTA, threshold and status (`pass`, `low_evidence`; a row with status `ASSEMBLY_MISMATCH` stops the run).
+  - `<row>.assembly_mismatches.txt`: the first 1,000 mismatching records reported by vcf_assembly_checker.
+- `harmonisation/liftover_rejects/`
+  - `<sample>.unlifted.vcf.gz`: records of GRCh37/hg19 rows that Picard LiftoverVcf could not lift (FILTER names the reason, e.g. `NoTarget`, `MismatchedRefAllele`).
+- `harmonisation/maf2vcf_skipped/`
+  - `<sample>.skipped.tsv`: MAF rows that maf2vcf.pl dropped because their reference allele disagrees with the FASTA (only written when there are any).
+- `harmonisation/vcf/`
+  - `<sample>.pass.vcf.gz` (+ `.tbi`): per-sample VCF on GRCh38 after normalisation, PASS (or missing FILTER) records on chr1-22, X and Y; the input of MutEnricher.
+- `mutations/`
+  - `<cohort>.mutations.tsv`: the cohort mutation table (`sample chrom pos ref alt vtype`) that every caller reads: the mutations rows as given, plus the harmonised vcf, sarek and maf rows.
+
+</details>
 
 ### MultiQC
 

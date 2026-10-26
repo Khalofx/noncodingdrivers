@@ -11,354 +11,238 @@
         "properties": {
             "genome": {
                 "type": "string",
-                "enum": [
-                    "GRCh38"
-                ],
-                "meta": [
-                    "genome"
-                ]
+                "enum": ["GRCh38"],
+                "meta": ["genome"]
             },
             "assembly": {
                 "type": "string",
-                "enum": [
-                    "GRCh38"
-                ],
-                "meta": [
-                    "assembly"
-                ]
+                "enum": ["GRCh38"],
+                "meta": ["assembly"]
             },
             "datasheet_version": {
                 "type": "string",
                 "pattern": "^\\d+\\.\\d+\\.\\d+$",
-                "meta": [
-                    "datasheet_version"
-                ]
+                "meta": ["datasheet_version"]
             },
             "species": {
                 "type": "string",
-                "meta": [
-                    "species"
-                ]
+                "meta": ["species"]
             },
             "chr_style": {
                 "type": "string",
-                "enum": [
-                    "ucsc",
-                    "ensembl",
-                    "ncbi"
-                ],
-                "meta": [
-                    "chr_style"
-                ]
+                "enum": ["ucsc", "ensembl", "ncbi"],
+                "meta": ["chr_style"]
             },
             "native": {
                 "type": "boolean",
-                "meta": [
-                    "native"
-                ]
+                "meta": ["native"]
             },
             "source": {
                 "type": "string",
-                "meta": [
-                    "source"
-                ]
+                "meta": ["source"]
             },
             "fasta": {
                 "type": "string",
                 "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                "meta": [
-                    "fasta"
-                ]
+                "meta": ["fasta"]
             },
             "fasta_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "fasta_md5"
-                ]
+                "meta": ["fasta_md5"]
             },
             "fasta_fai": {
                 "type": "string",
                 "pattern": "^\\S+\\.fai$",
-                "meta": [
-                    "fasta_fai"
-                ]
+                "meta": ["fasta_fai"]
             },
             "fasta_fai_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "fasta_fai_md5"
-                ]
+                "meta": ["fasta_fai_md5"]
             },
             "fasta_dict": {
                 "type": "string",
                 "pattern": "^\\S+\\.dict$",
-                "meta": [
-                    "fasta_dict"
-                ]
+                "meta": ["fasta_dict"]
             },
             "fasta_dict_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "fasta_dict_md5"
-                ]
+                "meta": ["fasta_dict_md5"]
             },
             "contig_count": {
                 "type": "integer",
                 "minimum": 1,
-                "meta": [
-                    "contig_count"
-                ]
+                "meta": ["contig_count"]
             },
             "rename_map": {
                 "type": "string",
-                "meta": [
-                    "rename_map"
-                ]
+                "meta": ["rename_map"]
             },
             "element_catalogue": {
                 "type": "string",
-                "meta": [
-                    "element_catalogue"
-                ]
+                "meta": ["element_catalogue"]
             },
             "element_catalogue_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "element_catalogue_md5"
-                ]
+                "meta": ["element_catalogue_md5"]
             },
             "element_catalogue_rows": {
                 "type": "integer",
                 "minimum": 1,
-                "meta": [
-                    "element_catalogue_rows"
-                ]
+                "meta": ["element_catalogue_rows"]
             },
             "element_catalogue_ids": {
                 "type": "integer",
                 "minimum": 1,
-                "meta": [
-                    "element_catalogue_ids"
-                ]
+                "meta": ["element_catalogue_ids"]
             },
             "element_catalogue_source": {
                 "type": "string",
-                "meta": [
-                    "element_catalogue_source"
-                ]
+                "meta": ["element_catalogue_source"]
             },
             "element_catalogue_provenance": {
                 "type": "string",
-                "enum": [
-                    "native",
-                    "provider_lifted",
-                    "pipeline_lifted"
-                ],
-                "meta": [
-                    "element_catalogue_provenance"
-                ]
+                "enum": ["native", "provider_lifted", "pipeline_lifted"],
+                "meta": ["element_catalogue_provenance"]
             },
             "regbuild_url": {
                 "type": "string",
                 "format": "uri",
-                "meta": [
-                    "regbuild_url"
-                ]
+                "meta": ["regbuild_url"]
             },
             "regbuild_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "regbuild_md5"
-                ]
+                "meta": ["regbuild_md5"]
             },
             "gtf": {
                 "type": "string",
-                "meta": [
-                    "gtf"
-                ]
+                "meta": ["gtf"]
             },
             "gtf_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "gtf_md5"
-                ]
+                "meta": ["gtf_md5"]
             },
             "gtf_source": {
                 "type": "string",
-                "meta": [
-                    "gtf_source"
-                ]
+                "meta": ["gtf_source"]
             },
             "jaspar_motifs": {
                 "type": "string",
-                "meta": [
-                    "jaspar_motifs"
-                ]
+                "meta": ["jaspar_motifs"]
             },
             "jaspar_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "jaspar_md5"
-                ]
+                "meta": ["jaspar_md5"]
             },
             "vep_cache": {
                 "type": "string",
-                "meta": [
-                    "vep_cache"
-                ]
+                "meta": ["vep_cache"]
             },
             "vep_cache_version": {
                 "type": "integer",
                 "minimum": 1,
-                "meta": [
-                    "vep_cache_version"
-                ]
+                "meta": ["vep_cache_version"]
             },
             "vep_genome": {
                 "type": "string",
-                "meta": [
-                    "vep_genome"
-                ]
+                "meta": ["vep_genome"]
             },
             "vep_species": {
                 "type": "string",
-                "meta": [
-                    "vep_species"
-                ]
+                "meta": ["vep_species"]
             },
             "vep_cache_url": {
                 "type": "string",
                 "format": "uri",
-                "meta": [
-                    "vep_cache_url"
-                ]
+                "meta": ["vep_cache_url"]
             },
             "vep_cache_bsd_sum": {
                 "type": "string",
                 "pattern": "^\\d+ \\d+$",
-                "meta": [
-                    "vep_cache_bsd_sum"
-                ]
+                "meta": ["vep_cache_bsd_sum"]
             },
             "vep_cache_archive_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "vep_cache_archive_md5"
-                ]
+                "meta": ["vep_cache_archive_md5"]
             },
             "oncodrivefml_genome": {
                 "type": "string",
-                "meta": [
-                    "oncodrivefml_genome"
-                ]
+                "meta": ["oncodrivefml_genome"]
             },
             "oncodrivefml_genome_note": {
                 "type": "string",
-                "meta": [
-                    "oncodrivefml_genome_note"
-                ]
+                "meta": ["oncodrivefml_genome_note"]
             },
             "regulatory_peaks_dir": {
                 "type": "string",
-                "meta": [
-                    "regulatory_peaks_dir"
-                ]
+                "meta": ["regulatory_peaks_dir"]
             },
             "regulatory_peaks_note": {
                 "type": "string",
-                "meta": [
-                    "regulatory_peaks_note"
-                ]
+                "meta": ["regulatory_peaks_note"]
             },
             "liftover_chain_from_hg19": {
                 "type": "string",
-                "meta": [
-                    "liftover_chain_from_hg19"
-                ]
+                "meta": ["liftover_chain_from_hg19"]
             },
             "liftover_chain_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "liftover_chain_md5"
-                ]
+                "meta": ["liftover_chain_md5"]
             },
             "liftover_source_assembly": {
                 "type": "string",
-                "enum": [
-                    "hg19"
-                ],
-                "meta": [
-                    "liftover_source_assembly"
-                ]
+                "enum": ["hg19"],
+                "meta": ["liftover_source_assembly"]
             },
             "liftover_source_fasta": {
                 "type": "string",
                 "pattern": "^\\S+\\.fn?a(sta)?$",
-                "meta": [
-                    "liftover_source_fasta"
-                ]
+                "meta": ["liftover_source_fasta"]
             },
             "liftover_source_fasta_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "liftover_source_fasta_md5"
-                ]
+                "meta": ["liftover_source_fasta_md5"]
             },
             "liftover_source_fasta_fai": {
                 "type": "string",
                 "pattern": "^\\S+\\.fai$",
-                "meta": [
-                    "liftover_source_fasta_fai"
-                ]
+                "meta": ["liftover_source_fasta_fai"]
             },
             "liftover_source_fasta_fai_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "liftover_source_fasta_fai_md5"
-                ]
+                "meta": ["liftover_source_fasta_fai_md5"]
             },
             "liftover_source_fasta_url": {
                 "type": "string",
                 "format": "uri",
-                "meta": [
-                    "liftover_source_fasta_url"
-                ]
+                "meta": ["liftover_source_fasta_url"]
             },
             "liftover_source_fasta_gz_md5": {
                 "type": "string",
                 "pattern": "^[0-9a-f]{32}$",
-                "meta": [
-                    "liftover_source_fasta_gz_md5"
-                ]
+                "meta": ["liftover_source_fasta_gz_md5"]
             },
             "cadd_snv_version": {
                 "type": "string",
-                "meta": [
-                    "cadd_snv_version"
-                ]
+                "meta": ["cadd_snv_version"]
             },
             "cadd_snv_licence": {
                 "type": "string",
-                "meta": [
-                    "cadd_snv_licence"
-                ]
+                "meta": ["cadd_snv_licence"]
             },
             "licence_summary": {
                 "type": "string",
-                "meta": [
-                    "licence_summary"
-                ]
+                "meta": ["licence_summary"]
             }
         },
         "required": [

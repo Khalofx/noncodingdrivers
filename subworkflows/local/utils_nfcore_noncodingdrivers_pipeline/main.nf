@@ -233,12 +233,8 @@ def vcfSampleNames(vcf) {
     def path = vcf instanceof Path ? vcf : file(vcf.toString())
     def stream = path.name.endsWith('.gz') ? new java.util.zip.GZIPInputStream(path.newInputStream()) : path.newInputStream()
     def reader = new BufferedReader(new InputStreamReader(stream))
-    def header = ''
-    try {
-        header = reader.lines().filter { line -> !line.startsWith('##') }.findFirst().orElse('')
-    } finally {
-        reader.close()
-    }
+    def header = reader.lines().filter { line -> !line.startsWith('##') }.findFirst().orElse('')
+    reader.close()
     return header.startsWith('#CHROM') ? header.tokenize('\t').drop(9) : []
 }
 

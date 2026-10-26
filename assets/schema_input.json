@@ -11,60 +11,38 @@
                 "type": "string",
                 "pattern": "^[A-Za-z0-9._-]+$",
                 "errorMessage": "sample must be provided and may contain only letters, digits, '.', '_' and '-'",
-                "meta": [
-                    "id"
-                ]
+                "meta": ["id"]
             },
             "entry": {
                 "type": "string",
-                "enum": [
-                    "mutations",
-                    "vcf",
-                    "sarek",
-                    "maf"
-                ],
+                "enum": ["mutations", "vcf", "sarek", "maf"],
                 "errorMessage": "entry must be one of: mutations, vcf, sarek, maf",
-                "meta": [
-                    "entry"
-                ]
+                "meta": ["entry"]
             },
             "cohort": {
                 "type": "string",
                 "pattern": "^[A-Za-z0-9._-]+$",
                 "errorMessage": "cohort may contain only letters, digits, '.', '_' and '-'; empty means the row is its own cohort",
-                "meta": [
-                    "cohort"
-                ]
+                "meta": ["cohort"]
             },
             "cancer_type": {
                 "type": "string",
                 "pattern": "^[A-Za-z0-9._-]+$",
                 "errorMessage": "cancer_type may contain only letters, digits, '.', '_' and '-'",
-                "meta": [
-                    "cancer_type"
-                ]
+                "meta": ["cancer_type"]
             },
             "assembly": {
                 "type": "string",
-                "enum": [
-                    "GRCh38",
-                    "hg38",
-                    "GRCh37",
-                    "hg19"
-                ],
+                "enum": ["GRCh38", "hg38", "GRCh37", "hg19"],
                 "default": "GRCh38",
                 "errorMessage": "assembly must be GRCh38 or hg38 (GRCh37/hg19 rows need liftover, which is not available in this version)",
-                "meta": [
-                    "assembly_declared"
-                ]
+                "meta": ["assembly_declared"]
             },
             "vcf_tumour_id": {
                 "type": "string",
                 "pattern": "^\\S+$",
                 "errorMessage": "vcf_tumour_id cannot contain spaces",
-                "meta": [
-                    "vcf_tumour_id"
-                ]
+                "meta": ["vcf_tumour_id"]
             },
             "mutations": {
                 "type": "string",
@@ -95,10 +73,7 @@
                 "errorMessage": "maf must end in .maf or .maf.gz"
             }
         },
-        "required": [
-            "sample",
-            "entry"
-        ],
+        "required": ["sample", "entry"],
         "allOf": [
             {
                 "if": {
@@ -109,26 +84,19 @@
                     }
                 },
                 "then": {
-                    "required": [
-                        "mutations"
-                    ]
+                    "required": ["mutations"]
                 }
             },
             {
                 "if": {
                     "properties": {
                         "entry": {
-                            "enum": [
-                                "vcf",
-                                "sarek"
-                            ]
+                            "enum": ["vcf", "sarek"]
                         }
                     }
                 },
                 "then": {
-                    "required": [
-                        "vcf"
-                    ]
+                    "required": ["vcf"]
                 }
             },
             {
@@ -140,9 +108,7 @@
                     }
                 },
                 "then": {
-                    "required": [
-                        "maf"
-                    ]
+                    "required": ["maf"]
                 }
             },
             {
@@ -154,15 +120,10 @@
                     }
                 },
                 "then": {
-                    "required": [
-                        "vcf",
-                        "vcf_tumour_id"
-                    ]
+                    "required": ["vcf", "vcf_tumour_id"]
                 }
             }
         ]
     },
-    "uniqueEntries": [
-        "sample"
-    ]
+    "uniqueEntries": ["sample"]
 }

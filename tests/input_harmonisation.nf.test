@@ -42,7 +42,9 @@ nextflow_pipeline {
                 { assert check[1].tokenize('\t')[4..6] == [ '461', '461', '1.000000' ] && check[1].endsWith('\tpass') },
                 { assert rejects.size() == 1 && rejects[0].tokenize('\t')[6] == 'NoTarget' },
                 { assert path("$outputDir/harmonisation/vcf").list().findAll { f -> f.name.endsWith('.pass.vcf.gz') }.size() == 30 },
-                { assert tert != null && tert[cols.indexOf('is_consensus')] == 'True' && tert[cols.indexOf('consensus_rank')] == '1' }
+                { assert tert != null && tert[cols.indexOf('is_consensus')] == 'True' && tert[cols.indexOf('consensus_rank')] == '1' },
+                // software versions (versions.yml of the run, Nextflow version removed)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
             )
         }
     }
@@ -76,7 +78,9 @@ nextflow_pipeline {
                 { assert path("$outputDir/harmonisation/vcf/D03.pass.vcf.gz").linesGzip.find { line -> line.startsWith('#CHROM') }.tokenize('\t').drop(9) == [ 'D03_T' ] },
                 // Ensembl contig names (5) become UCSC names (chr5)
                 { assert path("$outputDir/harmonisation/vcf/D02.pass.vcf.gz").linesGzip.findAll { line -> !line.startsWith('#') }.every { line -> line.startsWith('chr5\t') } },
-                { assert path("$outputDir/harmonisation/vcf").list().findAll { f -> f.name.endsWith('.pass.vcf.gz') }.size() == 15 }
+                { assert path("$outputDir/harmonisation/vcf").list().findAll { f -> f.name.endsWith('.pass.vcf.gz') }.size() == 15 },
+                // software versions (versions.yml of the run, Nextflow version removed)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
             )
         }
     }

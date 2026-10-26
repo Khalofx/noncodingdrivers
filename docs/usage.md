@@ -16,17 +16,17 @@ mutation table before the callers run.
 --input '[path to samplesheet file]'
 ```
 
-| Column | Description |
-| --- | --- |
-| `sample` | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table. |
-| `entry` | `mutations`, `vcf`, `sarek` or `maf` (below). |
-| `cohort` | Cohort the row belongs to; empty makes the row its own cohort. |
-| `cancer_type` | Optional label. |
-| `assembly` | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (`vcf`, `sarek`, `maf` only, with `--allow_hg19_liftover`). |
-| `mutations` | `mutations` rows: canonical table, tab-separated with columns `sample chrom pos ref alt vtype` (GRCh38, UCSC names, MAF allele conventions). |
-| `vcf`, `index` | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`. |
-| `maf` | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours. |
-| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows. |
+| Column          | Description                                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                                |
+| `entry`         | `mutations`, `vcf`, `sarek` or `maf` (below).                                                                                                |
+| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                               |
+| `cancer_type`   | Optional label.                                                                                                                              |
+| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (`vcf`, `sarek`, `maf` only, with `--allow_hg19_liftover`).       |
+| `mutations`     | `mutations` rows: canonical table, tab-separated with columns `sample chrom pos ref alt vtype` (GRCh38, UCSC names, MAF allele conventions). |
+| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                                 |
+| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                                  |
+| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                              |
 
 ### Entry tiers
 

@@ -19,6 +19,9 @@ lint:
     - manifest.homePage
   multiqc_config:
     - report_comment
+  nf_test_content:
+    # assembly gates: every test stops the run before a versions.yml is written
+    - tests/assembly_mismatch.nf.test
   files_exist:
     - conf/igenomes.config
     - conf/igenomes_ignored.config

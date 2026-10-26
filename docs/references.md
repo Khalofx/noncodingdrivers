@@ -22,17 +22,17 @@ datasheet records every file with its checksum and source; the same checksums ar
 The CADD score track for OncodriveFML (`--oncodrivefml_score`) is not in the datasheet: it is free
 for non-commercial use only and is never bundled or downloaded by the pipeline.
 
-| Datasheet key | File under `reference_base` | Checksum (MD5) | Used by |
-| --- | --- | --- | --- |
-| `fasta`, `fasta_fai` | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names) | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows |
-| `fasta_dict` | `derived/hg38.chr.dict` | `eee72059c0f8b6407202baa38ba3be8a` | Picard LiftoverVcf |
-| `element_catalogue` | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids) | `39f838e6c81fdb0b152504f2d51939b5` | all callers |
-| `gtf` | `gencode/gencode.v50.basic.annotation.gtf.gz` | `11e77cf1d4b78b43f57d608e3f7f2202` | nearest-gene table |
-| `vep_cache` | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`) | archive `6e10959391069a9eebb8d8d165fd29be` | `--run_vep` |
-| `oncodrivefml_genome` | `oncodrivefml_genome/datasets/genomereference/hg38-20161209` | official bgdata dataset | OncodriveFML |
-| `regulatory_peaks_dir` | `encode` (49 peak files, 12 tissues; per-file MD5 in `encode/PROVENANCE.tsv`) | | `--run_regulatory_context` |
-| `liftover_chain_from_hg19` | `liftover/hg19ToHg38.over.chain.gz` | `35887f73fe5e2231656504d1f6430900` | GRCh37/hg19 rows |
-| `liftover_source_fasta`, `liftover_source_fasta_fai` | `hg19/hg19.fa`, `hg19/hg19.fa.fai` (UCSC, 93 contigs) | `530d89d3ef07fdb2a9b3c701fb4ca486`, `e700bec606168273af0920bd1dd49eb9` | GRCh37/hg19 rows |
+| Datasheet key                                        | File under `reference_base`                                                   | Checksum (MD5)                                                         | Used by                    |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------- |
+| `fasta`, `fasta_fai`                                 | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names)                     | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows    |
+| `fasta_dict`                                         | `derived/hg38.chr.dict`                                                       | `eee72059c0f8b6407202baa38ba3be8a`                                     | Picard LiftoverVcf         |
+| `element_catalogue`                                  | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids)  | `39f838e6c81fdb0b152504f2d51939b5`                                     | all callers                |
+| `gtf`                                                | `gencode/gencode.v50.basic.annotation.gtf.gz`                                 | `11e77cf1d4b78b43f57d608e3f7f2202`                                     | nearest-gene table         |
+| `vep_cache`                                          | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`)                | archive `6e10959391069a9eebb8d8d165fd29be`                             | `--run_vep`                |
+| `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                  | official bgdata dataset                                                | OncodriveFML               |
+| `regulatory_peaks_dir`                               | `encode` (49 peak files, 12 tissues; per-file MD5 in `encode/PROVENANCE.tsv`) |                                                                        | `--run_regulatory_context` |
+| `liftover_chain_from_hg19`                           | `liftover/hg19ToHg38.over.chain.gz`                                           | `35887f73fe5e2231656504d1f6430900`                                     | GRCh37/hg19 rows           |
+| `liftover_source_fasta`, `liftover_source_fasta_fai` | `hg19/hg19.fa`, `hg19/hg19.fa.fai` (UCSC, 93 contigs)                         | `530d89d3ef07fdb2a9b3c701fb4ca486`, `e700bec606168273af0920bd1dd49eb9` | GRCh37/hg19 rows           |
 
 Two derived tables are not in the datasheet because the pipeline builds them from the files
 above in every run: the element coordinates for the anchor join (`ELEMENT_COORDS`, from the
