@@ -91,8 +91,11 @@ if (nrow(snv)) {
 raw <- NULL
 if (nrow(snv)) {
   # ---- motifs: JASPAR PFMs -> PPMs (universalmotif) -> MotifDb MotifList ------------------
+  # read_jaspar() returns a bare motif, not a list, for a file with one motif
   um  <- read_jaspar(motif_file)
+  if (!is.list(um)) um <- list(um)
   um  <- convert_type(um, "PPM", pseudocount = 4 * pseudocount)
+  if (!is.list(um)) um <- list(um)
   ids <- vapply(um, function(m) m@name, "")
   tfs <- vapply(um, function(m) m@altname, "")
   mlen <- setNames(vapply(um, function(m) ncol(m@motif), 0L), ids)
