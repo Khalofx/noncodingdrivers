@@ -1,0 +1,41 @@
+{
+    "candidates, nearest gene and regulatory context": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.candidates.tsv:md5,14e3dcca8b27080de769279610c13c36"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.nearest_gene.tsv:md5,2409cd4cb2d4e794c4c13c82a379fad8"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.regulatory_context.tsv:md5,43d61fc379872bc7b2b8f7850fa04673"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-26T09:34:03.89428794",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

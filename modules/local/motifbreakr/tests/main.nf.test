@@ -1,0 +1,71 @@
+nextflow_process {
+
+    name "Test Process MOTIFBREAKR"
+    script "../main.nf"
+    process "MOTIFBREAKR"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "motifbreakr"
+
+    test("TERT promoter SNVs - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/motifbreakr/candidates.tsv", checkIfExists: true)
+                ]
+                input[1] = file("${projectDir}/tests/data/motifbreakr/motifs.pfm", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert path(process.out.per_tf[0][1]).readLines()[0].tokenize('\t').contains('p_below_resolution') },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    // Real run: needs the image ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0 (or the SIF
+    // built from containers/motifbreakr/motifbreakr.def). TERT C228T (chr5:1295113 G>A) must show
+    // the ETS gain of the 10 Oct 2026 pilot: ELK4 MA0076.3, ref p 9.994507e-04, alt p 2.288818e-05.
+    test("TERT promoter SNVs") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/motifbreakr/candidates.tsv", checkIfExists: true)
+                ]
+                input[1] = file("${projectDir}/tests/data/motifbreakr/motifs.pfm", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.per_tf[0][1]).readLines()
+            def cols  = lines[0].tokenize('\t')
+            def rows  = lines.drop(1).collect { line -> [ cols, line.tokenize('\t') ].transpose().collectEntries() }
+            def elk4  = rows.find { row -> row.pos == '1295113' && row.motif_id == 'MA0076.3' }
+            assert process.success
+            assertAll(
+                { assert 'p_below_resolution' in cols },
+                { assert elk4 != null },
+                { assert elk4.direction == 'gain' },
+                { assert String.format('%.4g', elk4.ref_pvalue as double) == '0.0009995' },
+                { assert String.format('%.4g', elk4.alt_pvalue as double) == '2.289e-05' },
+                { assert rows.every { row -> row.chrom == 'chr5' } },
+                { assert snapshot(process.out.per_tf).match() }
+            )
+        }
+    }
+}

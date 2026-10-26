@@ -1,0 +1,97 @@
+nextflow_workflow {
+
+    name "Test Subworkflow EXPLAIN"
+    script "../main.nf"
+    workflow "EXPLAIN"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "explain"
+
+    // Fixture (tests/data/explain): TERT_promoter_fixture and frag_F are significant; frag_F has
+    // two fragments with a mutation in the gap between them, which no caller tested; elem_A is
+    // not significant. ENCODE peaks: liver H3K27ac (narrowPeak), liver DNase (hotspot) and lung
+    // CTCF, clipped to chr5:1.15-1.45 Mb.
+    test("candidates, nearest gene and regulatory context") {
+
+        when {
+            workflow {
+                """
+                def d = "${projectDir}/tests/data/explain"
+                input[0] = channel.of([ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/consensus.tsv", checkIfExists: true) ])
+                input[1] = channel.of([ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/mutations.tsv", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'elements' ], file("\${d}/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'gene_tss' ], file("\${d}/gene_tss.bed", checkIfExists: true) ])
+                input[4] = channel.of(
+                    [ [ id:'liver.H3K27ac.ENCFF813EXR', tissue:'liver', layer:'H3K27ac', accession:'ENCFF813EXR', signal_col:7 ], file("\${d}/peaks/liver/H3K27ac.ENCFF813EXR.bed.gz", checkIfExists: true) ],
+                    [ [ id:'liver.DNase.ENCFF656NFM', tissue:'liver', layer:'DNase', accession:'ENCFF656NFM', signal_col:5 ], file("\${d}/peaks/liver/DNase.ENCFF656NFM.bed.gz", checkIfExists: true) ],
+                    [ [ id:'lung.CTCF.ENCFF144JNX', tissue:'lung', layer:'CTCF', accession:'ENCFF144JNX', signal_col:7 ], file("\${d}/peaks/lung/CTCF.ENCFF144JNX.bed.gz", checkIfExists: true) ]
+                )
+                input[5] = channel.empty()
+                input[6] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[7] = []
+                input[8] = [ regctx: true, vep: false, motifs: false, vep_cache_version: 116 ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def cand  = table(workflow.out.candidates[0][1])
+            def near  = table(workflow.out.nearest[0][1])
+            def rc    = table(workflow.out.regctx[0][1])
+            assert workflow.success
+            assertAll(
+                { assert cand.size() == 5 },
+                { assert cand*.element_id.toSet() == [ 'TERT_promoter_fixture', 'frag_F' ] as Set },
+                { assert !cand.any { r -> r.pos == '1400300' } },                 // gap between frag_F's fragments
+                { assert !cand.any { r -> r.element_id == 'elem_A' } },           // not significant
+                { assert cand.count { r -> r.element_id == 'TERT_promoter_fixture' } == 3 },
+                { assert cand.find { r -> r.vtype == 'DEL' }?.element_id == 'frag_F' },
+                { assert near.size() == 2 },
+                { assert near.every { r -> r.nearest_gene_status == 'assigned' } },
+                // GENCODE v50: the nearest TSS to the TERT promoter midpoint is the + strand lncRNA
+                // ENSG00000300381 (as in v0.1); frag_F's is a - strand gene upstream of it, so the
+                // signed distance (tss - midpoint on -) is negative
+                { assert near.find { r -> r.element_id == 'TERT_promoter_fixture' }.subMap([ 'nearest_gene_ensembl_id', 'gene_strand', 'distance_to_tss', 'relative_position' ]) ==
+                    [ nearest_gene_ensembl_id: 'ENSG00000300381.1', gene_strand: '+', distance_to_tss: '156', relative_position: 'overlapping_tss' ] },
+                { assert near.find { r -> r.element_id == 'frag_F' }.subMap([ 'gene_strand', 'distance_to_tss', 'relative_position' ]) ==
+                    [ gene_strand: '-', distance_to_tss: '-13930', relative_position: 'upstream' ] },
+                { assert rc.size() == 6 },                                         // 2 elements x 3 staged files
+                { assert rc.findAll { r -> r.element_id == 'frag_F' }.every { r -> r.n_fragments == '2' } },
+                { assert rc.find { r -> r.layer == 'DNase' }.signal_source == 'max_density(col5)' },
+                { assert snapshot(workflow.out.candidates, workflow.out.nearest, workflow.out.regctx).match() }
+            )
+        }
+    }
+
+    test("no significant element - skip") {
+
+        when {
+            workflow {
+                """
+                def d = "${projectDir}/tests/data/explain"
+                input[0] = channel.of([ [ id:'none', cohort:'none', assembly:'GRCh38' ], file("\${d}/consensus_none.tsv", checkIfExists: true) ])
+                input[1] = channel.of([ [ id:'none', cohort:'none', assembly:'GRCh38' ], file("\${d}/mutations.tsv", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'elements' ], file("\${d}/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'gene_tss' ], file("\${d}/gene_tss.bed", checkIfExists: true) ])
+                input[4] = channel.empty()
+                input[5] = channel.empty()
+                input[6] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[7] = []
+                input[8] = [ regctx: false, vep: false, motifs: false, vep_cache_version: 116 ]
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert workflow.out.candidates.size() == 0 },
+                { assert workflow.out.nearest.size() == 0 },
+                { assert file("${metaDir}/nextflow.log").text.contains('no element has is_consensus == True') }
+            )
+        }
+    }
+}

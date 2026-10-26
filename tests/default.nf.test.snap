@@ -9,6 +9,12 @@
                 "ANCHOR_JOIN": {
                     "csvtk": "0.37.0"
                 },
+                "CANDIDATES": {
+                    "bedtools": "2.31.1"
+                },
+                "CANDIDATE_TABLE": {
+                    "gawk": "5.3.1"
+                },
                 "COHORT_CONCAT": {
                     "csvtk": "0.37.0"
                 },
@@ -27,11 +33,44 @@
                 "HARMONIZECALLS": {
                     "csvtk": "0.37.0"
                 },
+                "MIDPOINT_BED": {
+                    "gawk": "5.3.1"
+                },
+                "MUTATION_BED": {
+                    "gawk": "5.3.1"
+                },
+                "NEAREST_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "NEAREST_TSS": {
+                    "bedtools": "2.31.1"
+                },
                 "ONCODRIVEFML": {
                     "oncodrivefml": "2.5.0"
                 },
+                "REGCTX_OVERLAP": {
+                    "bedtools": "2.31.1"
+                },
+                "REGCTX_SIGNAL": {
+                    "bedtools": "2.31.1"
+                },
+                "REGCTX_TABLE": {
+                    "gawk": "5.3.1"
+                },
                 "RUNSUMMARYMQC": {
                     "python": "3.11.14"
+                },
+                "SIGNIFICANT_BED": {
+                    "gawk": "5.3.1"
+                },
+                "SORT_MIDPOINTS": {
+                    "bedtools": "2.31.1"
+                },
+                "SORT_PEAKS": {
+                    "bedtools": "2.31.1"
+                },
+                "SORT_SIGNIFICANT": {
+                    "bedtools": "2.31.1"
                 },
                 "UNTAR_ONCODRIVEFML_GENOME": {
                     "untar": 1.34
@@ -48,6 +87,9 @@
                 "callers/oncodrivefml",
                 "callers/oncodrivefml/SYNTH-TERT.oncodrivefml.status.txt",
                 "callers/oncodrivefml/SYNTH-TERT.oncodrivefml.tsv",
+                "candidates",
+                "candidates/SYNTH-TERT.candidates.tsv",
+                "candidates/SYNTH-TERT.nearest_gene.tsv",
                 "consensus",
                 "consensus/SYNTH-TERT.consensus.ebm_parameters.tsv",
                 "consensus/SYNTH-TERT.consensus.tsv",
@@ -91,18 +133,36 @@
                 "mutations",
                 "mutations/SYNTH-TERT.mutations.tsv",
                 "pipeline_info",
-                "pipeline_info/noncodingdrivers_software_mqc_versions.yml"
+                "pipeline_info/noncodingdrivers_software_mqc_versions.yml",
+                "regulatory_context",
+                "regulatory_context/SYNTH-TERT.regulatory_context.tsv",
+                "regulatory_context/per_file",
+                "regulatory_context/per_file/SYNTH-TERT.liver.DNase.ENCFF656NFM.coverage.bed",
+                "regulatory_context/per_file/SYNTH-TERT.liver.DNase.ENCFF656NFM.signal-c5.bed",
+                "regulatory_context/per_file/SYNTH-TERT.liver.H3K27ac.ENCFF813EXR.coverage.bed",
+                "regulatory_context/per_file/SYNTH-TERT.liver.H3K27ac.ENCFF813EXR.signal-c7.bed",
+                "regulatory_context/per_file/SYNTH-TERT.lung.CTCF.ENCFF144JNX.coverage.bed",
+                "regulatory_context/per_file/SYNTH-TERT.lung.CTCF.ENCFF144JNX.signal-c7.bed"
             ],
             [
+                "SYNTH-TERT.candidates.tsv:md5,94b8aa685ffb8b925b5a036741f8c373",
+                "SYNTH-TERT.nearest_gene.tsv:md5,a8f7dd15b43b255f0c5683f086571692",
                 "elements.coords.tsv:md5,1fa6cb43382b95781f15bc2e4a3ae6a5",
                 "multiqc_citations.txt:md5,4c806e63a283ec1b7e78cdae3a923d4f",
                 "multiqc_noncodingdrivers_caller_coverage_plot.txt:md5,5281cceacf45db03dbf7df0a88ee7192",
                 "multiqc_noncodingdrivers_caller_rows_plot.txt:md5,5281cceacf45db03dbf7df0a88ee7192",
                 "multiqc_noncodingdrivers_overview_plot.txt:md5,0fc098fdac3c04843c039f5e4e76c14a",
-                "SYNTH-TERT.mutations.tsv:md5,edff7ae46f6b8967d77dac216e307d23"
+                "SYNTH-TERT.mutations.tsv:md5,edff7ae46f6b8967d77dac216e307d23",
+                "SYNTH-TERT.regulatory_context.tsv:md5,14abdfa8bb332efb38b5d58437d28486",
+                "SYNTH-TERT.liver.DNase.ENCFF656NFM.coverage.bed:md5,bfd770aba2ba3fee3320c14a8b9edf00",
+                "SYNTH-TERT.liver.DNase.ENCFF656NFM.signal-c5.bed:md5,e6ad69b0d4b8e44233f617dab04a4099",
+                "SYNTH-TERT.liver.H3K27ac.ENCFF813EXR.coverage.bed:md5,17962717b7bcfad855c1ff72c9457770",
+                "SYNTH-TERT.liver.H3K27ac.ENCFF813EXR.signal-c7.bed:md5,a8dcbd60c1e593350124e235fd097bcf",
+                "SYNTH-TERT.lung.CTCF.ENCFF144JNX.coverage.bed:md5,a081b45ee68fe8d0f8c91fedac573ffa",
+                "SYNTH-TERT.lung.CTCF.ENCFF144JNX.signal-c7.bed:md5,ddfc7cc91e9310bfa4d00a5a3facf146"
             ]
         ],
-        "timestamp": "2026-10-23T15:47:10.540938029",
+        "timestamp": "2026-10-26T11:21:46.325249661",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

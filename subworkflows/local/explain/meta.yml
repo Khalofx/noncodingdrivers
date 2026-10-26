@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "explain"
+description: Annotation layers on the significant elements and their candidate mutations (candidate table, nearest gene, ENCODE regulatory context, Ensembl VEP, motifbreakR); none of them filters or re-ranks a candidate
+keywords:
+  - annotation
+  - candidate mutations
+  - nearest gene
+  - regulatory context
+  - vep
+  - motif
+components:
+  - gawk
+  - bedtools/sort
+  - bedtools/intersect
+  - bedtools/closest
+  - bedtools/coverage
+  - bedtools/map
+  - ensemblvep/vep
+input:
+  - ch_consensus:
+      type: file
+      description: |
+        Consensus table per cohort (element_id, chrom, start, end, is_consensus, ...)
+        Structure: [ val(meta), path(consensus) ]
+      pattern: "*.consensus.tsv"
+  - ch_mutations:
+      type: file
+      description: |
+        Canonical mutation table per cohort (sample chrom pos ref alt vtype); calls-only cohorts are skipped
+        Structure: [ val(meta), path(mutations) ]
+      pattern: "*.tsv"
+  - ch_elements:
+      type: file
+      description: |
+        Element catalogue BED (chrom start end element_id; one row per fragment)
+        Structure: [ val(meta2), path(bed) ]
+      pattern: "*.bed"
+  - ch_gene_tss:
+      type: file
+      description: |
+        Sorted gene TSS BED (assets/awk/gene_tss.awk), or an empty channel (no nearest-gene table)
+        Structure: [ val(meta3), path(bed) ]
+      pattern: "*.bed"
+  - ch_peaks:
+      type: file
+      description: |
+        One ENCODE peak file per item, meta with tissue, layer, accession and signal_col; or empty
+        Structure: [ val(meta4), path(peaks) ]
+      pattern: "*.{bed,bed.gz}"
+  - ch_vep_cache:
+      type: directory
+      description: |
+        Offline Ensembl VEP cache, or an empty channel
+        Structure: [ val(meta5), path(cache) ]
+  - awk_dir:
+      type: directory
+      description: Directory with the gawk adapter programs (assets/awk)
+  - motifs:
+      type: file
+      description: JASPAR-format PFM file for motifbreakR, or []
+      pattern: "*.pfm"
+  - options:
+      type: map
+      description: "[ regctx: bool, vep: bool, motifs: bool, vep_cache_version: int ]"
+output:
+  - candidates:
+      type: file
+      description: |
+        Patient-resolved candidate mutations, one row per sample x mutation x significant element
+        Structure: [ val(meta), path(candidates.tsv) ]
+      pattern: "*.candidates.tsv"
+  - nearest:
+      type: file
+      description: |
+        Nearest annotated TSS per significant element (proximity only), signed distance in the direction of transcription
+        Structure: [ val(meta), path(nearest_gene.tsv) ]
+      pattern: "*.nearest_gene.tsv"
+  - regctx:
+      type: file
+      description: |
+        Long table, one row per significant element x staged tissue x layer
+        Structure: [ val(meta), path(regulatory_context.tsv) ]
+      pattern: "*.regulatory_context.tsv"
+  - vep:
+      type: file
+      description: |
+        Ensembl VEP tab output for the distinct candidate variants
+        Structure: [ val(meta), path(tab.gz) ]
+      pattern: "*.tab.gz"
+  - motif_per_tf:
+      type: file
+      description: |
+        motifbreakR effects, one row per SNV x TF
+        Structure: [ val(meta), path(per_tf.tsv) ]
+      pattern: "*.motifbreakr.per_tf.tsv"
+  - mqc:
+      type: file
+      description: Ensembl VEP summary report for MultiQC
+      pattern: "*.html"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

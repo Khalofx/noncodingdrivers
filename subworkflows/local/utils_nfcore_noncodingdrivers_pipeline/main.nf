@@ -202,6 +202,39 @@ def validateDriverParameters() {
     if (params.combination_method == 'acat' && params.skip_acat) {
         error("--combination_method acat cannot be used with --skip_acat true: ACAT would not be computed.")
     }
+    if (params.run_regulatory_context && !params.regulatory_peaks_dir) {
+        error("--run_regulatory_context needs --regulatory_peaks_dir: one folder per tissue holding <layer>.<accession>.bed.gz peak files.")
+    }
+    if (params.run_vep && !params.vep_cache) {
+        error("--run_vep needs --vep_cache: an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")
+    }
+}
+
+//
+// Meta map of one ENCODE peak file, <dir>/<tissue>/<layer>.<accession>.bed[.gz]. The signal
+// column follows the file layout, read from its first data line: narrowPeak (10 or 20 columns)
+// keeps signalValue (fold enrichment) in column 7, DNase hotspot files (8 columns) keep
+// max_density in column 5. Any other layout stops the run rather than reading an arbitrary column.
+//
+def peakFileMeta(peak) {
+    def tissue    = peak.parent.name
+    def tokens    = peak.name.tokenize('.')
+    def layer     = tokens[0]
+    def accession = tokens.size() > 2 ? tokens[1] : 'NA'
+    def stream    = peak.name.endsWith('.gz') ? new java.util.zip.GZIPInputStream(peak.newInputStream()) : peak.newInputStream()
+    def first     = stream.withReader { reader ->
+        new BufferedReader(reader).lines()
+            .filter { line -> line && !(line.startsWith('#') || line.startsWith('track') || line.startsWith('browser')) }
+            .findFirst()
+            .orElse(null)
+    }
+    def ncol       = first ? first.tokenize('\t').size() : 0
+    def signal_col = ncol in [ 10, 20 ] ? 7 : (ncol == 8 ? 5 : 0)
+    if (!signal_col) {
+        error("Peak file ${peak}: ${ncol} columns is not a supported layout. Supported: narrowPeak (10 or 20 columns, " +
+              "signalValue in column 7) and DNase hotspot (8 columns, max_density in column 5).")
+    }
+    return [ id: "${tissue}.${layer}.${accession}", tissue: tissue, layer: layer, accession: accession, signal_col: signal_col ]
 }
 
 //

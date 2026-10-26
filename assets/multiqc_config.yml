@@ -12,3 +12,19 @@ report_section_order:
 export_plots: true
 
 disable_version_detection: true
+
+# Optional SigProfiler QC (--run_sigprofiler): COSMIC SBS96 signature activities per sample.
+# Cohort-level QC only; no element filter or score uses them.
+custom_data:
+  sigprofiler_sbs96_activities:
+    file_format: "tsv"
+    section_name: "SigProfiler SBS96 activities"
+    description: "Mutations attributed to each COSMIC SBS signature per sample (SigProfilerExtractor, decomposed to COSMIC). Cohort-level QC: no element filter or score uses these values."
+    plot_type: "bargraph"
+    pconfig:
+      id: "sigprofiler_sbs96_activities_plot"
+      title: "SigProfiler: COSMIC SBS96 activities"
+      ylab: "Mutations"
+sp:
+  sigprofiler_sbs96_activities:
+    fn: "COSMIC_SBS96_Activities.txt"
