@@ -1,0 +1,5 @@
+sample	chrom	pos	ref	alt	vtype	element_id
+S1	chr5	1295113	G	A	SNP	promoter_ENSR00000746745
+S2	chr5	1295113	G	A	SNP	promoter_ENSR00000746745
+S3	chr5	1295135	G	A	SNP	promoter_ENSR00000746745
+S4	chr5	1295140	C	-	DEL	promoter_ENSR00000746745

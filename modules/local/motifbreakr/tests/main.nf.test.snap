@@ -1,0 +1,128 @@
+{
+    "TERT promoter SNVs - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.motifbreakr.tsv:md5,7b13b7cecfa9b52f03a204f6a1cd2a7b"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.motifbreakr.per_tf.tsv:md5,2bf9b6ef17761ceedffbecd535374406"
+                    ]
+                ],
+                "2": [
+                    [
+                        "MOTIFBREAKR",
+                        "motifbreakr",
+                        "2.24.0"
+                    ]
+                ],
+                "3": [
+                    [
+                        "MOTIFBREAKR",
+                        "universalmotif",
+                        "1.28.0"
+                    ]
+                ],
+                "4": [
+                    [
+                        "MOTIFBREAKR",
+                        "bsgenome.hsapiens.ucsc.hg38",
+                        "1.4.5"
+                    ]
+                ],
+                "5": [
+                    [
+                        "MOTIFBREAKR",
+                        "r-base",
+                        "4.5.3"
+                    ]
+                ],
+                "motifbreakr": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.motifbreakr.tsv:md5,7b13b7cecfa9b52f03a204f6a1cd2a7b"
+                    ]
+                ],
+                "per_tf": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.motifbreakr.per_tf.tsv:md5,2bf9b6ef17761ceedffbecd535374406"
+                    ]
+                ],
+                "versions_bsgenome": [
+                    [
+                        "MOTIFBREAKR",
+                        "bsgenome.hsapiens.ucsc.hg38",
+                        "1.4.5"
+                    ]
+                ],
+                "versions_motifbreakr": [
+                    [
+                        "MOTIFBREAKR",
+                        "motifbreakr",
+                        "2.24.0"
+                    ]
+                ],
+                "versions_r": [
+                    [
+                        "MOTIFBREAKR",
+                        "r-base",
+                        "4.5.3"
+                    ]
+                ],
+                "versions_universalmotif": [
+                    [
+                        "MOTIFBREAKR",
+                        "universalmotif",
+                        "1.28.0"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-26T09:21:11.420761309",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "TERT promoter SNVs": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.motifbreakr.per_tf.tsv:md5,45a7ecb8dd2416bfdd1dfc12e5fddb53"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-26T09:21:38.49170571",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

@@ -1,0 +1,5 @@
+element_id	chrom	start	end	n_fragments	consensus_q	is_consensus
+TERT_promoter_fixture	chr5	1294989	1295601	1	0.001	False
+frag_F	chr5	1400000	1400700	2	0.05	False
+elem_A	chr5	1220000	1220600	1	0.9	False
+elem_B	chr5	1250000	1250800	1	1	False

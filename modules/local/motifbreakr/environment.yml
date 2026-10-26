@@ -1,0 +1,10 @@
+# Same channels and dependencies as containers/motifbreakr/environment.yml (the image recipe,
+# built from its explicit lock). Keep the two lists identical.
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::bioconductor-motifbreakr=2.24.0
+  - bioconda::bioconductor-universalmotif=1.28.0
+  - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.5
+  - conda-forge::procps-ng

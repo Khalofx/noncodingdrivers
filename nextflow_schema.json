@@ -308,6 +308,86 @@
                     "description": "Do not compute ACAT (use when the ACAT package is unavailable, e.g. -profile conda). Not allowed with --combination_method acat."
                 }
             }
+        },
+        "annotation_options": {
+            "title": "Annotation options",
+            "type": "object",
+            "fa_icon": "fas fa-info-circle",
+            "description": "Annotation layers on the significant elements and their candidate mutations (EXPLAIN). None of them filters or re-ranks a candidate.",
+            "properties": {
+                "gencode_gtf": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.gtf(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "GENCODE GTF (GRCh38, chr-named or Ensembl-named). Its gene records give the TSSs of the nearest-gene table.",
+                    "help_text": "A gene's TSS is its start on the + strand and its end on the - strand, for every gene biotype. The TSS BED built from it is published under references/ and can be reused with --gene_tss_bed."
+                },
+                "gene_tss_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed$",
+                    "fa_icon": "fas fa-file",
+                    "description": "Pre-built sorted gene TSS BED (chrom, tss-1, tss, gene_id, 0, strand, gene_name, gene_type), used instead of --gencode_gtf."
+                },
+                "run_regulatory_context": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-layer-group",
+                    "description": "Report ENCODE peak overlap (peak count, covered bases, maximum signal) of each significant element per tissue and layer."
+                },
+                "regulatory_peaks_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Folder with one sub-folder per tissue holding <layer>.<accession>.bed.gz peak files (narrowPeak or DNase hotspot).",
+                    "help_text": "A layer that is not staged for a tissue is absent from the output table, never reported as zero."
+                },
+                "run_vep": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-dna",
+                    "description": "Annotate candidate mutations with Ensembl VEP from an offline cache (consequences, gnomAD genome AF). --regulatory is never used."
+                },
+                "vep_cache": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Offline Ensembl VEP cache directory (holding homo_sapiens/<version>_GRCh38)."
+                },
+                "vep_cache_version": {
+                    "type": "integer",
+                    "default": 116,
+                    "fa_icon": "fas fa-code-branch",
+                    "description": "Ensembl VEP cache release (116 = GENCODE v50)."
+                },
+                "run_motifbreakr": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-search",
+                    "description": "Score candidate SNVs for transcription-factor motif disruption and creation with motifbreakR (annotation and hypothesis only)."
+                },
+                "jaspar_motifs": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-file",
+                    "description": "JASPAR-format PFM file for motifbreakR. Default: assets/motifs/jaspar_core_vertebrates_2026.pfm (JASPAR 2026 CORE vertebrates, 1,019 profiles)."
+                },
+                "run_sigprofiler": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-chart-bar",
+                    "description": "Optional cohort-level QC: SigProfiler mutational-signature extraction and per-sample exposures. Slow; nothing downstream uses it."
+                },
+                "sigprofiler_genome": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Pre-installed SigProfilerMatrixGenerator GRCh38 genome, for compute nodes without internet."
+                }
+            }
         }
     },
     "allOf": [
@@ -322,6 +402,9 @@
         },
         {
             "$ref": "#/$defs/consensus_options"
+        },
+        {
+            "$ref": "#/$defs/annotation_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

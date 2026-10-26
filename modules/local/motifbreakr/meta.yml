@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "motifbreakr"
+description: Score candidate SNVs for transcription-factor motif disruption and creation with motifbreakR (JASPAR motifs read by universalmotif); annotation and hypothesis only
+keywords:
+  - motif
+  - transcription factor
+  - non-coding
+  - variant effect
+tools:
+  - "motifbreakr":
+      description: "Predicting the disruptiveness of single nucleotide polymorphisms on transcription factor binding sites"
+      homepage: "https://bioconductor.org/packages/motifbreakR"
+      documentation: "https://bioconductor.org/packages/motifbreakR"
+      doi: "10.1093/bioinformatics/btv470"
+      licence: ["GPL-2.0-only"]
+      identifier: "biotools:motifbreakr"
+  - "universalmotif":
+      description: "Import, modify and export motifs (JASPAR PFMs to probability matrices)"
+      homepage: "https://bioconductor.org/packages/universalmotif"
+      documentation: "https://bioconductor.org/packages/universalmotif"
+      licence: ["GPL-3.0-only"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - candidates:
+        type: file
+        description: Candidate mutation table with chrom, pos, ref, alt and vtype columns (chr-named GRCh38); only SNVs are scanned
+        pattern: "*.tsv"
+        ontologies: []
+  - motifs:
+      type: file
+      description: JASPAR-format PFM file (">ID NAME" followed by four A/C/G/T count rows)
+      pattern: "*.{pfm,txt,jaspar}"
+      ontologies: []
+
+output:
+  motifbreakr:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.motifbreakr.tsv":
+          type: file
+          description: motifbreakR result table as returned by calculatePvalue() (list columns joined by commas)
+          pattern: "*.motifbreakr.tsv"
+          ontologies: []
+  per_tf:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.motifbreakr.per_tf.tsv":
+          type: file
+          description: One row per SNV x TF (the TF's matrix with the smallest best-allele p) with direction, fold change and the p_below_resolution flag (p = 0 is never floored)
+          pattern: "*.motifbreakr.per_tf.tsv"
+          ontologies: []
+  versions_motifbreakr:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "motifbreakr":
+          type: string
+          description: The name of the tool
+      - "grep '^motifbreakR' motifbreakr.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_universalmotif:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "universalmotif":
+          type: string
+          description: The name of the tool
+      - "grep '^universalmotif' motifbreakr.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_bsgenome:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "bsgenome.hsapiens.ucsc.hg38":
+          type: string
+          description: The name of the tool
+      - "grep '^BSgenome' motifbreakr.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_r:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "r-base":
+          type: string
+          description: The name of the tool
+      - "grep '^r-base' motifbreakr.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - motifbreakr:
+          type: string
+          description: The name of the tool
+      - grep '^motifbreakR' motifbreakr.versions.tsv | cut -f2:
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

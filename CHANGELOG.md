@@ -26,6 +26,17 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   CI (`.github/workflows/pytest.yml`).
 - Test profile on the companion repository `Khalofx/noncodingdrivers-test-datasets` (synthetic
   TERT-window cohort), Karakoram site profile.
+- Annotation layers in the `EXPLAIN` subworkflow; none of them filters or re-ranks a candidate:
+  patient-resolved candidate mutations on the fragments of the significant elements (nf-core
+  `bedtools/intersect`), nearest gene from the element midpoint to GENCODE gene TSSs with a
+  strand-aware signed distance (nf-core `bedtools/closest`; `--gencode_gtf` or `--gene_tss_bed`),
+  ENCODE regulatory context per tissue and layer (`--run_regulatory_context`; nf-core
+  `bedtools/coverage` and `bedtools/map`), Ensembl VEP on candidate mutations (`--run_vep`; nf-core
+  `ensemblvep/vep`, offline cache, never `--regulatory`) and motifbreakR on candidate SNVs
+  (`--run_motifbreakr`; local `MOTIFBREAKR`, JASPAR 2026 CORE vertebrates bundled).
+- Pipeline-owned motifbreakR image `ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0`, built
+  from an explicit conda lock (`containers/motifbreakr/`), with an Apptainer recipe for HPC builds.
+- Optional cohort-level signature QC (`--run_sigprofiler`; nf-core `sigprofiler`).
 
 ### `Fixed`
 
@@ -42,5 +53,10 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 | csvtk                 | 0.37.0  |
 | gawk                  | 5.3.1   |
 | MultiQC               | 1.35    |
+| bedtools              | 2.31.1  |
+| Ensembl VEP           | 116.3   |
+| motifbreakR           | 2.24.0  |
+| universalmotif        | 1.28.0  |
+| SigProfilerExtractor  | 1.2.2   |
 
 ### `Deprecated`

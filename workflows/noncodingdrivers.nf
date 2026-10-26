@@ -13,6 +13,11 @@ include { GAWK as COHORT_DEDUP              } from '../modules/nf-core/gawk/main
 include { UNTAR as UNTAR_ONCODRIVEFML_GENOME } from '../modules/nf-core/untar/main'
 include { DRIVER_DISCOVERY                  } from '../subworkflows/local/driver_discovery'
 include { RUNSUMMARYMQC                     } from '../modules/local/runsummarymqc'
+include { GAWK as GENE_TSS                  } from '../modules/nf-core/gawk/main'
+include { GAWK as SIGPROFILER_INPUT         } from '../modules/nf-core/gawk/main'
+include { SIGPROFILER                       } from '../modules/nf-core/sigprofiler/main'
+include { EXPLAIN                           } from '../subworkflows/local/explain'
+include { peakFileMeta                      } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -115,6 +120,72 @@ workflow NONCODINGDRIVERS {
     ch_multiqc_files = ch_multiqc_files.mix(RUNSUMMARYMQC.out.sections.map { _meta, sections -> sections })
 
     //
+    // References for the annotation layers. The nearest-gene table uses a sorted gene TSS BED:
+    // --gene_tss_bed, or one built from --gencode_gtf by assets/awk/gene_tss.awk (TSS = gene
+    // start on +, gene end on -). Without either, no nearest-gene table is written.
+    //
+    def ch_gene_tss = channel.empty()
+    if (params.gene_tss_bed) {
+        ch_gene_tss = channel.value([ [ id: 'gene_tss' ], file(params.gene_tss_bed, checkIfExists: true) ])
+    } else if (params.gencode_gtf) {
+        def gtf = file(params.gencode_gtf, checkIfExists: true)
+        GENE_TSS(
+            channel.of([ [ id: gtf.name.replaceAll(/\.gtf(\.gz)?$/, '') ], gtf, 'tss.bed' ]),
+            file("${projectDir}/assets/awk/gene_tss.awk", checkIfExists: true),
+            false
+        )
+        ch_gene_tss = GENE_TSS.out.output.first()
+    } else {
+        log.warn "Neither --gene_tss_bed nor --gencode_gtf is set: the nearest-gene table is not written"
+    }
+
+    // ENCODE peak files, one per tissue and layer: <regulatory_peaks_dir>/<tissue>/<layer>.<accession>.bed.gz
+    def ch_peaks = channel.empty()
+    if (params.run_regulatory_context) {
+        ch_peaks = channel.fromPath("${params.regulatory_peaks_dir}/*/*.{bed,bed.gz}", checkIfExists: true)
+            .map { peak -> [ peakFileMeta(peak), peak ] }
+    }
+
+    def ch_vep_cache = channel.empty()
+    if (params.run_vep) {
+        ch_vep_cache = channel.value([ [ id: "vep_${params.vep_cache_version}" ], file(params.vep_cache, checkIfExists: true) ])
+    }
+    def motifs = params.run_motifbreakr
+        ? file(params.jaspar_motifs ?: "${projectDir}/assets/motifs/jaspar_core_vertebrates_2026.pfm", checkIfExists: true)
+        : []
+
+    //
+    // SUBWORKFLOW: annotation layers (none of them filters or re-ranks a candidate)
+    //
+    EXPLAIN(
+        DRIVER_DISCOVERY.out.consensus,
+        ch_mutations,
+        ch_elements,
+        ch_gene_tss,
+        ch_peaks,
+        ch_vep_cache,
+        file("${projectDir}/assets/awk", checkIfExists: true),
+        motifs,
+        [ regctx: params.run_regulatory_context, vep: params.run_vep, motifs: params.run_motifbreakr,
+          vep_cache_version: params.vep_cache_version ]
+    )
+    ch_multiqc_files = ch_multiqc_files.mix(EXPLAIN.out.mqc)
+
+    //
+    // Optional cohort-level QC: SigProfiler signature exposures per sample (nf-core sigprofiler).
+    // No element filter and no scoring use these exposures.
+    //
+    if (params.run_sigprofiler) {
+        SIGPROFILER_INPUT(ch_mutations.map { meta, tsv -> [ meta, tsv, 'tsv' ] }, file("${projectDir}/assets/awk/sigprofiler_input.awk", checkIfExists: true), false)
+        SIGPROFILER(
+            SIGPROFILER_INPUT.out.output,
+            'GRCh38',
+            params.sigprofiler_genome ? file(params.sigprofiler_genome, checkIfExists: true) : [],
+            []
+        )
+    }
+
+    //
     // Collate and save software versions
     //
     def topic_versions = channel.topic("versions")
@@ -172,6 +243,7 @@ workflow NONCODINGDRIVERS {
     emit:
     mutations      = ch_mutations                      // channel: [ val(meta), path(mutations) ] one table per cohort
     consensus      = DRIVER_DISCOVERY.out.consensus    // channel: [ val(meta), path(consensus) ]
+    candidates     = EXPLAIN.out.candidates            // channel: [ val(meta), path(candidates) ]
     multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                       // channel: [ path(versions.yml) ]
 }

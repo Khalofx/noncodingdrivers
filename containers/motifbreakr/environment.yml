@@ -1,0 +1,12 @@
+# Requested packages of the noncodingdrivers motifbreakR image. The image itself is built from
+# conda-lock.linux-64.txt, the explicit lock resolved from this file (every package, URL and MD5),
+# so a rebuild installs exactly the tested set. Regenerate the lock only when a pin changes
+# (containers/motifbreakr/README.md). Keep identical to modules/local/motifbreakr/environment.yml.
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::bioconductor-motifbreakr=2.24.0
+  - bioconda::bioconductor-universalmotif=1.28.0
+  - bioconda::bioconductor-bsgenome.hsapiens.ucsc.hg38=1.4.5
+  - conda-forge::procps-ng
