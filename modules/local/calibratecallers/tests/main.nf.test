@@ -1,0 +1,43 @@
+nextflow_process {
+
+    name "Test Process CALIBRATECALLERS"
+    script "../main.nf"
+    process "CALIBRATECALLERS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "calibratecallers"
+
+    // Synthetic tables (tests/data/calibratecallers, numpy seed 20261027): 300 elements with
+    // uniform p-values; the observed run has three planted low p-values.
+    test("observed and two null replicates") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/calibratecallers"
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("\${d}/test.consensus.tsv", checkIfExists: true),
+                    file("\${d}/test.activedriverwgs.tsv", checkIfExists: true),
+                    [ file("\${d}/test.null2.consensus.tsv", checkIfExists: true), file("\${d}/test.null1.consensus.tsv", checkIfExists: true) ],
+                    [ file("\${d}/test.null1.activedriverwgs.tsv", checkIfExists: true), file("\${d}/test.null2.activedriverwgs.tsv", checkIfExists: true) ]
+                ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def cal = table(process.out.calibration[0][1])
+            assert process.success
+            assertAll(
+                { assert cal*.run.toSet() == [ 'observed', 'null1', 'null2', 'null_summary' ] as Set },
+                { assert cal.findAll { r -> r.run == 'null_summary' }*.method.toSet() == [ 'activedriverwgs', 'oncodrivefml', 'ebm', 'acat' ] as Set },
+                { assert cal.findAll { r -> r.run == 'null_summary' }.every { r -> r.status in [ 'within_band', 'conservative', 'excluded_for_inflation' ] } },
+                { assert cal.every { r -> r.element_set == 'activedriverwgs_expected_ge_1' } },
+                { assert snapshot(process.out.calibration, process.out.qq).match() }
+            )
+        }
+    }
+}

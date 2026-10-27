@@ -20,6 +20,10 @@ include { EXPLAIN                           } from '../subworkflows/local/explai
 include { peakFileMeta                      } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { resolveReferences                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { INPUT_HARMONISATION               } from '../subworkflows/local/input_harmonisation'
+include { VARIANT_FLAGS                     } from '../subworkflows/local/variant_flags'
+include { NULL_CALIBRATION                  } from '../subworkflows/local/null_calibration'
+include { POSTFILTERFLAGS                   } from '../modules/local/postfilterflags'
+include { WRITEDRIVEREVIDENCE               } from '../modules/local/writedriverevidence'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,6 +111,34 @@ workflow NONCODINGDRIVERS {
     //
     def ch_elements = channel.value([ [ id: 'elements', assembly: 'GRCh38' ], file(refs.elements_bed, checkIfExists: true) ])
 
+
+    //
+    // Variant flags: mask and germline flags per mutation row, element-level fractions and the
+    // callable fraction of each element. Added files only; nothing downstream reads them for
+    // ranking.
+    //
+    def ch_variant_flags = channel.empty()
+    def ch_element_flags = channel.empty()
+    if (params.run_variant_flags) {
+        def germline = !params.skip_germline_flags
+        VARIANT_FLAGS(
+            ch_mutations,
+            ch_elements,
+            channel.value([
+                [ id: 'masks' ],
+                file(refs.blacklist_bed, checkIfExists: true),
+                file(refs.segdup_bed, checkIfExists: true),
+                file(refs.low_mappability_bed, checkIfExists: true),
+                file(refs.umap_bed, checkIfExists: true)
+            ]),
+            germline ? channel.value([ [ id: 'gnomad' ], file(refs.gnomad_echtvar, checkIfExists: true) ]) : channel.empty(),
+            germline ? channel.value([ [ id: 'GRCh38' ], file(refs.fasta, checkIfExists: true), file(refs.fasta_fai, checkIfExists: true) ]) : channel.empty(),
+            file("${projectDir}/assets/awk", checkIfExists: true),
+            germline
+        )
+        ch_variant_flags = VARIANT_FLAGS.out.variant_flags
+        ch_element_flags = VARIANT_FLAGS.out.element_flags
+    }
     def ch_ofml_score = channel.empty()
     def ofml_config   = []
     def ofml_genome   = []
@@ -160,6 +192,63 @@ workflow NONCODINGDRIVERS {
     //
     // MODULE: run summary for MultiQC (counts describing the run; no candidate ranking)
     //
+    //
+    // Null calibration (in-house, off by default): the same callers on SIMULATENULL copies of
+    // each cohort; reported only
+    //
+    def ch_null_calibration = channel.empty()
+    if (params.run_null_calibration) {
+        NULL_CALIBRATION(
+            ch_mutations,
+            DRIVER_DISCOVERY.out.consensus,
+            DRIVER_DISCOVERY.out.raw,
+            ch_elements,
+            channel.value([ [ id: 'GRCh38' ], file(refs.fasta, checkIfExists: true), file(refs.fasta_fai, checkIfExists: true) ]),
+            ch_ofml_score,
+            ofml_config,
+            ofml_genome,
+            callers,
+            params.null_replicates,
+            params.seed
+        )
+        ch_null_calibration = NULL_CALIBRATION.out.calibration
+    }
+    //
+    // Post-filter flags and the long-form evidence table (D33). Added files only: the consensus
+    // is not filtered or re-ranked; tiers are assigned downstream.
+    //
+    def ch_evidence = channel.empty()
+    if (params.run_driver_evidence) {
+        // coordinate provenance of each cohort's mutations: GRCh37/hg19 rows are lifted
+        def ch_coordinates = ch_samplesheet
+            .map { meta, _mutations, _vcf, _index, _maf -> [ meta.cohort, (meta.assembly_declared ?: 'GRCh38') in [ 'GRCh37', 'hg19' ] ? 'lifted' : 'native' ] }
+            .unique()
+            .groupTuple()
+            .map { cohort, labels -> [ cohort, labels.unique().size() > 1 ? 'mixed' : labels[0] ] }
+        def ch_cons_by_id = DRIVER_DISCOVERY.out.consensus.map { meta, consensus -> [ meta.id, meta, consensus ] }
+        def ch_flags_by_id = ch_element_flags.map { meta, flags -> [ meta.id, flags ] }
+        POSTFILTERFLAGS(
+            ch_cons_by_id
+                .join(ch_flags_by_id, remainder: true)
+                .filter { _id, meta, _consensus, _flags -> meta != null }
+                .map { _id, meta, consensus, flags -> [ meta, consensus, flags ?: [] ] }
+        )
+        WRITEDRIVEREVIDENCE(
+            ch_cons_by_id
+                .join(ch_flags_by_id, remainder: true)
+                .filter { _id, meta, _consensus, _flags -> meta != null }
+                .join(POSTFILTERFLAGS.out.postfilter.map { meta, postfilter -> [ meta.id, postfilter ] })
+                .join(ch_null_calibration.map { meta, calibration -> [ meta.id, calibration ] }, remainder: true)
+                .filter { _id, meta, _consensus, _flags, _postfilter, _calibration -> meta != null }
+                .join(ch_coordinates)
+                .map { _id, meta, consensus, flags, postfilter, calibration, coordinates ->
+                    [ meta, consensus, flags ?: [], postfilter, calibration ?: [], coordinates ]
+                },
+            file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true),
+            workflow.manifest.version
+        )
+        ch_evidence = WRITEDRIVEREVIDENCE.out.evidence
+    }
     RUNSUMMARYMQC(
         DRIVER_DISCOVERY.out.consensus
             .join(DRIVER_DISCOVERY.out.raw.groupTuple(size: combined_callers.size()))
@@ -293,6 +382,10 @@ workflow NONCODINGDRIVERS {
     mutations      = ch_mutations                      // channel: [ val(meta), path(mutations) ] one table per cohort
     consensus      = DRIVER_DISCOVERY.out.consensus    // channel: [ val(meta), path(consensus) ]
     candidates     = EXPLAIN.out.candidates            // channel: [ val(meta), path(candidates) ]
+    variant_flags  = ch_variant_flags                  // channel: [ val(meta), path(variant_flags.tsv) ]
+    element_flags  = ch_element_flags                  // channel: [ val(meta), path(element_flags.tsv) ]
+    null_calibration = ch_null_calibration             // channel: [ val(meta), path(null_calibration.tsv) ]
+    evidence       = ch_evidence                       // channel: [ val(meta), path(driver_evidence.tsv) ]
     multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
     versions       = ch_versions                       // channel: [ path(versions.yml) ]
 }

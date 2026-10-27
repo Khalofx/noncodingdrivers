@@ -40,6 +40,11 @@
                         "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
                         "installed_by": ["modules"]
                     },
+                    "bedtools/getfasta": {
+                        "branch": "master",
+                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "installed_by": ["modules"]
+                    },
                     "bedtools/intersect": {
                         "branch": "master",
                         "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
@@ -55,6 +60,11 @@
                         "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
                         "installed_by": ["modules"]
                     },
+                    "bedtools/subtract": {
+                        "branch": "master",
+                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "installed_by": ["modules"]
+                    },
                     "csvtk/concat": {
                         "branch": "master",
                         "git_sha": "2f74af306499775ab48db1ed4077d2fa5aecf9c4",
@@ -63,6 +73,16 @@
                     "csvtk/join": {
                         "branch": "master",
                         "git_sha": "b5803eb47964c7fa2c455b6c1e60d408ead4f2b3",
+                        "installed_by": ["modules"]
+                    },
+                    "echtvar/anno": {
+                        "branch": "master",
+                        "git_sha": "3ae65622c8c8e6ab8390a73dd75a698308a4971b",
+                        "installed_by": ["modules"]
+                    },
+                    "echtvar/encode": {
+                        "branch": "master",
+                        "git_sha": "9707facbacc9c5c02ecf0b192f0604a29351b00a",
                         "installed_by": ["modules"]
                     },
                     "ensemblvep/vep": {

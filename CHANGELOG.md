@@ -9,6 +9,26 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- Variant flags (`VARIANT_FLAGS`, `--run_variant_flags`, on by default; flag, never filter): every
+  mutation row is flagged against the ENCODE Blacklist v2, the GIAB v3.6 segmental duplications
+  and low-mappability regions (aliased nf-core `bedtools/intersect`), Umap k100 uniqueness (nf-core
+  `bedtools/coverage`) and gnomAD v4.1 genomes (`germline_pop_common`: PASS and grpmax FAF95 above
+  `--germline_faf_threshold`; nf-core `echtvar/anno`, indels anchored with nf-core
+  `bedtools/getfasta`); element-level fractions, support counts and the callable fraction (Umap
+  k100 minus Blacklist v2, nf-core `bedtools/subtract`). Datasheet keys `blacklist_bed`,
+  `segdup_bed`, `low_mappability_bed`, `umap_bed`, `gnomad_echtvar`; the gnomAD archive is built
+  once with nf-core `echtvar/encode` (recipe in `docs/references.md`).
+- Post-filter flags (`POSTFILTERFLAGS`, `bin/postfilter_flags.py`): minimum support, mappability and
+  maximum sample fraction per element; `--postfilter_mode pcawg` adds `q_postfilter`.
+- Long-form evidence table (`WRITEDRIVEREVIDENCE`, `bin/write_driver_evidence.py`,
+  `evidence/<cohort>.driver_evidence.tsv`, layout `assets/schema_driver_evidence.json`, sources
+  `assets/evidence_sources.tsv`). Evidence tiers, palindrome and APOBEC flags are assigned
+  downstream (D33).
+- Null calibration (`NULL_CALIBRATION`, `--run_null_calibration`, off by default; in-house, D32):
+  `SIMULATENULL` (`bin/simulate_null.py`; each SNV moved within +/- 50 kb to the same
+  strand-collapsed trinucleotide, same patient, seed `--seed` + replicate) and the reused
+  `DRIVER_DISCOVERY`; `CALIBRATECALLERS` (`bin/calibrate_callers.py`) reports the inflation factor,
+  q < FDR counts and QQ points per method against `--null_lambda_band`. Reported only.
 - Driver core: `mutations`-tier samplesheet (`assets/schema_input.json`), per-cohort table merge
   (nf-core `csvtk/concat` + `gawk`), ActiveDriverWGS, OncodriveFML (licence-gated:
   `--accept_oncodrivefml_licence`), harmonisation (`HARMONIZECALLS`), anchoring on `element_id`

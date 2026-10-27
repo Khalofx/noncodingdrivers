@@ -1,0 +1,28 @@
+evidence_item	unit	source	source_version	coordinates
+consensus_q	q	COMBINEPVALUES: q-value of the combination named by combination_method (EBM by default)	EmpiricalBrownsMethod 1.34.0; ACAT 0.91	cohort
+consensus_rank	rank	COMBINEPVALUES	pipeline	cohort
+p_activedriverwgs	p	ActiveDriverWGS	1.2.1	cohort
+q_activedriverwgs	q	ActiveDriverWGS (Benjamini-Hochberg over all shards)	1.2.1	cohort
+p_oncodrivefml	p	OncodriveFML	2.5.0	cohort
+q_oncodrivefml	q	OncodriveFML	2.5.0	cohort
+ebm_p	p	EmpiricalBrownsMethod	1.34.0	cohort
+ebm_q	q	EmpiricalBrownsMethod (Benjamini-Hochberg)	1.34.0	cohort
+acat_p	p	ACAT	0.91	cohort
+acat_q	q	ACAT (Benjamini-Hochberg)	0.91	cohort
+n_tested_callers	count	COMBINEPVALUES	pipeline	cohort
+vote_count	count	COMBINEPVALUES	pipeline	cohort
+n_mutations	count	VARIANT_FLAGS: rows assigned to the element (point rule, bedtools intersect)	bedtools 2.31.1	cohort
+n_patients	count	VARIANT_FLAGS	bedtools 2.31.1	cohort
+max_sample_fraction	fraction	VARIANT_FLAGS: largest share of the element's mutations from one patient	bedtools 2.31.1	cohort
+frac_in_blacklist_v2	fraction	ENCODE Blacklist v2 hg38 (bedtools intersect)	Blacklist v2 (Boyle-Lab 61a04d2c); bedtools 2.31.1	cohort
+frac_in_segdup	fraction	GIAB genome stratifications GRCh38 segmental duplications (bedtools intersect)	GIAB v3.6; bedtools 2.31.1	cohort
+frac_in_low_mappability	fraction	GIAB genome stratifications GRCh38 low mappability, all (bedtools intersect)	GIAB v3.6; bedtools 2.31.1	cohort
+mean_umap_unique_fraction	fraction	Umap k100 single-read mappability hg38 (bedtools coverage)	Umap k100; bedtools 2.31.1	cohort
+frac_germline_pop_common	fraction	gnomAD v4.1 genomes, PASS and fafmax_faf95_max above the threshold (echtvar anno)	gnomAD v4.1; echtvar 0.2.4	cohort
+callable_fraction	fraction	Element territory in Umap k100 unique sequence minus ENCODE Blacklist v2 (bedtools subtract, coverage)	Umap k100; Blacklist v2; bedtools 2.31.1	native
+postfilter_min_support	count	POSTFILTERFLAGS: min(n_mutations, n_patients) against the thresholds	pipeline	cohort
+postfilter_mappability	fraction	POSTFILTERFLAGS: share of mutations outside GIAB low mappability	pipeline	cohort
+postfilter_max_sample_fraction	fraction	POSTFILTERFLAGS	pipeline	cohort
+postfilter_status	status	POSTFILTERFLAGS: fail when any post-filter fails, pass when all pass	pipeline	cohort
+q_postfilter	q	POSTFILTERFLAGS --postfilter_mode pcawg: Benjamini-Hochberg after failing elements set to p = 1	pipeline	cohort
+null_lambda	lambda	CALIBRATECALLERS: median null inflation factor of one method (cohort-level row, element_id '.')	pipeline	cohort

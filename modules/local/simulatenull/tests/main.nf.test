@@ -1,0 +1,62 @@
+nextflow_process {
+
+    name "Test Process SIMULATENULL"
+    script "../main.nf"
+    process "SIMULATENULL"
+
+    tag "modules"
+    tag "modules_local"
+    tag "simulatenull"
+
+    // SYNTH-TERT (30 donors, 461 SNVs, 1 DNP, 1 deletion) on the chr5:1-1.4 Mb FASTA window.
+    // Same seed, same table: the md5 snapshot is the determinism check (D32).
+    test("synth_tert - replicate 1 - seed 2") {
+
+        when {
+            process {
+                """
+                def td = "\${params.pipelines_testdata_base_path}data/synthetic_tert"
+                input[0] = [ [ id:'synth_tert', cohort:'synth_tert', assembly:'GRCh38' ], file("\${td}/mutations.tsv", checkIfExists: true), 1, 2 ]
+                input[1] = [ [ id:'GRCh38' ], file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa", checkIfExists: true),
+                             file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa.fai", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mutations[0][2]).readLines()
+            def summary = path(process.out.summary[0][2]).readLines().drop(1).collectEntries { line -> def f = line.tokenize('\t'); [ f[0], f[1] ] }
+            assert process.success
+            assertAll(
+                { assert rows[0] == 'sample\tchrom\tpos\tref\talt\tvtype' },
+                { assert summary.snvs_in == '461' && summary.non_snv_not_carried == '2' },
+                { assert summary.ref_mismatch_dropped == '0' },
+                { assert (rows.size() - 1) == summary.snvs_out.toInteger() },
+                { assert rows.drop(1).every { r -> r.endsWith('\tSNP') && r.split('\t')[1] == 'chr5' } },
+                { assert rows.drop(1).collect { r -> r.tokenize('\t')[0] }.toSet().size() == 30 },          // every donor keeps SNVs
+                { assert snapshot(process.out.mutations, process.out.summary).match() }
+            )
+        }
+    }
+
+    test("synth_tert - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                def td = "\${params.pipelines_testdata_base_path}data/synthetic_tert"
+                input[0] = [ [ id:'synth_tert', cohort:'synth_tert', assembly:'GRCh38' ], file("\${td}/mutations.tsv", checkIfExists: true), 1, 2 ]
+                input[1] = [ [ id:'GRCh38' ], file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa", checkIfExists: true),
+                             file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa.fai", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out.mutations, process.out.summary).match()
+        }
+    }
+}

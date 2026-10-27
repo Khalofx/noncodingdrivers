@@ -1,0 +1,44 @@
+nextflow_process {
+
+    name "Test Process WRITEDRIVEREVIDENCE"
+    script "../main.nf"
+    process "WRITEDRIVEREVIDENCE"
+
+    tag "modules"
+    tag "modules_local"
+    tag "writedriverevidence"
+
+    config "./nextflow.config"
+
+    // Columns and statuses of assets/schema_driver_evidence.json (the full schema validation is
+    // tests/test_driver_evidence.py); nominal scope keeps four of the six fixture elements.
+    test("consensus and element flags - nominal scope") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/driver_evidence"
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.consensus.tsv", checkIfExists: true),
+                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native' ]
+                input[1] = file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true)
+                input[2] = '1.0.0dev'
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.evidence[0][1]).readLines()
+            def cols = lines[0].tokenize('\t')
+            def rows = lines.drop(1).collect { r -> [ cols, r.split('\t', -1).toList() ].transpose().collectEntries() }
+            assert process.success
+            assertAll(
+                { assert cols == [ 'cohort', 'element_id', 'evidence_item', 'value', 'unit', 'status', 'threshold', 'source', 'source_version', 'native_or_lifted' ] },
+                { assert rows*.element_id.toSet() == [ 'promoter_A', 'enhancer_B', 'enhancer_C', 'promoter_E' ] as Set },
+                { assert rows.find { r -> r.element_id == 'enhancer_B' && r.evidence_item == 'frac_in_segdup' }.status == 'flagged' },
+                { assert rows.find { r -> r.element_id == 'promoter_A' && r.evidence_item == 'consensus_q' }.status == 'significant' },
+                { assert rows.every { r -> r.native_or_lifted == 'native' } },
+                { assert snapshot(process.out.evidence).match() }
+            )
+        }
+    }
+}

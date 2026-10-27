@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "variant_flags"
+description: Per-row mask flags (ENCODE Blacklist v2, GIAB segdups and low mappability, Umap k100) and gnomAD germline flags of each cohort mutation table, with their element-level aggregation and the callable fraction of each element; flag, never filter
+keywords:
+  - variant flags
+  - mappability
+  - blacklist
+  - germline
+  - gnomad
+components:
+  - gawk
+  - bedtools/intersect
+  - bedtools/coverage
+  - bedtools/getfasta
+  - bedtools/subtract
+  - bcftools/sort
+  - bcftools/query
+  - echtvar/anno
+input:
+  - ch_mutations:
+      type: file
+      description: |
+        Canonical mutation table per cohort (sample chrom pos ref alt vtype)
+        Structure: [ val(meta), path(mutations) ]
+      pattern: "*.tsv"
+  - ch_elements:
+      type: file
+      description: |
+        Element catalogue BED (chrom start end element_id; one row per fragment)
+        Structure: [ val(meta2), path(bed) ]
+      pattern: "*.bed"
+  - ch_masks:
+      type: file
+      description: |
+        Mask BEDs: ENCODE Blacklist v2, GIAB segdups, GIAB low mappability (all), Umap k100 unique regions
+        Structure: [ val(meta3), path(blacklist), path(segdup), path(low_mappability), path(umap) ]
+      pattern: "*.bed{,.gz}"
+  - ch_gnomad:
+      type: file
+      description: |
+        gnomAD v4.1 genomes echtvar archive (fields gnomad_filter, gnomad_af, gnomad_fafmax_faf95_max)
+        Structure: [ val(meta4), path(zip) ]
+      pattern: "*.zip"
+  - ch_fasta:
+      type: file
+      description: |
+        GRCh38 FASTA and index; the anchor bases of indels for the sites VCF
+        Structure: [ val(meta5), path(fasta), path(fai) ]
+      pattern: "*.{fa,fa.fai}"
+  - awk_dir:
+      type: directory
+      description: Directory with the gawk adapter programs (assets/awk)
+  - germline:
+      type: boolean
+      description: Annotate gnomAD germline frequencies with echtvar anno
+output:
+  - variant_flags:
+      type: file
+      description: |
+        One row per mutation-table row: in_blacklist_v2, in_segdup, in_low_mappability, umap_unique_fraction, gnomad_filter, gnomad_af, gnomad_fafmax_faf95_max, germline_pop_common
+        Structure: [ val(meta), path(variant_flags.tsv) ]
+      pattern: "*.variant_flags.tsv"
+  - element_flags:
+      type: file
+      description: |
+        One row per element id: support (n_mutations, n_patients, max_sample_fraction), mask fractions, callable_fraction
+        Structure: [ val(meta), path(element_flags.tsv) ]
+      pattern: "*.element_flags.tsv"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

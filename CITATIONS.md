@@ -32,6 +32,11 @@
 - PCAWG non-coding drivers — Rheinbay E, et al. Nature 2020. doi:10.1038/s41586-020-1965-x
 - Ensembl Regulatory Build — https://www.ensembl.org/info/genome/funcgen/regulatory_build.html
 - GENCODE — https://www.gencodegenes.org/
+- echtvar — Pedersen BS, et al. Nucleic Acids Res 2023. doi:10.1093/nar/gkac931
+- gnomAD v4.1 genomes — Chen S, et al. Nature 2024. doi:10.1038/s41586-023-06045-0; https://gnomad.broadinstitute.org (this tool includes data from the gnomAD v4.1 release)
+- ENCODE Blacklist v2 — Amemiya HM, Kundaje A, Boyle AP. Sci Rep 2019. doi:10.1038/s41598-019-45839-z
+- GIAB genome stratifications v3.6 — Dwarshuis N, et al. Nat Commun 2024. doi:10.1038/s41467-024-53260-y
+- Umap — Karimzadeh M, et al. Nucleic Acids Res 2018. doi:10.1093/nar/gky677
 
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
 

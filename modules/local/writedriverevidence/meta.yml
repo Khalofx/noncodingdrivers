@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "writedriverevidence"
+description: Long-form evidence table, one row per cohort x element x evidence item with value, unit, status, threshold, source, source_version and native_or_lifted (assets/schema_driver_evidence.json); no tiers
+keywords:
+  - evidence
+  - report
+  - noncoding
+tools:
+  - "write_driver_evidence.py":
+      description: "Pipeline-owned script (bin/write_driver_evidence.py)"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: Cohort meta map
+    - consensus:
+        type: file
+        description: Consensus table of COMBINEPVALUES
+        pattern: "*.consensus.tsv"
+        ontologies: []
+    - element_flags:
+        type: file
+        description: Element-level flags of VARIANT_FLAGS, or []
+        pattern: "*.element_flags.tsv"
+        ontologies: []
+    - postfilter:
+        type: file
+        description: Post-filter table of POSTFILTERFLAGS, or []
+        pattern: "*.postfilter.tsv"
+        ontologies: []
+    - calibration:
+        type: file
+        description: Null calibration of CALIBRATECALLERS, or []
+        pattern: "*.null_calibration.tsv"
+        ontologies: []
+    - coordinates:
+        type: string
+        description: Coordinate provenance of the cohort's mutations (native, lifted or mixed)
+  - sources:
+      type: file
+      description: Evidence item registry (assets/evidence_sources.tsv)
+      pattern: "*.tsv"
+      ontologies: []
+  - pipeline_version:
+      type: string
+      description: Pipeline version written for pipeline-computed items
+
+output:
+  evidence:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.driver_evidence.tsv":
+          type: file
+          description: Long-form evidence table
+          pattern: "*.driver_evidence.tsv"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

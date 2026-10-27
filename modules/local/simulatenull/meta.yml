@@ -1,0 +1,99 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "simulatenull"
+description: Neutral copy of a cohort mutation table for null calibration; each SNV moves to a random position with the same trinucleotide within +/- 50 kb, in the same patient (in-house, off by default)
+keywords:
+  - null model
+  - calibration
+  - simulation
+  - noncoding
+tools:
+  - "simulate_null.py":
+      description: "Pipeline-owned script (bin/simulate_null.py): PCAWG Sanger-style local, context-preserving randomisation of SNVs"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - mutations:
+        type: file
+        description: Canonical cohort mutation table (sample chrom pos ref alt vtype)
+        pattern: "*.tsv"
+        ontologies: []
+    - replicate:
+        type: integer
+        description: Null replicate number (1..n)
+    - seed:
+        type: integer
+        description: Random seed of this replicate (params.seed + replicate)
+  - - meta2:
+        type: map
+        description: Reference meta map
+    - fasta:
+        type: file
+        description: GRCh38 FASTA (UCSC names)
+        pattern: "*.{fa,fasta}"
+        ontologies: []
+    - fai:
+        type: file
+        description: FASTA index
+        pattern: "*.fai"
+        ontologies: []
+
+output:
+  mutations:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - replicate:
+          type: integer
+          description: Null replicate number
+      - "*.mutations.tsv":
+          type: file
+          description: Null mutation table (SNVs only), canonical columns
+          pattern: "*.mutations.tsv"
+          ontologies: []
+  summary:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - replicate:
+          type: integer
+          description: Null replicate number
+      - "*.null_summary.tsv":
+          type: file
+          description: Counts of rows carried, dropped and collapsed
+          pattern: "*.null_summary.tsv"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

@@ -55,6 +55,17 @@
   liftover_source_fasta_fai_md5: e700bec606168273af0920bd1dd49eb9
   liftover_source_fasta_url: https://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz
   liftover_source_fasta_gz_md5: 806c02398f5ac5da8ffd6da2d1d5d1a9
+  blacklist_bed: ${reference_base}/masks/hg38-blacklist.v2.bed.gz
+  blacklist_md5: 83fe6bf8187a64dee8079b80f75ba289
+  blacklist_source: "ENCODE Blacklist v2, hg38 (Amemiya et al. 2019): Boyle-Lab/Blacklist lists/hg38-blacklist.v2.bed.gz at commit 61a04d2c5e49341d76735d485c61f0d1177d08a8 (636 regions)"
+  segdup_bed: ${reference_base}/masks/GRCh38_segdups.bed.gz
+  segdup_md5: 72ec3f7db18ef9318c64b1df271703fe
+  low_mappability_bed: ${reference_base}/masks/GRCh38_lowmappabilityall.bed.gz
+  low_mappability_md5: 8a78766bb99abf1d25a5b307d49a0324
+  giab_stratifications_source: "GIAB genome stratifications v3.6, GRCh38@all: SegmentalDuplications/GRCh38_segdups.bed.gz (7,432 regions), Mappability/GRCh38_lowmappabilityall.bed.gz (673,815 regions)"
+  umap_bed: ${reference_base}/masks/k100.umap.bed.gz
+  umap_md5: 1ef87107f449ccaf7e537de9740692fb
+  umap_source: "Umap k100 single-read mappability, hg38 (Karimzadeh et al. 2018): https://bismap.hoffmanlab.org/raw/hg38/k100.umap.bed.gz"
   cadd_snv_version: "v1.7"
   cadd_snv_licence: "Restricted: free for non-commercial use; user-supplied via --oncodrivefml_score, never bundled"
   licence_summary: "open, except CADD (user-supplied, non-commercial)"

@@ -417,6 +417,176 @@
                 }
             }
         },
+        "variant_flags_options": {
+            "title": "Variant flag options",
+            "type": "object",
+            "fa_icon": "fas fa-flag",
+            "description": "Mask and germline flags of every mutation row and their element-level fractions (VARIANT_FLAGS). Flag, never filter: the mutation table, the callers and the consensus are unchanged.",
+            "properties": {
+                "run_variant_flags": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-flag",
+                    "description": "Flag every mutation row with the ENCODE Blacklist v2, GIAB segdup and low-mappability masks, Umap k100 uniqueness and gnomAD germline frequency; aggregate per element with the callable fraction.",
+                    "help_text": "The masks and the gnomAD archive come from the reference datasheet (--reference_base) unless given explicitly. Outputs: variant_flags/<cohort>.variant_flags.tsv and variant_flags/<cohort>.element_flags.tsv."
+                },
+                "blacklist_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "ENCODE Blacklist v2 for hg38 (BED, UCSC names). Default: datasheet blacklist_bed."
+                },
+                "segdup_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "GIAB v3.6 GRCh38 segmental duplications (GRCh38_segdups.bed.gz). Default: datasheet segdup_bed."
+                },
+                "low_mappability_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "GIAB v3.6 GRCh38 low-mappability regions (GRCh38_lowmappabilityall.bed.gz). Default: datasheet low_mappability_bed."
+                },
+                "umap_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "Umap k100 single-read mappability regions for hg38 (k100.umap.bed.gz). Default: datasheet umap_bed.",
+                    "help_text": "Uniquely mappable sequence. umap_unique_fraction is the covered fraction of each variant; the callable territory of an element is this file minus the ENCODE Blacklist v2."
+                },
+                "gnomad_echtvar": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.zip$",
+                    "fa_icon": "fas fa-file-archive",
+                    "description": "gnomAD v4.1 genomes echtvar archive with the fields gnomad_filter, gnomad_af and gnomad_fafmax_faf95_max. Default: datasheet gnomad_echtvar.",
+                    "help_text": "Built once with nf-core echtvar/encode from the official per-chromosome sites VCFs (recipe in docs/references.md)."
+                },
+                "skip_germline_flags": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-forward",
+                    "description": "Do not annotate gnomAD germline frequencies: the germline columns are NA."
+                },
+                "germline_faf_threshold": {
+                    "type": "number",
+                    "default": 0.001,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-percentage",
+                    "description": "germline_pop_common is true when the gnomAD FILTER is PASS and fafmax_faf95_max (grpmax FAF95) is above this value."
+                }
+            }
+        },
+        "evidence_options": {
+            "title": "Evidence options",
+            "type": "object",
+            "fa_icon": "fas fa-clipboard-list",
+            "description": "PCAWG-style post-filter flags and the long-form evidence table (POSTFILTERFLAGS, WRITEDRIVEREVIDENCE). Evidence tiers are assigned downstream, not by the pipeline.",
+            "properties": {
+                "run_driver_evidence": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-clipboard-list",
+                    "description": "Write post-filter flags (postfilter/<cohort>.postfilter.tsv) and the long-form evidence table (evidence/<cohort>.driver_evidence.tsv).",
+                    "help_text": "One row per cohort x element x evidence item with value, unit, status, threshold, source, source_version and native_or_lifted; validated layout in assets/schema_driver_evidence.json. The consensus is never filtered or re-ranked."
+                },
+                "postfilter_mode": {
+                    "type": "string",
+                    "default": "flag_only",
+                    "enum": ["flag_only", "pcawg"],
+                    "fa_icon": "fas fa-filter",
+                    "description": "flag_only keeps the q-values; pcawg adds q_postfilter (failing elements set to p = 1 before Benjamini-Hochberg) and never overwrites consensus_q."
+                },
+                "postfilter_min_mutations": {
+                    "type": "integer",
+                    "default": 3,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-sort-numeric-up",
+                    "description": "Minimum support: mutations in the element."
+                },
+                "postfilter_min_patients": {
+                    "type": "integer",
+                    "default": 3,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-users",
+                    "description": "Minimum support: patients with a mutation in the element."
+                },
+                "postfilter_min_mappable_fraction": {
+                    "type": "number",
+                    "default": 0.5,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-percentage",
+                    "description": "Mappability: the share of the element's mutations outside GIAB low-mappability regions must be above this."
+                },
+                "postfilter_max_sample_fraction": {
+                    "type": "number",
+                    "default": 0.5,
+                    "minimum": 0,
+                    "maximum": 1,
+                    "fa_icon": "fas fa-percentage",
+                    "description": "Maximum sample fraction: the largest share of the element's mutations from one patient must not be above this."
+                },
+                "evidence_scope": {
+                    "type": "string",
+                    "default": "nominal",
+                    "enum": ["nominal", "all"],
+                    "fa_icon": "fas fa-search",
+                    "description": "Elements written to the evidence table: nominal (any caller or combination p < 0.01, or consensus_q < 0.25) or all."
+                }
+            }
+        },
+        "null_calibration_options": {
+            "title": "Null calibration options",
+            "type": "object",
+            "fa_icon": "fas fa-balance-scale",
+            "description": "Per-caller calibration on neutral copies of each cohort (NULL_CALIBRATION; in-house, off by default). Reported only: no p- or q-value is changed.",
+            "properties": {
+                "run_null_calibration": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-balance-scale",
+                    "description": "Re-run the callers on SIMULATENULL copies of each cohort and report the per-method inflation factor, q < FDR counts and QQ points.",
+                    "help_text": "Each SNV moves to a random position with the same trinucleotide within +/- --null_window bases, in the same patient (the PCAWG Sanger null); non-SNV rows are not carried. Each replicate costs about as much as the observed run. Needs the GRCh38 FASTA."
+                },
+                "null_replicates": {
+                    "type": "integer",
+                    "default": 3,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-clone",
+                    "description": "Null replicates per cohort."
+                },
+                "null_window": {
+                    "type": "integer",
+                    "default": 50000,
+                    "minimum": 1000,
+                    "fa_icon": "fas fa-arrows-alt-h",
+                    "description": "Half-width (bases) of the window within which each SNV is moved."
+                },
+                "null_lambda_band": {
+                    "type": "string",
+                    "default": "0.8,1.2",
+                    "pattern": "^\\d+(\\.\\d+)?,\\d+(\\.\\d+)?$",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "description": "Band of the null inflation factor, low,high. A method with a replicate above it is reported excluded_for_inflation; below it, conservative."
+                },
+                "seed": {
+                    "type": "integer",
+                    "default": 1,
+                    "fa_icon": "fas fa-seedling",
+                    "description": "Random seed of the null simulation: replicate r uses seed + r."
+                }
+            }
+        },
         "annotation_options": {
             "title": "Annotation options",
             "type": "object",
@@ -513,6 +683,15 @@
         },
         {
             "$ref": "#/$defs/consensus_options"
+        },
+        {
+            "$ref": "#/$defs/variant_flags_options"
+        },
+        {
+            "$ref": "#/$defs/evidence_options"
+        },
+        {
+            "$ref": "#/$defs/null_calibration_options"
         },
         {
             "$ref": "#/$defs/annotation_options"

@@ -1,0 +1,43 @@
+nextflow_process {
+
+    name "Test Process POSTFILTERFLAGS"
+    script "../main.nf"
+    process "POSTFILTERFLAGS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "postfilterflags"
+
+    config "./nextflow.config"
+
+    // tests/data/driver_evidence: six elements; enhancer_B has 6 of 7 mutations in low
+    // mappability, enhancer_C two mutations, CTCF_D one patient, promoter_E no mutation.
+    test("pcawg mode") {
+
+        when {
+            params {
+                postfilter_mode = 'pcawg'
+            }
+            process {
+                """
+                def d = "${projectDir}/tests/data/driver_evidence"
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.consensus.tsv", checkIfExists: true), file("\${d}/test.element_flags.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def pf = table(process.out.postfilter[0][1]).collectEntries { r -> [ r.element_id, r ] }
+            assert process.success
+            assertAll(
+                { assert pf.promoter_A.postfilter_status == 'pass' },
+                { assert pf.enhancer_B.mappability_status == 'fail' && pf.enhancer_B.q_postfilter == '1' },
+                { assert pf.enhancer_C.min_support_status == 'fail' },
+                { assert pf.CTCF_D.max_sample_fraction_status == 'fail' },
+                { assert pf.promoter_E.mappability_status == 'not_applied' },
+                { assert snapshot(process.out.postfilter).match() }
+            )
+        }
+    }
+}

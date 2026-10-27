@@ -1,0 +1,84 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/khalofx/noncodingdrivers/master/assets/schema_driver_evidence.json",
+    "title": "khalofx/noncodingdrivers driver_evidence.tsv",
+    "description": "Long-form evidence table (WRITEDRIVEREVIDENCE): one row per cohort x element x evidence item. Every field is text; numbers are written with up to six significant digits, NA when missing. Cohort-level rows (null calibration) have element_id '.'. No field is a tier.",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "cohort": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._-]+$",
+                "description": "Cohort id (samplesheet cohort)"
+            },
+            "element_id": {
+                "type": "string",
+                "pattern": "^([A-Za-z0-9._:-]+|\\.)$",
+                "description": "Element id of the catalogue, or '.' for a cohort-level item"
+            },
+            "evidence_item": {
+                "type": "string",
+                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+)$",
+                "description": "Evidence item (assets/evidence_sources.tsv)"
+            },
+            "value": {
+                "type": "string",
+                "pattern": "^(NA|-?[0-9]+(\\.[0-9]+)?([eE][-+]?[0-9]+)?)$",
+                "description": "Numeric value, or NA"
+            },
+            "unit": {
+                "type": "string",
+                "enum": ["count", "fraction", "lambda", "p", "q", "rank", "status"]
+            },
+            "status": {
+                "type": "string",
+                "enum": [
+                    "observed",
+                    "not_tested",
+                    "not_applied",
+                    "significant",
+                    "not_significant",
+                    "flagged",
+                    "not_flagged",
+                    "pass",
+                    "fail",
+                    "within_band",
+                    "excluded_for_inflation",
+                    "conservative",
+                    "not_assessable"
+                ]
+            },
+            "threshold": {
+                "type": "string",
+                "pattern": "^(NA|[0-9.eE+-]+([;,][0-9.eE+-]+)?)$",
+                "description": "Threshold the status refers to, or NA"
+            },
+            "source": {
+                "type": "string",
+                "minLength": 1
+            },
+            "source_version": {
+                "type": "string",
+                "minLength": 1
+            },
+            "native_or_lifted": {
+                "type": "string",
+                "enum": ["native", "lifted", "mixed"]
+            }
+        },
+        "required": [
+            "cohort",
+            "element_id",
+            "evidence_item",
+            "value",
+            "unit",
+            "status",
+            "threshold",
+            "source",
+            "source_version",
+            "native_or_lifted"
+        ],
+        "additionalProperties": false
+    }
+}

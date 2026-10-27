@@ -50,7 +50,8 @@ def test_every_property_is_a_meta_key():
 
 def test_paths_are_relative_to_reference_base_or_the_pipeline():
     path_keys = ["fasta", "fasta_fai", "fasta_dict", "element_catalogue", "gtf", "vep_cache", "oncodrivefml_genome",
-                 "regulatory_peaks_dir", "liftover_chain_from_hg19", "liftover_source_fasta", "liftover_source_fasta_fai"]
+                 "regulatory_peaks_dir", "liftover_chain_from_hg19", "liftover_source_fasta", "liftover_source_fasta_fai",
+                 "blacklist_bed", "segdup_bed", "low_mappability_bed", "umap_bed"]
     e = _entry()
     for k in path_keys:
         assert e[k].startswith(PLACEHOLDER + "/"), k
@@ -87,7 +88,9 @@ def test_staged_references_match_the_datasheet():
     e = _entry()
     pairs = {"fasta": "fasta_md5", "fasta_fai": "fasta_fai_md5", "fasta_dict": "fasta_dict_md5",
              "element_catalogue": "element_catalogue_md5", "gtf": "gtf_md5", "liftover_chain_from_hg19": "liftover_chain_md5",
-             "liftover_source_fasta": "liftover_source_fasta_md5", "liftover_source_fasta_fai": "liftover_source_fasta_fai_md5"}
+             "liftover_source_fasta": "liftover_source_fasta_md5", "liftover_source_fasta_fai": "liftover_source_fasta_fai_md5",
+             "blacklist_bed": "blacklist_md5", "segdup_bed": "segdup_md5", "low_mappability_bed": "low_mappability_md5",
+             "umap_bed": "umap_md5"}
     bad = {}
     for path_key, md5_key in pairs.items():
         path = e[path_key].replace(PLACEHOLDER, base)

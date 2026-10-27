@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "null_calibration"
+description: Null calibration of each driver caller (in-house, off by default); SIMULATENULL copies of each cohort run through the same DRIVER_DISCOVERY subworkflow, CALIBRATECALLERS reports the inflation factor and q < FDR counts per method; reported only
+keywords:
+  - null model
+  - calibration
+  - inflation factor
+components:
+  - simulatenull
+  - calibratecallers
+input:
+  - ch_mutations:
+      type: file
+      description: |
+        Observed canonical mutation table per cohort
+        Structure: [ val(meta), path(mutations) ]
+      pattern: "*.tsv"
+  - ch_consensus:
+      type: file
+      description: |
+        Observed consensus table per cohort
+        Structure: [ val(meta), path(consensus) ]
+      pattern: "*.consensus.tsv"
+  - ch_raw:
+      type: file
+      description: |
+        Observed caller tables per cohort (<cohort>.<caller>.tsv)
+        Structure: [ val(meta), path(table) ]
+      pattern: "*.tsv"
+  - ch_elements:
+      type: file
+      description: |
+        Element catalogue BED
+        Structure: [ val(meta2), path(bed) ]
+      pattern: "*.bed"
+  - ch_fasta:
+      type: file
+      description: |
+        GRCh38 FASTA and index
+        Structure: [ val(meta3), path(fasta), path(fai) ]
+      pattern: "*.{fa,fa.fai}"
+  - ch_ofml_score:
+      type: file
+      description: |
+        OncodriveFML score track, or empty
+        Structure: [ val(meta4), path(score), path(tbi) ]
+  - ofml_config:
+      type: file
+      description: OncodriveFML configuration, or []
+  - ofml_genome:
+      type: directory
+      description: OncodriveFML bgdata genome, or []
+  - callers:
+      type: list
+      description: Callers of the observed run (MutEnricher is dropped)
+  - replicates:
+      type: integer
+      description: Null replicates per cohort
+  - seed:
+      type: integer
+      description: Replicate r uses seed + r
+output:
+  - calibration:
+      type: file
+      description: |
+        Lambda and q < FDR count per run and method, with the null summary and its band status
+        Structure: [ val(meta), path(null_calibration.tsv) ]
+      pattern: "*.null_calibration.tsv"
+  - qq:
+      type: file
+      description: |
+        QQ points per run and method
+        Structure: [ val(meta), path(null_qq.tsv) ]
+      pattern: "*.null_qq.tsv"
+  - summary:
+      type: file
+      description: |
+        SIMULATENULL counts per replicate
+        Structure: [ val(meta), val(replicate), path(null_summary.tsv) ]
+      pattern: "*.null_summary.tsv"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

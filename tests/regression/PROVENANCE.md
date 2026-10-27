@@ -24,6 +24,10 @@ project cluster under `noncodingdrivers/data/baseline/` (read-only); there is no
 | CADD GRCh38 v1.7 whole-genome SNVs, `whole_genome_SNVs.tsv.gz` (user-supplied, not redistributed)                   | MD5 `88577a55f1cd519d44e0f415ba248eb9`; `.tbi` MD5 `347df8fac17ea374c4598f4f44c7ce8b`                                                |
 | Ensembl VEP 116 cache, `homo_sapiens_vep_116_GRCh38.tar.gz`                                                         | MD5 `6e10959391069a9eebb8d8d165fd29be`                                                                                               |
 | OncodriveFML genome: official bgdata `genomereference/hg38-20161209`                                                | copied unchanged into `data/refs/oncodrivefml_genome/`                                                                               |
+| Variant-flag mask: ENCODE Blacklist v2 hg38 `masks/hg38-blacklist.v2.bed.gz` (Boyle-Lab/Blacklist commit 61a04d2c)  | MD5 `83fe6bf8187a64dee8079b80f75ba289`                                                                                               |
+| Variant-flag mask: GIAB v3.6 GRCh38 segmental duplications `masks/GRCh38_segdups.bed.gz`                            | MD5 `72ec3f7db18ef9318c64b1df271703fe`                                                                                               |
+| Variant-flag mask: GIAB v3.6 GRCh38 low mappability (all) `masks/GRCh38_lowmappabilityall.bed.gz`                   | MD5 `8a78766bb99abf1d25a5b307d49a0324`                                                                                               |
+| Variant-flag mask: Umap k100 single-read mappability hg38 `masks/k100.umap.bed.gz`                                  | MD5 `1ef87107f449ccaf7e537de9740692fb`                                                                                               |
 
 hg19 MAF to GRCh38 liftover of Liver-HCC-public (the baseline canonical table): 3,380,218 records in,
 3,379,254 out; 875 failed (176 unmapped, 2 split mappings, 697 REF mismatches); 65,116 insertions
