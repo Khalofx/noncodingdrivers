@@ -55,7 +55,7 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.failed },
-                { assert process.stderr.any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_all (entry vcf): 122 of 451') } }
+                { assert (process.stdout + process.stderr).any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_all (entry vcf): 122 of 451') } }
             )
         }
     }

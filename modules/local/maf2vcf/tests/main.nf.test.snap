@@ -1,0 +1,76 @@
+{
+    "one tumour, hg19": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "D04",
+                        "sample": "D04"
+                    },
+                    "D04.vcf:md5,fe00518557948330df257fe43958dc78"
+                ]
+            ],
+            {
+                "versions_vcf2maf": [
+                    [
+                        "MAF2VCF",
+                        "vcf2maf",
+                        "1.6.22"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-27T08:58:48.169203065",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        "stub.vcf:md5,2f235b760e091ef09ce42d2f27b57d18"
+                    ]
+                ],
+                "1": [
+                    
+                ],
+                "2": [
+                    [
+                        "MAF2VCF",
+                        "vcf2maf",
+                        "1.6.22"
+                    ]
+                ],
+                "skipped": [
+                    
+                ],
+                "vcf": [
+                    [
+                        {
+                            "id": "stub"
+                        },
+                        "stub.vcf:md5,2f235b760e091ef09ce42d2f27b57d18"
+                    ]
+                ],
+                "versions_vcf2maf": [
+                    [
+                        "MAF2VCF",
+                        "vcf2maf",
+                        "1.6.22"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-27T08:58:53.743040015",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

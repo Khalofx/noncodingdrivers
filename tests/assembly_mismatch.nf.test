@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.failed },
                 { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_maf') } },
-                { assert !workflow.trace.tasks().any { task -> task.name.contains('ACTIVEDRIVERWGS') || task.name.contains('ONCODRIVEFML') || task.name.contains('MAF2VCF') } }
+                { assert !workflow.trace.tasks().any { task -> task.name.tokenize(':')[-1].tokenize(' ')[0] in [ 'ACTIVEDRIVERWGS', 'ONCODRIVEFML', 'MAF2VCF' ] } }
             )
         }
     }
@@ -42,7 +42,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.failed },
                 { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_all') } },
-                { assert !workflow.trace.tasks().any { task -> task.name.contains('PICARD_LIFTOVERVCF') || task.name.contains('ACTIVEDRIVERWGS') } }
+                { assert !workflow.trace.tasks().any { task -> task.name.tokenize(':')[-1].tokenize(' ')[0] in [ 'PICARD_LIFTOVERVCF', 'ACTIVEDRIVERWGS', 'ONCODRIVEFML' ] } }
             )
         }
     }
