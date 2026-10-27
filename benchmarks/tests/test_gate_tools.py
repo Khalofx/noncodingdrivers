@@ -130,19 +130,64 @@ def test_compare_acat_q_uses_recorded_cohort_bound(tmp_path):
 
 def test_table_to_vcfs(tmp_path):
     src = os.path.join(ROOT, "tests", "data", "cohort_mutations.tsv")
-    fai = os.path.join(ROOT, "tests", "data", "tiny.fa.fai")
     out = tmp_path / "vcfs"
     d = pd.read_csv(src, sep="\t")
-    fai_arg = []
-    contigs = {line.split("\t")[0] for line in open(fai)}
-    if set(d["chrom"]) <= contigs:
-        fai_arg = ["--fai", fai]
-    assert table_to_vcfs.main([src, str(out)] + fai_arg) == 0
+    assert table_to_vcfs.main([src, str(out)]) == 0
     files = sorted(os.listdir(out))
     assert len(files) == d["sample"].nunique()
     body = [line for f in files for line in open(out / f) if not line.startswith("#")]
     assert len(body) == len(d.drop_duplicates(["sample", "chrom", "pos", "ref", "alt"]))
     assert all(line.split("\t")[6] == "PASS" for line in body)
+
+
+def _tiny_fasta(tmp_path):
+    fa = tmp_path / "t.fa"
+    fa.write_text(">chr1\nACGTACGTAC\nGTTTGCAAAC\n>chr2\nGGGGG\n")
+    (tmp_path / "t.fa.fai").write_text("chr1\t20\t6\t10\t11\nchr2\t5\t29\t5\t6\n")
+    return str(fa)
+
+
+def test_table_to_vcfs_anchors_indels(tmp_path):
+    """Canonical (MAF-style) indels become anchored VCF records: a deletion moves to the base
+    before it, an insertion keeps its position and gains the anchor base."""
+    fa = _tiny_fasta(tmp_path)
+    tab = tmp_path / "t.tsv"
+    tab.write_text("sample\tchrom\tpos\tref\talt\tvtype\n"
+                   "S1\tchr1\t12\tT\t-\tDEL\n"
+                   "S1\tchr1\t11\t-\tAA\tINS\n"
+                   "S1\tchr1\t3\tG\tT\tSNP\n"
+                   "S1\tchr1\t13\tTT\t-\tDEL\n"
+                   "S2\tchr2\t2\tG\tC\tSNP\n")
+    assert table_to_vcfs.main([str(tab), str(tmp_path / "out"), "--fasta", fa]) == 0
+    recs = [line.split("\t")[1:5] for line in open(tmp_path / "out" / "S1.vcf") if not line.startswith("#")]
+    assert recs == [["3", ".", "G", "T"], ["11", ".", "G", "GAA"], ["11", ".", "GT", "G"], ["12", ".", "TTT", "T"]]
+    contigs = [line for line in open(tmp_path / "out" / "S2.vcf") if line.startswith("##contig")]
+    assert contigs == ["##contig=<ID=chr1,length=20>\n", "##contig=<ID=chr2,length=5>\n"]
+
+
+def test_table_to_vcfs_unknown_contigs(tmp_path):
+    fa = _tiny_fasta(tmp_path)
+    tab = tmp_path / "t.tsv"
+    tab.write_text("sample\tchrom\tpos\tref\talt\tvtype\nS1\tchr1\t3\tG\tT\tSNP\nS1\tchrUn_X\t5\t-\tA\tINS\n")
+    script = os.path.join(ROOT, "benchmarks", "table_to_vcfs.py")
+    r = subprocess.run([sys.executable, script, str(tab), str(tmp_path / "o1"), "--fasta", fa], capture_output=True, text=True)
+    assert r.returncode != 0 and "chrUn_X" in r.stderr
+    r = subprocess.run([sys.executable, script, str(tab), str(tmp_path / "o2"), "--fasta", fa, "--drop-unknown-contigs"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0 and "dropped 1 rows on chrUn_X" in r.stderr
+    assert [line for line in open(tmp_path / "o2" / "S1.vcf") if not line.startswith("#")] == ["chr1\t3\t.\tG\tT\t.\tPASS\t.\tGT\t0/1\n"]
+
+
+def test_table_to_vcfs_refuses_unanchored_or_wrong_indels(tmp_path):
+    fa = _tiny_fasta(tmp_path)
+    tab = tmp_path / "t.tsv"
+    tab.write_text("sample\tchrom\tpos\tref\talt\tvtype\nS1\tchr1\t12\tA\t-\tDEL\n")
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "benchmarks", "table_to_vcfs.py"), str(tab), str(tmp_path / "o1")],
+                       capture_output=True, text=True)
+    assert r.returncode != 0 and "--fasta" in r.stderr
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "benchmarks", "table_to_vcfs.py"), str(tab), str(tmp_path / "o2"), "--fasta", fa],
+                       capture_output=True, text=True)
+    assert r.returncode != 0 and "do not match the FASTA" in r.stderr
 
 
 def test_cli_help():

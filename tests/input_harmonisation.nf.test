@@ -1,0 +1,87 @@
+nextflow_pipeline {
+
+    name "Input harmonisation: maf (hg19, liftover), vcf, sarek and mutations rows"
+    script "../main.nf"
+    tag "pipeline"
+    tag "input_harmonisation"
+
+    // Fixtures: Khalofx/noncodingdrivers-test-datasets data/synthetic_tert/harmonisation, built from
+    // the SYNTH-TERT table: GRCh38 and hg19 FASTA windows of chr5 (1-1.4 Mb), a one-block chain
+    // (hg19 = GRCh38 + 115 bp), an hg19 MAF of all 30 donors (PCAWG style, CRLF) with one chrM row
+    // and one row outside the chain, per-sample VCFs (UCSC names, Ensembl names, tumour/normal).
+
+    test("-profile test - hg19 MAF row with --allow_hg19_liftover") {
+
+        when {
+            params {
+                outdir                = "$outputDir"
+                input                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_maf_hg19.csv'
+                allow_hg19_liftover   = true
+                fasta                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+                fasta_dict            = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.dict'
+                liftover_chain        = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19ToHg38.chr5_1-1400115.chain'
+                liftover_source_fasta = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa'
+            }
+        }
+
+        then {
+            def expected  = new URL('https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/expected.snvs.tsv').text.readLines().drop(1).sort()
+            def mutations = path("$outputDir/mutations/SYNTH-TERT.mutations.tsv").readLines()
+            def snvs      = mutations.drop(1).findAll { line -> line.tokenize('\t')[5] == 'SNP' }.collect { line -> line.tokenize('\t').take(5).join('\t') }.sort()
+            def check     = path("$outputDir/harmonisation/assembly_check/synth_tert_maf.assembly_check.tsv").readLines()
+            def rejects   = path("$outputDir/harmonisation/liftover_rejects/D01.unlifted.vcf.gz").linesGzip.findAll { line -> !line.startsWith('#') }
+            def consensus = path("$outputDir/consensus/SYNTH-TERT.consensus.tsv").readLines()
+            def cols      = consensus[0].tokenize('\t')
+            def tert      = consensus.drop(1).collect { line -> line.split('\t', -1) }.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
+            assert workflow.success
+            assertAll(
+                // 460 SNVs on chr5; the chrM row (MT in the MAF) is dropped by design, the row outside the chain is rejected
+                { assert snvs == expected && snvs.size() == 460 },
+                { assert mutations.size() == 463 },
+                { assert mutations.contains('D11\tchr5\t1310001\tT\t-\tDEL') && mutations.contains('D12\tchr5\t1320000\tGG\tAA\tDNP') },
+                { assert check[1].tokenize('\t')[4..6] == [ '461', '461', '1.000000' ] && check[1].endsWith('\tpass') },
+                { assert rejects.size() == 1 && rejects[0].tokenize('\t')[6] == 'NoTarget' },
+                { assert path("$outputDir/harmonisation/vcf").list().findAll { f -> f.toString().endsWith('.pass.vcf.gz') }.size() == 30 },
+                { assert tert != null && tert[cols.indexOf('is_consensus')] == 'True' && tert[cols.indexOf('consensus_rank')] == '1' },
+                // software versions (versions.yml of the run, Nextflow version removed)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
+            )
+        }
+    }
+
+    test("-profile test - mixed tiers: mutations, vcf (UCSC and Ensembl names), sarek, maf (hg19)") {
+
+        when {
+            params {
+                outdir                = "$outputDir"
+                input                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_tiers.csv'
+                allow_hg19_liftover   = true
+                fasta                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+                fasta_dict            = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.dict'
+                liftover_chain        = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19ToHg38.chr5_1-1400115.chain'
+                liftover_source_fasta = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa'
+            }
+        }
+
+        then {
+            def expected  = new URL('https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/expected.snvs.tsv').text.readLines().drop(1).sort()
+            def mutations = path("$outputDir/mutations/SYNTH-TERT.mutations.tsv").readLines()
+            def snvs      = mutations.drop(1).findAll { line -> line.tokenize('\t')[5] == 'SNP' }.collect { line -> line.tokenize('\t').take(5).join('\t') }.sort()
+            def status    = [ 'D01', 'D02', 'D03', 'synth_tert_maf' ].collectEntries { id ->
+                [ id, path("$outputDir/harmonisation/assembly_check/${id}.assembly_check.tsv").readLines()[1].tokenize('\t')[-1] ] }
+            assert workflow.success
+            assertAll(
+                { assert snvs == expected },
+                // single-donor VCF rows carry 16 SNVs: too few to judge the build (low_evidence), the MAF row passes
+                { assert status == [ D01: 'low_evidence', D02: 'low_evidence', D03: 'low_evidence', synth_tert_maf: 'pass' ] },
+                // the sarek row keeps the tumour column D03_T only
+                { assert path("$outputDir/harmonisation/vcf/D03.pass.vcf.gz").linesGzip.find { line -> line.startsWith('#CHROM') }.tokenize('\t').drop(9) == [ 'D03_T' ] },
+                // Ensembl contig names (5) become UCSC names (chr5)
+                { assert path("$outputDir/harmonisation/vcf/D02.pass.vcf.gz").linesGzip.findAll { line -> !line.startsWith('#') }.every { line -> line.startsWith('chr5\t') } },
+                { assert path("$outputDir/harmonisation/vcf").list().findAll { f -> f.toString().endsWith('.pass.vcf.gz') }.size() == 15 },
+                // software versions (versions.yml of the run, Nextflow version removed)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
+            )
+        }
+    }
+}

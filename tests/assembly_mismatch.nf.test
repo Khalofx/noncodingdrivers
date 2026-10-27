@@ -1,0 +1,90 @@
+nextflow_pipeline {
+
+    name "Assembly gates: wrong declared build, hg19 without opt-in, hg19 without its FASTA"
+    script "../main.nf"
+    tag "pipeline"
+    tag "input_harmonisation"
+
+    test("-profile test - hg19 MAF declared GRCh38 stops with ASSEMBLY_MISMATCH before any caller") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_maf_declared_grch38.csv'
+                fasta  = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_maf') } },
+                { assert !workflow.trace.tasks().any { task -> task.name.tokenize(':')[-1].tokenize(' ')[0] in [ 'ACTIVEDRIVERWGS', 'ONCODRIVEFML', 'MAF2VCF' ] } }
+            )
+        }
+    }
+
+    test("-profile test - GRCh38 VCF declared hg19 stops with ASSEMBLY_MISMATCH") {
+
+        when {
+            params {
+                outdir                = "$outputDir"
+                input                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_vcf_declared_hg19.csv'
+                allow_hg19_liftover   = true
+                fasta                 = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+                fasta_dict            = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.dict'
+                liftover_chain        = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19ToHg38.chr5_1-1400115.chain'
+                liftover_source_fasta = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ASSEMBLY_MISMATCH: row synth_tert_all') } },
+                { assert !workflow.trace.tasks().any { task -> task.name.tokenize(':')[-1].tokenize(' ')[0] in [ 'PICARD_LIFTOVERVCF', 'ACTIVEDRIVERWGS', 'ONCODRIVEFML' ] } }
+            )
+        }
+    }
+
+    test("-profile test - hg19 row without --allow_hg19_liftover stops before any task (ASSEMBLY_NOT_ENABLED)") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_maf_hg19.csv'
+                fasta  = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ASSEMBLY_NOT_ENABLED') } }
+            )
+        }
+    }
+
+    test("-profile test - hg19 MAF row without the hg19 FASTA stops before any task (HG19_FASTA_MISSING)") {
+
+        when {
+            params {
+                outdir              = "$outputDir"
+                input               = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/samplesheet/samplesheet_maf_hg19.csv'
+                allow_hg19_liftover = true
+                fasta               = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+                fasta_dict          = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.dict'
+                liftover_chain      = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/hg19ToHg38.chr5_1-1400115.chain'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('HG19_FASTA_MISSING') } }
+            )
+        }
+    }
+}

@@ -55,8 +55,8 @@
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.vcf(\\.gz)?$",
-                "errorMessage": "vcf must end in .vcf or .vcf.gz"
+                "pattern": "^\\S+\\.vcf\\.gz$",
+                "errorMessage": "vcf must be a bgzip-compressed VCF ending in .vcf.gz (bgzip calls.vcf; tabix -p vcf calls.vcf.gz)"
             },
             "index": {
                 "type": "string",
@@ -109,6 +109,18 @@
                 },
                 "then": {
                     "required": ["maf"]
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "entry": {
+                            "const": "sarek"
+                        }
+                    }
+                },
+                "then": {
+                    "required": ["vcf", "vcf_tumour_id"]
                 }
             }
         ]

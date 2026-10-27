@@ -1,0 +1,105 @@
+{
+    "stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "stub",
+                            "entry": "vcf",
+                            "assembly_declared": "GRCh38"
+                        },
+                        "stub.assembly_check.tsv:md5,5059964ebbc0ae42ddf8ab70e863161f"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "stub",
+                            "entry": "vcf",
+                            "assembly_declared": "GRCh38"
+                        },
+                        "stub.assembly_mismatches.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        "ASSEMBLYCHECK",
+                        "vcf-validator",
+                        "0.10.2"
+                    ]
+                ],
+                "mismatches": [
+                    [
+                        {
+                            "id": "stub",
+                            "entry": "vcf",
+                            "assembly_declared": "GRCh38"
+                        },
+                        "stub.assembly_mismatches.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "summary": [
+                    [
+                        {
+                            "id": "stub",
+                            "entry": "vcf",
+                            "assembly_declared": "GRCh38"
+                        },
+                        "stub.assembly_check.tsv:md5,5059964ebbc0ae42ddf8ab70e863161f"
+                    ]
+                ],
+                "versions_vcfvalidator": [
+                    [
+                        "ASSEMBLYCHECK",
+                        "vcf-validator",
+                        "0.10.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-27T09:08:42.696751259",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "GRCh38 SNVs against the GRCh38 FASTA - pass": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "synth_tert_all",
+                        "entry": "vcf",
+                        "assembly_declared": "GRCh38"
+                    },
+                    "synth_tert_all.assembly_check.tsv:md5,adc2b8c96c6d6ef96186fd1b878e161b"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "synth_tert_all",
+                        "entry": "vcf",
+                        "assembly_declared": "GRCh38"
+                    },
+                    "synth_tert_all.assembly_mismatches.txt:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            ],
+            {
+                "versions_vcfvalidator": [
+                    [
+                        "ASSEMBLYCHECK",
+                        "vcf-validator",
+                        "0.10.2"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-10-27T09:08:31.54955841",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

@@ -18,6 +18,8 @@ include { GAWK as SIGPROFILER_INPUT         } from '../modules/nf-core/gawk/main
 include { SIGPROFILER                       } from '../modules/nf-core/sigprofiler/main'
 include { EXPLAIN                           } from '../subworkflows/local/explain'
 include { peakFileMeta                      } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { resolveReferences                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { INPUT_HARMONISATION               } from '../subworkflows/local/input_harmonisation'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,15 +42,62 @@ workflow NONCODINGDRIVERS {
     def ch_multiqc_files = channel.empty()
 
     //
+    // Reference set of the run: datasheet assets/references/<genome>.yml with explicit
+    // parameters taking precedence (PIPELINE_INITIALISATION has validated it)
+    //
+    def refs = resolveReferences()
+
+    def ch_rows = ch_samplesheet.branch { meta, _mutations, _vcf, _index, _maf ->
+        mutations: meta.entry == 'mutations'
+        variants: true
+    }
+
+    //
+    // SUBWORKFLOW: vcf, sarek and maf rows -> per-sample canonical tables and PASS VCFs (GRCh38).
+    // Each row first passes the assembly check against the FASTA of its declared build.
+    //
+    def ch_harmonised  = channel.empty()
+    def ch_cohort_vcfs = channel.empty()
+    if (refs.fasta) {
+        def ch_fasta = channel.value([ [ id: 'GRCh38' ], file(refs.fasta, checkIfExists: true), file(refs.fasta_fai, checkIfExists: true) ])
+        def ch_dict  = channel.value(params.allow_hg19_liftover
+            ? [ [ id: 'GRCh38' ], file(refs.fasta_dict, checkIfExists: true) ]
+            : [ [:], [] ])
+        def ch_source = channel.value(params.allow_hg19_liftover && refs.liftover_source_fasta
+            ? [ [ id: 'hg19' ], file(refs.liftover_source_fasta, checkIfExists: true), file(refs.liftover_source_fai, checkIfExists: true) ]
+            : [ [:], [], [] ])
+        def ch_chain = channel.value(params.allow_hg19_liftover && refs.liftover_chain
+            ? [ [ id: 'hg19ToHg38' ], file(refs.liftover_chain, checkIfExists: true) ]
+            : [ [:], [] ])
+        INPUT_HARMONISATION(
+            ch_rows.variants.map { meta, _mutations, vcf, index, maf -> [ meta, vcf, index, maf ] },
+            ch_fasta,
+            ch_dict,
+            ch_source,
+            ch_chain,
+            file(refs.rename_chrs, checkIfExists: true),
+            params.assembly_min_match,
+            params.assembly_min_records
+        )
+        ch_harmonised = INPUT_HARMONISATION.out.mutations
+        // MutEnricher (QC-only) reads the per-sample PASS VCFs of each cohort
+        ch_cohort_vcfs = INPUT_HARMONISATION.out.vcf
+            .map { meta, vcf, tbi -> [ meta.cohort, vcf, tbi ] }
+            .groupTuple()
+            .map { cohort, vcfs, tbis -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], vcfs, tbis ] }
+    }
+
+    //
     // One canonical mutation table per cohort. csvtk concat aligns the tables by column name;
     // a gawk program (conf/modules.config) then drops exact duplicate rows. Every row keeps its
-    // sample column, so donors stay distinct after the merge. Only the mutations entry tier
-    // reaches this point (PIPELINE_INITIALISATION rejects vcf, sarek and maf rows for now).
+    // sample column, so donors stay distinct after the merge. mutations rows enter as given;
+    // vcf, sarek and maf rows enter as the per-sample tables of INPUT_HARMONISATION.
     //
-    def ch_cohort_tables = ch_samplesheet
+    def ch_cohort_tables = ch_rows.mutations
         .map { meta, mutations, _vcf, _index, _maf -> [ meta.cohort, mutations ] }
+        .mix(ch_harmonised.map { meta, table -> [ meta.cohort, table ] })
         .groupTuple()
-        .map { cohort, tables -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], tables.sort { table -> table.toString() } ] }
+        .map { cohort, tables -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], tables.sort { table -> [ table.name, table.toString() ].join('\t') } ] }
     COHORT_CONCAT(ch_cohort_tables, 'tsv', 'tsv')
     COHORT_DEDUP(COHORT_CONCAT.out.csv.map { meta, tsv -> [ meta, tsv, 'mutations.tsv' ] }, [], false)
     def ch_mutations = COHORT_DEDUP.out.output
@@ -56,7 +105,7 @@ workflow NONCODINGDRIVERS {
     //
     // References for the callers
     //
-    def ch_elements = channel.value([ [ id: 'elements', assembly: 'GRCh38' ], file(params.elements_bed, checkIfExists: true) ])
+    def ch_elements = channel.value([ [ id: 'elements', assembly: 'GRCh38' ], file(refs.elements_bed, checkIfExists: true) ])
 
     def ch_ofml_score = channel.empty()
     def ofml_config   = []
@@ -69,18 +118,16 @@ workflow NONCODINGDRIVERS {
         ])
         ofml_config = file(params.oncodrivefml_conf ?: "${projectDir}/assets/oncodrivefml.CADD_GRCh38.conf", checkIfExists: true)
         // Offline bgdata genome: a directory, or a .tar.gz of it unpacked by the nf-core untar module
-        if (params.oncodrivefml_genome && params.oncodrivefml_genome.toString().endsWith('.tar.gz')) {
-            UNTAR_ONCODRIVEFML_GENOME(channel.of([ [ id: 'oncodrivefml_genome' ], file(params.oncodrivefml_genome, checkIfExists: true) ]))
+        if (refs.oncodrivefml_genome && refs.oncodrivefml_genome.toString().endsWith('.tar.gz')) {
+            UNTAR_ONCODRIVEFML_GENOME(channel.of([ [ id: 'oncodrivefml_genome' ], file(refs.oncodrivefml_genome, checkIfExists: true) ]))
             ofml_genome = UNTAR_ONCODRIVEFML_GENOME.out.untar.map { _meta, genome -> genome }.first()
-        } else if (params.oncodrivefml_genome) {
-            ofml_genome = file(params.oncodrivefml_genome, checkIfExists: true)
+        } else if (refs.oncodrivefml_genome) {
+            ofml_genome = file(refs.oncodrivefml_genome, checkIfExists: true)
         }
     }
 
-    // MutEnricher (QC-only) reads per-sample PASS VCFs, which only the vcf, sarek and maf entry
-    // tiers provide; mutations-tier cohorts have no VCF and are not run through MutEnricher.
-    // Until those tiers are added, the per-sample VCF channel is empty and MutEnricher has no task.
-    def ch_cohort_vcfs = channel.empty()
+    // MutEnricher (QC-only) reads the per-sample PASS VCFs of the vcf, sarek and maf rows
+    // (ch_cohort_vcfs above); mutations-tier cohorts have no VCF and are not run through MutEnricher.
     def ch_mappable = params.run_mutenricher
         ? channel.value([
             [ id: 'mappable' ],
@@ -127,8 +174,8 @@ workflow NONCODINGDRIVERS {
     def ch_gene_tss = channel.empty()
     if (params.gene_tss_bed) {
         ch_gene_tss = channel.value([ [ id: 'gene_tss' ], file(params.gene_tss_bed, checkIfExists: true) ])
-    } else if (params.gencode_gtf) {
-        def gtf = file(params.gencode_gtf, checkIfExists: true)
+    } else if (refs.gencode_gtf) {
+        def gtf = file(refs.gencode_gtf, checkIfExists: true)
         GENE_TSS(
             channel.of([ [ id: gtf.name.replaceAll(/\.gtf(\.gz)?$/, '') ], gtf, 'tss.bed' ]),
             file("${projectDir}/assets/awk/gene_tss.awk", checkIfExists: true),
@@ -142,16 +189,16 @@ workflow NONCODINGDRIVERS {
     // ENCODE peak files, one per tissue and layer: <regulatory_peaks_dir>/<tissue>/<layer>.<accession>.bed.gz
     def ch_peaks = channel.empty()
     if (params.run_regulatory_context) {
-        ch_peaks = channel.fromPath("${params.regulatory_peaks_dir}/*/*.{bed,bed.gz}", checkIfExists: true)
+        ch_peaks = channel.fromPath("${refs.regulatory_peaks_dir}/*/*.{bed,bed.gz}", checkIfExists: true)
             .map { peak -> [ peakFileMeta(peak), peak ] }
     }
 
     def ch_vep_cache = channel.empty()
     if (params.run_vep) {
-        ch_vep_cache = channel.value([ [ id: "vep_${params.vep_cache_version}" ], file(params.vep_cache, checkIfExists: true) ])
+        ch_vep_cache = channel.value([ [ id: "vep_${params.vep_cache_version}" ], file(refs.vep_cache, checkIfExists: true) ])
     }
     def motifs = params.run_motifbreakr
-        ? file(params.jaspar_motifs ?: "${projectDir}/assets/motifs/jaspar_core_vertebrates_2026.pfm", checkIfExists: true)
+        ? file(refs.jaspar_motifs, checkIfExists: true)
         : []
 
     //

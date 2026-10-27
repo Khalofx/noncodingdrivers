@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "input_harmonisation"
+description: Harmonise vcf, sarek and maf samplesheet rows to per-sample GRCh38 PASS VCFs and canonical mutation tables, with a build check per row and opt-in hg19 liftover
+keywords:
+  - vcf
+  - maf
+  - liftover
+  - normalisation
+  - harmonisation
+components:
+  - bcftools/annotate
+  - bcftools/norm
+  - bcftools/view
+  - bcftools/query
+  - bcftools/sort
+  - picard/liftovervcf
+  - gawk
+input:
+  - ch_rows:
+      type: file
+      description: "[ val(meta), path(vcf), path(index), path(maf) ] vcf, sarek and maf samplesheet rows"
+  - ch_fasta:
+      type: file
+      description: "[ val(meta2), path(fasta), path(fai) ] GRCh38 analysis FASTA (value channel)"
+  - ch_dict:
+      type: file
+      description: "[ val(meta3), path(dict) ] sequence dictionary of the GRCh38 FASTA (value channel; liftover only)"
+  - ch_source:
+      type: file
+      description: "[ val(meta4), path(fasta), path(fai) ] hg19 FASTA for GRCh37/hg19 rows, or [ [:], [], [] ]"
+  - ch_chain:
+      type: file
+      description: "[ val(meta5), path(chain) ] hg19 -> GRCh38 chain, or [ [:], [] ]"
+  - rename_map:
+      type: file
+      description: bcftools --rename-chrs map to UCSC contig names
+  - min_match:
+      type: float
+      description: Minimum fraction of matching REF alleles per row
+  - min_records:
+      type: integer
+      description: Rows with fewer checked SNVs pass with status low_evidence
+output:
+  - mutations:
+      type: file
+      description: "[ val(meta), path(tsv) ] canonical mutation table per sample"
+  - vcf:
+      type: file
+      description: "[ val(meta), path(vcf.gz), path(tbi) ] per-sample PASS VCF on GRCh38"
+  - assembly_check:
+      type: file
+      description: "[ val(meta), path(tsv) ] assembly-check summary per samplesheet row"
+  - unlifted:
+      type: file
+      description: "[ val(meta), path(vcf.gz) ] records Picard LiftoverVcf rejected"
+  - skipped:
+      type: file
+      description: "[ val(meta), path(tsv) ] MAF rows maf2vcf.pl dropped (REF disagrees with the FASTA)"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

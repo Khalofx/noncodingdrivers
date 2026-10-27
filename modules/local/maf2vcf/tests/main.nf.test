@@ -1,0 +1,65 @@
+nextflow_process {
+
+    name "Test Process MAF2VCF"
+    script "../main.nf"
+    process "MAF2VCF"
+
+    tag "modules"
+    tag "modules_local"
+    tag "maf2vcf"
+
+    // One tumour (D04) of the SYNTH-TERT hg19 MAF, as written by assets/awk/maf_split.awk, and the
+    // hg19 chr5 window of Khalofx/noncodingdrivers-test-datasets
+
+    test("one tumour, hg19") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id: 'D04', sample: 'D04' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/D04.hg19.sample.maf', checkIfExists: true) ]
+                input[1] = [ [ id: 'hg19' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa', checkIfExists: true),
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa.fai', checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.vcf[0][1]).readLines()
+            def body  = lines.findAll { line -> !line.startsWith('#') }
+            assertAll(
+                { assert process.success },
+                { assert lines.find { line -> line.startsWith('#CHROM') }.tokenize('\t').drop(9) == [ 'D04' ] },
+                { assert lines.contains('##contig=<ID=chr5,length=1400115>') },
+                { assert body.every { line -> line.tokenize('\t')[6] == 'PASS' } },
+                { assert process.out.skipped.size() == 0 },
+                { assert snapshot(process.out.vcf, process.out.findAll { key, val -> key.startsWith('versions') }).match() }
+            )
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id: 'stub' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/D04.hg19.sample.maf', checkIfExists: true) ]
+                input[1] = [ [ id: 'hg19' ],
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa', checkIfExists: true),
+                             file(params.pipelines_testdata_base_path + 'data/synthetic_tert/harmonisation/hg19.chr5_1-1400115.fa.fai', checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

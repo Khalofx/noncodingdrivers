@@ -33,3 +33,36 @@ caller tasks were reused from the Step 3 regression runs (`-resume`).
 PACA-CA under `--combination_method acat` has no element with `is_consensus == True`. The run logs
 `no element has is_consensus == True; candidate mutations, nearest genes and annotation layers are
 skipped, no candidate file is written` and publishes no candidate, nearest-gene or annotation file.
+
+## Input tiers and hg19 liftover (Liver-HCC-public, 261 donors)
+
+The same cohort was run from three inputs: the canonical `mutations` table (the validated
+baseline), 261 per-sample VCFs projected from that table (`benchmarks/table_to_vcfs.py`, indels
+anchored on the FASTA), and the hg19 PCAWG MAF of the 261 aliquots (a `csvtk grep` subset of
+`final_consensus_passonly.snv_mnv_indel.icgc.public.maf.gz`, 3,380,218 records) lifted with
+`--allow_hg19_liftover`. The criterion is an equal SNV set; every other difference is listed.
+
+| Check                                          | VCF rows                                                                                                                 | MAF row (hg19, Picard LiftoverVcf)                                                                                                                                                                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Assembly check                                 | 261/261 rows pass; 3,379,234/3,379,234 REF alleles match                                                                 | 3,152,665/3,152,665 MAF SNVs match hg19                                                                                                                                                                                                   |
+| SNV rows (3,151,863)                           | sorted SHA-256 equal to the `mutations` table                                                                            | sorted SHA-256 equal to the `mutations` table                                                                                                                                                                                             |
+| DNP, TNP, ONP (32,377, 361, 19)                | identical                                                                                                                | identical                                                                                                                                                                                                                                 |
+| Deletions (129,518 in the table)               | 129,443: 405 left-aligned by `bcftools norm`; 75 were listed twice in the table (below)                                  | 129,439: 402 left-aligned; the same 75 duplicates; 4 rejected by Picard                                                                                                                                                                   |
+| Insertions (65,116 in the table)               | 65,095: 5 left-aligned; 1 listed twice; 20 on alt or unplaced contigs                                                    | 65,095: 154 left-aligned; 1 listed twice; 20 on alt or unplaced contigs                                                                                                                                                                   |
+| Records outside the analysis contigs           | 20 insertions on 7 alt/unplaced contigs (absent from the 25-contig FASTA)                                                | the same 20 are not in the run: the chain maps them to contigs the FASTA lacks, which Picard rejects as `NoTarget`                                                                                                                        |
+| Caller results (ActiveDriverWGS, OncodriveFML) | both native result tables byte-identical to the `mutations`-tier run                                                     | both native result tables byte-identical to the `mutations`-tier run                                                                                                                                                                      |
+| Consensus (`--combination_method ebm`)         | 541,936 elements, identical p and q; 31 significant, the same set; Brown c 1.013805, df 3.94553; TERT q 3.07e-05, rank 5 | identical, as for the VCF rows                                                                                                                                                                                                            |
+| Liftover rejects                               |                                                                                                                          | 900 (802 SNVs: 797 `NoTarget`, 5 `MismatchedRefAllele`; 11 MNVs; 87 indels incl. 2 `IndelStraddlesMultipleIntervals`); the earlier pyliftover conversion failed 875 (176 unmapped, 2 split, 697 REF mismatches) and kept the same SNV set |
+
+**Duplicate representations.** The `mutations` table, converted from the PCAWG MAF without
+normalisation, lists 75 deletions and 1 insertion twice for the same donor, in two equivalent
+positions of a repeat (for example chr1:19,578,665 `AGAC>-` and chr1:19,578,666 `GACA>-` in a
+`GAGACA` repeat). `bcftools norm` left-aligns both copies to one record (chr1:19,578,664
+`GAGAC>G`), and the cohort merge keeps it once.
+
+**Picard versus pyliftover.** Four deletions that pyliftover lifted (by their first base) are
+rejected by Picard: two span a chain gap (`IndelStraddlesMultipleIntervals`) and two have their
+anchor base in an unmapped interval (`NoTarget`).
+
+**Wrong declared assembly.** The same MAF declared `GRCh38` stops at the assembly check with
+`ASSEMBLY_MISMATCH` (818,924 of 3,152,665 REF alleles, 25.98%, match GRCh38); no caller task ran.

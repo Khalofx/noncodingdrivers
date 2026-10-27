@@ -37,6 +37,19 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 - Pipeline-owned motifbreakR image `ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0`, built
   from an explicit conda lock (`containers/motifbreakr/`), with an Apptainer recipe for HPC builds.
 - Optional cohort-level signature QC (`--run_sigprofiler`; nf-core `sigprofiler`).
+- Reference datasheet `assets/references/GRCh38.yml` (schema `assets/schema_references.json`):
+  the validated GRCh38 reference set with checksums, paths relative to `--reference_base`;
+  explicit parameters take precedence. Asset recipes and checksums in `docs/references.md`.
+- `vcf`, `sarek` and `maf` entry tiers through the `INPUT_HARMONISATION` subworkflow: contig
+  renaming (nf-core `bcftools/annotate`), MAF split per tumour (gawk) and conversion with
+  maf2vcf.pl (local `MAF2VCF`, vcf2maf 1.6.22), sorting, normalisation, PASS and primary-chromosome
+  filtering and the canonical table (nf-core `bcftools/sort`, `bcftools/norm`, `bcftools/view`,
+  `bcftools/query`, gawk). The per-sample PASS VCFs feed MutEnricher.
+- Assembly check per samplesheet row (local `ASSEMBLYCHECK`, EBI vcf_assembly_checker 0.10.2):
+  REF alleles against the FASTA of the declared build; below `--assembly_min_match` (0.99) the run
+  stops with `ASSEMBLY_MISMATCH` before any caller.
+- Opt-in GRCh37/hg19 liftover (`--allow_hg19_liftover`; nf-core `picard/liftovervcf`), rejected
+  records published; GRCh37/hg19 rows without the opt-in stop with `ASSEMBLY_NOT_ENABLED`.
 
 ### `Fixed`
 

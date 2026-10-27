@@ -5,6 +5,31 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bcftools/annotate": {
+                        "branch": "master",
+                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "installed_by": ["modules"]
+                    },
+                    "bcftools/norm": {
+                        "branch": "master",
+                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "installed_by": ["modules"]
+                    },
+                    "bcftools/query": {
+                        "branch": "master",
+                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "installed_by": ["modules"]
+                    },
+                    "bcftools/sort": {
+                        "branch": "master",
+                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "installed_by": ["modules"]
+                    },
+                    "bcftools/view": {
+                        "branch": "master",
+                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "installed_by": ["modules"]
+                    },
                     "bedtools/closest": {
                         "branch": "master",
                         "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
@@ -53,6 +78,11 @@
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
+                        "installed_by": ["modules"]
+                    },
+                    "picard/liftovervcf": {
+                        "branch": "master",
+                        "git_sha": "467c847035812fc17db844c6f37615b415b75eb3",
                         "installed_by": ["modules"]
                     },
                     "sigprofiler": {

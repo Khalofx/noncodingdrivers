@@ -8,47 +8,71 @@
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+The samplesheet is a comma-separated file with a header row. Each row is one input file of a
+cohort, given as one of four entry tiers. Rows with the same `cohort` are merged into one cohort
+mutation table before the callers run.
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-### Multiple runs of the same sample
+| Column          | Description                                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                                |
+| `entry`         | `mutations`, `vcf`, `sarek` or `maf` (below).                                                                                                |
+| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                               |
+| `cancer_type`   | Optional label.                                                                                                                              |
+| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (`vcf`, `sarek`, `maf` only, with `--allow_hg19_liftover`).       |
+| `mutations`     | `mutations` rows: canonical table, tab-separated with columns `sample chrom pos ref alt vtype` (GRCh38, UCSC names, MAF allele conventions). |
+| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                                 |
+| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                                  |
+| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                              |
 
-The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+### Entry tiers
+
+- **`mutations`**: a canonical table, used as given. Deletions start at their first deleted base
+  with `alt` `-`; insertions sit on the base before them with `ref` `-`; `vtype` is `SNP`, `DNP`,
+  `TNP`, `ONP`, `INS` or `DEL`.
+- **`vcf`**: one sample's somatic calls. A VCF with several sample columns needs `vcf_tumour_id`.
+- **`sarek`**: a tumour/normal VCF (for example nf-core/sarek output); `vcf_tumour_id` names the
+  tumour column.
+- **`maf`**: a MAF with any number of tumours (`Tumor_Sample_Barcode`); each tumour becomes one
+  sample. Characters outside `[A-Za-z0-9._-]` in barcodes become `_`.
+
+`vcf`, `sarek` and `maf` rows go through `INPUT_HARMONISATION`: contig names are mapped to UCSC
+names, maf rows are converted with maf2vcf.pl, GRCh37/hg19 rows are lifted with Picard
+LiftoverVcf, then bcftools normalises (multiallelic records split, indels left-aligned, records
+whose REF disagrees with the FASTA dropped), keeps PASS or missing-FILTER records on chr1-22, X
+and Y, and the records are written in the canonical conventions above. The per-sample PASS VCFs
+are published under `harmonisation/vcf/` and are what MutEnricher (`--run_mutenricher`) reads.
+
+### Assembly check
+
+Every `vcf`, `sarek` and `maf` row is checked against the FASTA of its declared assembly before
+anything else reads it (EBI `vcf_assembly_checker`). A row in which fewer than
+`--assembly_min_match` (default 0.99) of the REF alleles match stops the run with
+`ASSEMBLY_MISMATCH`; for maf rows the check reads the MAF SNVs themselves. A row with fewer than
+`--assembly_min_records` (default 50) checkable SNVs keeps its declared assembly with an
+`ASSEMBLY_LOW_EVIDENCE` warning. Summaries are published under `harmonisation/assembly_check/`.
+
+GRCh37/hg19 rows stop the run with `ASSEMBLY_NOT_ENABLED` unless `--allow_hg19_liftover true` is
+set; they then need the hg19 FASTA (`HG19_FASTA_MISSING` otherwise) and the chain (see
+[references](references.md)). Rejected liftover records are published under
+`harmonisation/liftover_rejects/`; a `mutations` table is never lifted.
 
 ```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
+sample,entry,cohort,cancer_type,assembly,mutations,vcf,index,maf,vcf_tumour_id
+liver_table,mutations,LIVER,HCC,GRCh38,liver.mutations.tsv,,,,
+D01,vcf,LIVER,HCC,GRCh38,,D01.vcf.gz,D01.vcf.gz.tbi,,
+D02,sarek,LIVER,HCC,GRCh38,,D02.mutect2.filtered.vcf.gz,D02.mutect2.filtered.vcf.gz.tbi,,D02_T
+pcawg_liver,maf,LIVER,HCC,hg19,,,,liver.hg19.maf.gz,
 ```
 
-### Full samplesheet
+## References
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
-
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
-
-```csv title="samplesheet.csv"
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
-```
-
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-
-An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
+The GRCh38 reference set comes from the datasheet `assets/references/GRCh38.yml`; set
+`--reference_base` to the folder holding the files, or give each file explicitly. See
+[references](references.md) for the datasheet, the checksums and the recipes that build each asset.
 
 ## Running the pipeline
 
