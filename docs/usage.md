@@ -74,6 +74,25 @@ The GRCh38 reference set comes from the datasheet `assets/references/GRCh38.yml`
 `--reference_base` to the folder holding the files, or give each file explicitly. See
 [references](references.md) for the datasheet, the checksums and the recipes that build each asset.
 
+## Flags, evidence and null calibration
+
+None of these options filters a mutation or changes a p- or q-value; they add files.
+
+- **Variant flags** (`--run_variant_flags`, default `true`) need the four mask BEDs and, for the
+  germline flag, the gnomAD v4.1 genomes echtvar archive and the GRCh38 FASTA. With
+  `--reference_base` they come from the datasheet; otherwise give `--blacklist_bed`,
+  `--segdup_bed`, `--low_mappability_bed`, `--umap_bed`, `--gnomad_echtvar` and `--fasta`. Without
+  a gnomAD archive, `--skip_germline_flags true` writes the germline columns as NA. A run that
+  needs none of this sets `--run_variant_flags false`.
+- **Post-filter flags and the evidence table** (`--run_driver_evidence`, default `true`).
+  `--postfilter_mode pcawg` adds `q_postfilter` beside the unchanged q-values; `--evidence_scope all`
+  writes every element instead of the nominal ones. Evidence tiers are assigned downstream from
+  `driver_evidence.tsv`.
+- **Null calibration** (`--run_null_calibration`, default `false`) re-runs the callers on
+  `--null_replicates` neutral copies of each cohort (seed `--seed` + replicate), each costing about
+  as much as the observed run, and reports the inflation factor of every caller and combination
+  against `--null_lambda_band`.
+
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:

@@ -28,6 +28,7 @@ project cluster under `noncodingdrivers/data/baseline/` (read-only); there is no
 | Variant-flag mask: GIAB v3.6 GRCh38 segmental duplications `masks/GRCh38_segdups.bed.gz`                            | MD5 `72ec3f7db18ef9318c64b1df271703fe`                                                                                               |
 | Variant-flag mask: GIAB v3.6 GRCh38 low mappability (all) `masks/GRCh38_lowmappabilityall.bed.gz`                   | MD5 `8a78766bb99abf1d25a5b307d49a0324`                                                                                               |
 | Variant-flag mask: Umap k100 single-read mappability hg38 `masks/k100.umap.bed.gz`                                  | MD5 `1ef87107f449ccaf7e537de9740692fb`                                                                                               |
+| gnomAD v4.1 genomes echtvar archive `gnomad/gnomad.v4.1.genomes.echtvar.zip` (echtvar 0.2.4, 759,336,320 variants; field configuration MD5 `06f2ebddcf38deebfbd8873ed5e40986`) | MD5 `7bc89a78568a424d7694e2d351617bcd` |
 
 hg19 MAF to GRCh38 liftover of Liver-HCC-public (the baseline canonical table): 3,380,218 records in,
 3,379,254 out; 875 failed (176 unmapped, 2 split mappings, 697 REF mismatches); 65,116 insertions
