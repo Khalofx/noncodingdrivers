@@ -13,8 +13,9 @@ nextflow_workflow {
     // P2 carry the common SNV chr5:89061 T>C (fafmax_faf95_max 0.080); chr5:11537 T>C is rare
     // (AC 2, no FAF) and chr5:10433 T>C fails gnomAD (AC0); the deletion chr5:11629 A>- (VCF
     // 11628 TA>T, FAF 0.024) and the insertion chr5:14265 ->A (VCF C>CA, FAF 0.236) test the
-    // anchoring; chr5:250000 A>T is not in gnomAD. Masks: the real masks clipped to the window
-    // (Blacklist v2 covers chr5:0-44,100, a GIAB segdup chr5:13,577-49,495).
+    // anchoring; gnomAD has no record at chr5:250001 (T>G here). Masks: the real masks clipped to the window
+    // (Blacklist v2 covers chr5:0-44,100, a GIAB segdup chr5:13,577-49,495). chrM is not in the
+    // FASTA window: its row keeps the mask flags and has no germline result.
     test("masks, germline flags and element aggregation") {
 
         when {
@@ -47,15 +48,16 @@ nextflow_workflow {
             def el  = { id -> ef.find { r -> r.element_id == id } }
             assert workflow.success
             assertAll(
-                { assert vf.size() == 8 },
-                { assert vf*.pos == [ '89061', '89061', '11537', '10433', '11629', '14265', '250000', '1295113' ] },   // table order
+                { assert vf.size() == 9 },
+                { assert vf*.pos == [ '89061', '89061', '11537', '10433', '11629', '14265', '250001', '1295113', '100' ] },   // table order
                 { assert row('89061', 'P1').subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2' ]) == [ gnomad_filter: 'PASS', germline_pop_common: 'true', in_blacklist_v2: 'false' ] },
                 { assert row('89061', 'P2').germline_pop_common == 'true' },
                 { assert row('11537', 'P1').subMap([ 'gnomad_filter', 'gnomad_fafmax_faf95_max', 'germline_pop_common' ]) == [ gnomad_filter: 'PASS', gnomad_fafmax_faf95_max: 'NA', germline_pop_common: 'false' ] },
                 { assert row('10433', 'P2').subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2', 'in_low_mappability' ]) == [ gnomad_filter: 'AC0', germline_pop_common: 'false', in_blacklist_v2: 'true', in_low_mappability: 'true' ] },
                 { assert row('11629', 'P3').subMap([ 'vtype', 'gnomad_filter', 'germline_pop_common' ]) == [ vtype: 'DEL', gnomad_filter: 'PASS', germline_pop_common: 'true' ] },
                 { assert row('14265', 'P3').subMap([ 'vtype', 'gnomad_filter', 'germline_pop_common', 'in_segdup' ]) == [ vtype: 'INS', gnomad_filter: 'PASS', germline_pop_common: 'true', in_segdup: 'true' ] },
-                { assert row('250000', 'P1').subMap([ 'gnomad_filter', 'gnomad_af', 'germline_pop_common' ]) == [ gnomad_filter: 'NA', gnomad_af: 'NA', germline_pop_common: 'false' ] },
+                { assert row('250001', 'P1').subMap([ 'gnomad_filter', 'gnomad_af', 'germline_pop_common' ]) == [ gnomad_filter: 'NA', gnomad_af: 'NA', germline_pop_common: 'false' ] },
+                { assert vf.find { r -> r.chrom == 'chrM' }.subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2' ]) == [ gnomad_filter: 'NA', germline_pop_common: 'NA', in_blacklist_v2: 'false' ] },   // contig absent from the FASTA window
                 { assert vf.every { r -> r.umap_unique_fraction ==~ /[01](\.\d+)?/ } },
                 { assert ef.size() == 5 },                                                      // every element, with or without mutations
                 { assert el('elem_tel').subMap([ 'n_mutations', 'n_patients', 'frac_in_blacklist_v2', 'frac_in_low_mappability', 'frac_germline_pop_common', 'callable_fraction' ]) ==
@@ -96,7 +98,7 @@ nextflow_workflow {
             def ef = table(workflow.out.element_flags[0][1])
             assert workflow.success
             assertAll(
-                { assert vf.size() == 8 },
+                { assert vf.size() == 9 },
                 { assert vf.every { r -> r.germline_pop_common == 'NA' && r.gnomad_filter == 'NA' } },
                 { assert vf.find { r -> r.pos == '10433' }.in_blacklist_v2 == 'true' },
                 { assert ef.find { r -> r.element_id == 'elem_tel' }.frac_germline_pop_common == 'NA' },
