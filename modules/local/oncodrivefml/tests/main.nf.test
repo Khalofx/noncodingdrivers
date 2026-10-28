@@ -3,7 +3,6 @@ nextflow_process {
     name "Test Process ONCODRIVEFML"
     script "../main.nf"
     process "ONCODRIVEFML"
-    config "./nextflow.config"
 
     tag "modules"
     tag "modules_local"
