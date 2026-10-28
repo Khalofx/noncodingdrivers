@@ -5,7 +5,8 @@ process CALIBRATECALLERS {
     // In-house calibration report (D32; off by default, --run_null_calibration): per-method
     // inflation factor and q < FDR counts on the SIMULATENULL cohorts, and QQ points
     // (bin/calibrate_callers.py). Reported only; no p- or q-value is changed.
-    container 'ghcr.io/khalofx/noncodingdrivers-utils:1.0.0'
+    // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
     tuple val(meta), path(observed_consensus), path(observed_adwgs), path(null_consensus, stageAs: 'null/*'), path(null_adwgs, stageAs: 'null/*')

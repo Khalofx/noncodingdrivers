@@ -34,8 +34,8 @@ nextflow_process {
         }
     }
 
-    // Real run: needs the image ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0 (or the SIF
-    // built from containers/motifbreakr/motifbreakr.def). TERT C228T (chr5:1295113 G>A) must show
+    // Real run: needs the module's image (ghcr.io/khalofx/noncodingdrivers-motifbreakr 2.24.0, pinned
+    // by digest). TERT C228T (chr5:1295113 G>A) must show
     // the ETS gain of the 10 Oct 2026 pilot: ELK4 MA0076.3, ref p 9.994507e-04, alt p 2.288818e-05.
     test("TERT promoter SNVs") {
 

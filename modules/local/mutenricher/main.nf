@@ -9,7 +9,8 @@ process MUTENRICHER {
     // No conda directive: MutEnricher has no Bioconda or conda-forge package. The image
     // (containers/mutenricher) pins python 3.7, builds cyvcf2 from source and carries bgzip and
     // tabix from htslib 1.21.
-    container 'ghcr.io/khalofx/noncodingdrivers-mutenricher:1.3.3'
+    // Tag 1.3.3, pinned by digest.
+    container 'ghcr.io/khalofx/noncodingdrivers-mutenricher@sha256:896eafb86136dff87a0fb6e2232d81ccdeb0737f0766f86c958d6716bae2deb0'
 
     input:
     tuple val(meta), path(vcfs, stageAs: 'vcfs/*'), path(tbis, stageAs: 'vcfs/*') // per-sample PASS VCFs (bgzip) and their .tbi

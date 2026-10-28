@@ -5,7 +5,8 @@ process WRITEDRIVEREVIDENCE {
     // Long-form evidence table (D33; bin/write_driver_evidence.py), one row per cohort x element x
     // evidence item, in the layout of assets/schema_driver_evidence.json. No tiers: those are
     // assigned downstream (reports repository).
-    container 'ghcr.io/khalofx/noncodingdrivers-utils:1.0.0'
+    // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
     tuple val(meta), path(consensus), path(element_flags), path(postfilter), path(calibration), val(coordinates)

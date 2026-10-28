@@ -5,7 +5,8 @@ process RUNSUMMARYMQC {
     // MultiQC custom content describing the run (counts only; no candidate ranking), written by
     // bin/run_summary_mqc.py from the consensus table and the callers' own output tables.
     // No conda directive: the script is pipeline-owned; the utils image carries its python.
-    container 'ghcr.io/khalofx/noncodingdrivers-utils:1.0.0'
+    // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
     tuple val(meta), path(consensus), path(caller_tables, stageAs: 'callers/*')

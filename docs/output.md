@@ -2,21 +2,23 @@
 
 ## Introduction
 
-This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
+This document describes the output produced by the pipeline. `<cohort>` is the samplesheet `cohort` of a row; every table is tab-separated with a header row.
 
 The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
-
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
 
 ## Pipeline overview
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-- [Input harmonisation](#input-harmonisation) - Assembly checks, liftover rejects and per-sample PASS VCFs of vcf, sarek and maf rows
+- [Input harmonisation](#input-harmonisation) - Assembly checks, liftover rejects, per-sample PASS VCFs and the cohort mutation table
+- [Driver discovery](#driver-discovery) - Native result tables of ActiveDriverWGS, OncodriveFML and MutEnricher
+- [Consensus](#consensus) - Per-element combined p- and q-values and the consensus call
 - [Variant flags](#variant-flags) - Mask and germline flags of every mutation row, element-level fractions and callable fraction
 - [Post-filter flags and evidence table](#post-filter-flags-and-evidence-table) - PCAWG-style post-filter flags and the long-form `driver_evidence.tsv`
 - [Null calibration](#null-calibration) - Per-caller inflation factor on neutral copies of each cohort (opt-in)
-- [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
+- [Candidates and annotation layers](#candidates-and-annotation-layers) - Mutations, nearest gene, regulatory context, VEP and motifbreakR for the significant elements
+- [Signature QC](#signature-qc) - SigProfiler on the cohort (opt-in)
+- [MultiQC](#multiqc) - Run summary report
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ### Input harmonisation
@@ -35,6 +37,36 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
   - `<sample>.pass.vcf.gz` (+ `.tbi`): per-sample VCF on GRCh38 after normalisation, PASS (or missing FILTER) records on chr1-22, X and Y; the input of MutEnricher.
 - `mutations/`
   - `<cohort>.mutations.tsv`: the cohort mutation table (`sample chrom pos ref alt vtype`) that every caller reads: the mutations rows as given, plus the harmonised vcf, sarek and maf rows.
+
+</details>
+
+### Driver discovery
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `callers/activedriverwgs/`
+  - `<cohort>.activedriverwgs.tsv`: the ActiveDriverWGS result table of all shards (`id`, `pp_element`, `element_muts_obs`, `element_muts_exp`, `element_enriched`, the site-level columns, `fdr_element`, `fdr_site`, `has_site_mutations`); `fdr_element` is recomputed over all shards.
+  - `<cohort>.activedriverwgs.untested.txt`: element ids ActiveDriverWGS could not test (for example an empty background window). They are recorded, not dropped, and cannot be significant.
+- `callers/oncodrivefml/`
+  - `<cohort>.oncodrivefml.tsv`: the native OncodriveFML table (`GENE_ID` is the element id; `P_VALUE`, `Q_VALUE` and their `_NEG` counterparts, mutation and sample counts).
+  - `<cohort>.oncodrivefml.status.txt`: the exit code of the OncodriveFML run.
+- `callers/mutenricher/` (`--run_mutenricher`): the native MutEnricher region table (SNVs only, sample-count statistic, local background). QC only: it never enters the combination.
+
+</details>
+
+### Consensus
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `consensus/`
+  - `<cohort>.consensus.tsv`: one row per element tested by at least one caller. `p_<caller>`, `q_<caller>`: per-caller p- and q-values; `chrom`, `start`, `end`, `n_fragments`: the element span (a catalogue id split by the coding-sequence exclusion spans several fragments); `n_tested_callers`; `ebm_p`, `ebm_q` (empirical Brown's method) and `acat_p`, `acat_q` (ACAT), each with Benjamini–Hochberg q-values; `rra_score`, `rra_q` (robust rank aggregation) and `vote_count` (callers with their own q <= `--fdr_threshold`) as sensitivity columns; `combination_method`, `consensus_q` (the q-value of the chosen combination), `consensus_rank` and `is_consensus` (`True` when `consensus_q` < `--fdr_threshold`).
+  - `<cohort>.consensus.ebm_parameters.tsv`: the callers combined, the number of elements and of complete elements, the sum of the off-diagonal covariance, and Brown's scale `brown_c` and degrees of freedom `brown_df`.
+- `consensus/intermediate/`
+  - `elements.coords.tsv`: span and fragment count of every catalogue id.
+  - `<cohort>.<caller>.harmonized.tsv`: each caller's result as `element_id`, `p_<caller>`, `q_<caller>`.
+  - `<cohort>.matched.tsv`: the per-caller columns joined on `element_id`, the input of the combination.
 
 </details>
 
@@ -90,6 +122,39 @@ that include it, have a null `lambda` near 0.5 by construction (one-sided count 
 
 </details>
 
+### Candidates and annotation layers
+
+Written only for cohorts with at least one element with `is_consensus` true. None of these files
+filters or re-ranks an element.
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `candidates/`
+  - `<cohort>.candidates.tsv`: one row per patient x mutation x significant element: `sample chrom pos ref alt vtype`, `element_id` and the fragment the mutation lies in (`fragment_start`, `fragment_end`). Mutations between the fragments of an element (excluded coding bases) are not candidates.
+  - `<cohort>.nearest_gene.tsv`: one row per significant element: the nearest GENCODE gene TSS to the element midpoint (`nearest_gene`, `nearest_gene_ensembl_id`, `gene_type`, `nearest_tss`, `gene_strand`), the strand-aware signed `distance_to_tss` and its absolute value, `relative_position` (`overlapping_tss`, `upstream` or `downstream`) and `nearest_gene_status`.
+  - `intermediate/<cohort>.significant.sorted.bed`: the fragments of the significant elements.
+  - `vep/<cohort>.candidates.vep.tab.gz` and `_summary.html` (`--run_vep`): Ensembl VEP 116.3 consequences of the candidate mutations (tab format, offline cache; `--regulatory` is not used).
+- `regulatory_context/` (`--run_regulatory_context`)
+  - `<cohort>.regulatory_context.tsv`: one row per significant element x staged ENCODE file: `tissue`, `layer`, `accession`, `n_fragments`, `n_peaks`, `covered_bp`, `element_bp`, `covered_frac`, `max_signal` with its `signal_source` (narrowPeak `signalValue` or DNase hotspot `max_density`; comparable within a layer only) and `status` (`overlap` or `no_overlap`). A tissue x layer that was not staged has no row.
+  - `per_file/`: the bedtools coverage and signal BEDs behind each row.
+- `motifbreakr/` (`--run_motifbreakr`)
+  - `<cohort>.motifbreakr.tsv`: the native motifbreakR result for the candidate SNVs.
+  - `<cohort>.motifbreakr.per_tf.tsv`: one row per SNV x transcription factor: the best motif, `ref_pvalue`, `alt_pvalue`, `best_pvalue`, `direction` (`gain`, `loss` or `none`), `fold_change`, and `p_below_resolution` for p-values below the resolution of `calculatePvalue()` (flagged, never floored; their `fold_change` is NA).
+- `references/`
+  - `gencode.v50.basic.annotation.tss.bed`: the gene TSSs used for the nearest-gene table.
+
+</details>
+
+### Signature QC
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `qc/sigprofiler/` (`--run_sigprofiler`): the SigProfiler output (mutation matrices and extracted signatures) of the cohort's SNVs; QC only, nothing else reads it.
+
+</details>
+
 ### MultiQC
 
 <details markdown="1">
@@ -104,7 +169,7 @@ that include it, have a null `lambda` near 0.5 by construction (one-sided count 
 
 [MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
 
-Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQC. The pipeline has special steps which also allow the software versions to be reported in the MultiQC output for future traceability. For more information about how to use MultiQC reports, see <http://multiqc.info>.
+The report holds the run summary of each cohort (elements tested, per-caller coverage and output rows, without candidate ranking), the VEP summary when `--run_vep` is set, and the software versions of the run. For more information about how to use MultiQC reports, see <http://multiqc.info>.
 
 ### Pipeline information
 

@@ -7,112 +7,112 @@
                 "nf-core": {
                     "bcftools/annotate": {
                         "branch": "master",
-                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "git_sha": "ed7a2286df416088793e62fa6a740d07974d0ff8",
                         "installed_by": ["modules"]
                     },
                     "bcftools/norm": {
                         "branch": "master",
-                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "git_sha": "ed7a2286df416088793e62fa6a740d07974d0ff8",
                         "installed_by": ["modules"]
                     },
                     "bcftools/query": {
                         "branch": "master",
-                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "git_sha": "ed7a2286df416088793e62fa6a740d07974d0ff8",
                         "installed_by": ["modules"]
                     },
                     "bcftools/sort": {
                         "branch": "master",
-                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "git_sha": "ed7a2286df416088793e62fa6a740d07974d0ff8",
                         "installed_by": ["modules"]
                     },
                     "bcftools/view": {
                         "branch": "master",
-                        "git_sha": "b574a8bc9e9a536780339f1812b7492340ae36da",
+                        "git_sha": "ed7a2286df416088793e62fa6a740d07974d0ff8",
                         "installed_by": ["modules"]
                     },
                     "bedtools/closest": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/coverage": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/getfasta": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/intersect": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/map": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/sort": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "bedtools/subtract": {
                         "branch": "master",
-                        "git_sha": "06054b469d0997aa3442ba1373e17a641260f451",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "csvtk/concat": {
                         "branch": "master",
-                        "git_sha": "2f74af306499775ab48db1ed4077d2fa5aecf9c4",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "csvtk/join": {
                         "branch": "master",
-                        "git_sha": "b5803eb47964c7fa2c455b6c1e60d408ead4f2b3",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "echtvar/anno": {
                         "branch": "master",
-                        "git_sha": "3ae65622c8c8e6ab8390a73dd75a698308a4971b",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "echtvar/encode": {
                         "branch": "master",
-                        "git_sha": "9707facbacc9c5c02ecf0b192f0604a29351b00a",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "ensemblvep/vep": {
                         "branch": "master",
-                        "git_sha": "35e732a577f9a83dd75d061150c5ebda8e6fc388",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "gawk": {
                         "branch": "master",
-                        "git_sha": "7844e96252d0693fb2331969a1c9790eb831b0f6",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "98403d15b0e50edae1f3fec5eae5e24982f1fade",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "picard/liftovervcf": {
                         "branch": "master",
-                        "git_sha": "467c847035812fc17db844c6f37615b415b75eb3",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "sigprofiler": {
                         "branch": "master",
-                        "git_sha": "2a355c816f06b834fadd05fd444cbea171f7bdee",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     },
                     "untar": {
                         "branch": "master",
-                        "git_sha": "6d46786420b4d7bc88eba026eb389c0c5535d120",
+                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["modules"]
                     }
                 }

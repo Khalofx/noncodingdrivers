@@ -5,7 +5,8 @@ process SIMULATENULL {
     // In-house null simulation (D32; off by default, --run_null_calibration): each SNV moves to a
     // random position with the same trinucleotide within +/- 50 kb, in the same patient
     // (bin/simulate_null.py). No conda directive: the utils image carries python, numpy and pandas.
-    container 'ghcr.io/khalofx/noncodingdrivers-utils:1.0.0'
+    // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
     tuple val(meta), path(mutations), val(replicate), val(seed)
