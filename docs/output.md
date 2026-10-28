@@ -72,7 +72,13 @@ derived downstream from `driver_evidence.tsv`.
 ### Null calibration
 
 `--run_null_calibration` (off by default; in-house, reported only). Each replicate re-runs the
-callers on a neutral copy of the cohort and costs about as much as the observed run.
+callers on a neutral copy of the cohort and costs about as much as the observed run. Read the
+number of elements at q < `--fdr_threshold` in the null runs first: any element there is a false
+positive under the null. A method is `excluded_for_inflation` when a null replicate's `lambda` is
+above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
+`conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
+that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
+`docs/validation.md`).
 
 <details markdown="1">
 <summary>Output files</summary>

@@ -28,7 +28,9 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   `SIMULATENULL` (`bin/simulate_null.py`; each SNV moved within +/- 50 kb to the same
   strand-collapsed trinucleotide, same patient, seed `--seed` + replicate) and the reused
   `DRIVER_DISCOVERY`; `CALIBRATECALLERS` (`bin/calibrate_callers.py`) reports the inflation factor,
-  q < FDR counts and QQ points per method against `--null_lambda_band`. Reported only.
+  q < FDR counts and QQ points per method against `--null_lambda_band`. Reported only. The gate is
+  one-sided (D35): a method is excluded only for inflation (null lambda above the band); below it
+  is reported as `conservative`. Validation in `docs/validation.md` (SYNTH-NC, Liver-HCC-public).
 - Driver core: `mutations`-tier samplesheet (`assets/schema_input.json`), per-cohort table merge
   (nf-core `csvtk/concat` + `gawk`), ActiveDriverWGS, OncodriveFML (licence-gated:
   `--accept_oncodrivefml_licence`), harmonisation (`HARMONIZECALLS`), anchoring on `element_id`

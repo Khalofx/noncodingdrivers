@@ -66,3 +66,76 @@ anchor base in an unmapped interval (`NoTarget`).
 
 **Wrong declared assembly.** The same MAF declared `GRCh38` stops at the assembly check with
 `ASSEMBLY_MISMATCH` (818,924 of 3,152,665 REF alleles, 25.98%, match GRCh38); no caller task ran.
+
+## Variant flags, evidence table and null calibration (Step 6)
+
+Commit `6e71b36` on Karakoram. SYNTH-NC (60 synthetic donors, one GRCh38 `maf` row) and
+Liver-HCC-public with 3 null replicates each; LIRI-JP without. Step 6 adds files only: the
+consensus of both PCAWG cohorts is unchanged.
+
+| Gate                            | Criterion                                                                                         | Result                                                                                                                                                                                                                                    |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Spike-in recovery (SYNTH-NC) | Planted drivers recovered at q < 0.1, at least as in `baseline.json` (EBM 4/5, ACAT 5/5)          | EBM 4/5 (E1-E4), ACAT 5/5; ranks E1 1, E2 2, E3 4, E4 5, E5 8 (EBM q 0.31, at the detection limit as in the baseline); the spectrum decoy E6 rank 3                                                                                       |
+| 2. Null calibration (one-sided) | At most one element at q < 0.1 per null replicate and method; no null lambda above 1.2            | 0 elements in all 24 checks (2 cohorts x 3 replicates x ActiveDriverWGS, OncodriveFML, EBM, ACAT); highest null lambda 1.127 (OncodriveFML, SYNTH-NC)                                                                                     |
+| 3. Liver-HCC-public unchanged   | Same consensus as the Step 4 run: EBM 31 and ACAT 28 significant, TERT promoter rank 5 under both | 541,936 elements, maximum relative difference of every p- and q-value 0; EBM 31, ACAT 28; TERT promoter rank 5 under both (ranked by p; two elements tie at its ACAT q)                                                                   |
+| 4. SRGAP2B flagged (LIRI-JP)    | `enhancer_ENSR00000371308` keeps its rank and carries the segdup and/or low-mappability flag      | rank 4, as in the Step 4 run; 24 mutations in 22 patients, all in GIAB segmental duplications and low-mappability regions (both fractions 1, `flagged`); Umap uniqueness 0.46; callable fraction 0.498; fails the mappability post-filter |
+
+**Variant flags.** No mutation is removed; the flags and fractions are added files.
+
+| Cohort           | Rows      | Blacklist v2  | Segdup         | Low mappability | Umap mean | In gnomAD v4.1 | `germline_pop_common` | Germline NA |
+| ---------------- | --------- | ------------- | -------------- | --------------- | --------- | -------------- | --------------------- | ----------- |
+| SYNTH-NC         | 231,472   | 8,326 (3.6%)  | 12,231 (5.3%)  | 18,745 (8.1%)   | 0.964     | 21,525         | 1,498 (0.65%)         | 0           |
+| Liver-HCC-public | 3,379,254 | 15,565 (0.5%) | 94,215 (2.8%)  | 80,549 (2.4%)   | 0.997     | 490,354        | 27,252 (0.81%)        | 20          |
+| LIRI-JP          | 3,605,363 | 17,100 (0.5%) | 103,411 (2.9%) | 90,946 (2.5%)   | 0.997     | 602,363        | 39,568 (1.10%)        | 33          |
+
+The germline NA rows are the insertions on alt and unplaced contigs that the 25-contig FASTA lacks
+(Step 5). The planted TERT C228T (chr5:1,295,113 G>A) is a PASS gnomAD v4.1 genomes allele at
+fafmax_faf95_max 1.1e-4, below `--germline_faf_threshold` (1e-3): it is not flagged. Of the 544,737
+catalogue elements, 10,899 have a callable fraction below 0.5 (the same in every cohort: the
+fraction depends on the territory only).
+
+**Post-filters of the significant elements** (`--postfilter_mode flag_only`). In both liver cohorts
+the same two significant elements fail, both on mappability (no mutation outside GIAB low
+mappability), and every other significant element passes all three filters:
+
+| Element                    | Region                                 | Liver-HCC-public rank (q) | LIRI-JP rank (q) | Mutations / patients | Segdup, low mappability | Callable fraction |
+| -------------------------- | -------------------------------------- | ------------------------- | ---------------- | -------------------- | ----------------------- | ----------------- |
+| `enhancer_ENSR00000371308` | chr1:144,994,401-145,004,400 (SRGAP2B) | 6 (3.2e-5)                | 4 (4.2e-6)       | 22/22 and 24/22      | 1, 1                    | 0.498             |
+| `promoter_ENSR00000982577` | chr14:19,511,000-19,511,400            | 25 (0.030)                | 35 (0.041)       | 4/4 and 4/4          | 1, 1                    | 0                 |
+
+SYNTH-NC: all 6 significant elements pass.
+
+**Null calibration** (`--run_null_calibration`, D32, D35). The null moves each SNV to a random
+position with the same trinucleotide within +/- 50 kb, in the same patient (PCAWG Sanger design,
+Rheinbay et al. 2020, Supplementary Information section 6); lambda = chi-squared quantile of the
+median p / 0.4549 over the elements with an ActiveDriverWGS expected count >= 1.
+
+| Cohort (elements)          | Method          | Null lambda, median [min, max] | Null median p | Observed lambda | Observed median p | Null status  |
+| -------------------------- | --------------- | ------------------------------ | ------------- | --------------- | ----------------- | ------------ |
+| SYNTH-NC (485)             | ActiveDriverWGS | 0.471 [0.372, 0.513]           | 0.643         | 0.435           | 0.657             | conservative |
+|                            | OncodriveFML    | 1.096 [0.925, 1.127]           | 0.480         | 0.933           | 0.515             | within_band  |
+|                            | EBM             | 0.651 [0.562, 0.689]           | 0.586         | 0.540           | 0.620             | conservative |
+|                            | ACAT            | 0.601 [0.582, 0.686]           | 0.601         | 0.521           | 0.626             | conservative |
+| Liver-HCC-public (108,429) | ActiveDriverWGS | 0.452 [0.451, 0.453]           | 0.650         | 0.435           | 0.656             | conservative |
+|                            | OncodriveFML    | 0.957 [0.949, 0.958]           | 0.509         | 0.847           | 0.535             | within_band  |
+|                            | EBM             | 0.522 [0.520, 0.527]           | 0.626         | 0.463           | 0.646             | conservative |
+|                            | ACAT            | 0.579 [0.568, 0.579]           | 0.608         | 0.519           | 0.627             | conservative |
+
+The gate is one-sided (D35): only inflation produces false drivers, and power is gate 1. The
+median-based lambda of ActiveDriverWGS sits near 0.45 by construction: it is a one-sided count
+test that gives p = 1 to elements without mutations and inverts the p-value of depleted elements,
+so the null median p is about 0.65 instead of 0.5; EBM and ACAT inherit this. The observed runs
+match their own nulls (observed / null lambda 0.83-0.96), and PCAWG likewise removed only inflated
+methods and kept deflated ones (Supplementary Information section 7). `--null_lambda_band` keeps
+the default `0.8,1.2`; its lower bound sets the `conservative` label only. Because the null
+mirrors ActiveDriverWGS's own +/- 50 kb trinucleotide model, which its authors benchmarked, the
+check mainly validates the EBM/ACAT consensus, the pipeline's caller set-up (fragmented catalogue,
+sharded ActiveDriverWGS with FDR over all shards) and OncodriveFML. It cannot detect effects below
+the 50 kb scale (CTCF-site hypermutation, APOBEC hairpins, mapping artefacts such as the two
+elements above): those are what the variant flags and post-filters report. Cost: one observed run
+per replicate (Liver-HCC-public with 3 replicates: 10 h, 1,773 CPU-h on Karakoram).
+
+**Test profile.** The SYNTH-TERT fixture carries a chrM row, while the test FASTA covers chr5:1-1.4
+Mb: the first test-profile run showed that the sites VCF for the gnomAD lookup must leave out
+contigs absent from the FASTA index (bcftools sort stops on an undeclared contig). Fixed before
+these runs; the germline columns of such rows are NA.
