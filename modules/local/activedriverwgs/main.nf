@@ -6,7 +6,8 @@ process ACTIVEDRIVERWGS {
     // in bioconda-recipes (b95d6dd); absent from conda-forge noarch and linux-64 repodata.
     // So this module has no conda directive.
     // The image is built from containers/activedriverwgs/Dockerfile (R 4.5.3 + CRAN
-    // ActiveDriverWGS 1.2.1 + BSgenome.Hsapiens.UCSC.hg38 1.4.5), tag 1.2.1, pinned by digest.
+    // ActiveDriverWGS 1.2.1 + BSgenome.Hsapiens.UCSC.hg38 1.4.5).
+    // ghcr.io/khalofx/noncodingdrivers-activedriverwgs:1.2.1, pinned by digest
     container 'ghcr.io/khalofx/noncodingdrivers-activedriverwgs@sha256:56d69a0bb7489510a314fb812f0d5758926b637761cf7bf6708f8d7ebd82d5c7'
 
     input:
