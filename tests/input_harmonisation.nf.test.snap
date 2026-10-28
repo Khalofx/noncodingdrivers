@@ -16,10 +16,10 @@
                     "vcf-validator": "0.10.2"
                 },
                 "BCFTOOLS_NORM": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "BCFTOOLS_QUERY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "CALLABLE_TERRITORY": {
                     "bedtools": "2.31.1"
@@ -58,7 +58,7 @@
                     "gawk": "5.3.1"
                 },
                 "GERMLINE_QUERY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "GNOMAD_ANNO": {
                     "echtvar": "0.2.4"
@@ -79,7 +79,7 @@
                     "gawk": "5.3.1"
                 },
                 "MAF_VCF_SORT": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "MASK_BLACKLIST": {
                     "bedtools": "2.31.1"
@@ -109,7 +109,7 @@
                     "oncodrivefml": "2.5.0"
                 },
                 "PASS_PRIMARY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "PICARD_LIFTOVERVCF": {
                     "picard": "3.5.0"
@@ -148,7 +148,7 @@
                     "bedtools": "2.31.1"
                 },
                 "SORT_SITES_VCF": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "UNTAR_ONCODRIVEFML_GENOME": {
                     "untar": 1.34
@@ -190,10 +190,10 @@
                     "vcf-validator": "0.10.2"
                 },
                 "BCFTOOLS_NORM": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "BCFTOOLS_QUERY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "CALLABLE_TERRITORY": {
                     "bedtools": "2.31.1"
@@ -232,7 +232,7 @@
                     "gawk": "5.3.1"
                 },
                 "GERMLINE_QUERY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "GNOMAD_ANNO": {
                     "echtvar": "0.2.4"
@@ -253,7 +253,7 @@
                     "gawk": "5.3.1"
                 },
                 "MAF_VCF_SORT": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "MASK_BLACKLIST": {
                     "bedtools": "2.31.1"
@@ -283,7 +283,7 @@
                     "oncodrivefml": "2.5.0"
                 },
                 "PASS_PRIMARY": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "PICARD_LIFTOVERVCF": {
                     "picard": "3.5.0"
@@ -304,7 +304,7 @@
                     "gawk": "5.3.1"
                 },
                 "RENAME_CHROMS": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "RUNSUMMARYMQC": {
                     "python": "3.11.14"
@@ -325,7 +325,7 @@
                     "bedtools": "2.31.1"
                 },
                 "SORT_SITES_VCF": {
-                    "bcftools": "1.23.1"
+                    "bcftools": 1.25
                 },
                 "UNTAR_ONCODRIVEFML_GENOME": {
                     "untar": 1.34
