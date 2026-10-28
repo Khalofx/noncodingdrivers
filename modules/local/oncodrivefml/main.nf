@@ -8,7 +8,9 @@ process ONCODRIVEFML {
     // No conda directive: no oncodrivefml/bgdata package in Bioconda or conda-forge (2026-10-20).
     // Image: the baseline OncodriveFML image rebuilt with procps (containers/oncodrivefml).
     // The rights-holder image docker.io/bbglab/oncodrivefml:2.5.0 has no `ps` (checked 2026-10-21).
-    container 'ghcr.io/khalofx/noncodingdrivers-oncodrivefml:2.5.0'
+    // Tag 2.5.0, pinned by digest. The image is not public (OncodriveFML may not be redistributed
+    // without a licence): build containers/oncodrivefml/ and set the container in a config (docs/usage.md).
+    container 'ghcr.io/khalofx/noncodingdrivers-oncodrivefml@sha256:5a113bf33516c42a07c3c557732e157807f2a95508d80b77245140d43f64f2d2'
     // The image's entrypoint starts OncodriveFML; Docker must run Nextflow's task shell instead.
     containerOptions { workflow.containerEngine == 'docker' ? '--entrypoint ""' : '' }
 
