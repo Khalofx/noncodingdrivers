@@ -1,0 +1,31 @@
+{
+    "observed and two null replicates": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.null_calibration.tsv:md5,a9c1b42a1796ce5c0cce094e83b055a7"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.null_qq.tsv:md5,02c55d3ebe726b3d9f84f6bfc4bcada8"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-27T14:19:50.921654761",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

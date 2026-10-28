@@ -265,6 +265,11 @@ def resolveReferences() {
         regulatory_peaks_dir : pickRef(sheet, 'regulatory_peaks_dir', 'regulatory_peaks_dir'),
         rename_chrs       : pickRef(sheet, 'rename_chrs', 'rename_map'),
         liftover_chain    : pickRef(sheet, 'liftover_chain', 'liftover_chain_from_hg19'),
+        blacklist_bed       : pickRef(sheet, 'blacklist_bed', 'blacklist_bed'),
+        segdup_bed          : pickRef(sheet, 'segdup_bed', 'segdup_bed'),
+        low_mappability_bed : pickRef(sheet, 'low_mappability_bed', 'low_mappability_bed'),
+        umap_bed            : pickRef(sheet, 'umap_bed', 'umap_bed'),
+        gnomad_echtvar      : pickRef(sheet, 'gnomad_echtvar', 'gnomad_echtvar'),
     ]
     // FASTA and its companions
     refs.fasta = pickRef(sheet, 'fasta', 'fasta')
@@ -336,6 +341,27 @@ def validateDriverParameters(refs) {
     }
     if (params.run_regulatory_context && !refs.regulatory_peaks_dir) {
         error("--run_regulatory_context needs --regulatory_peaks_dir (or --reference_base for the datasheet): one folder per tissue holding <layer>.<accession>.bed.gz peak files.")
+    }
+    if (params.run_variant_flags) {
+        def masks = [ blacklist_bed: refs.blacklist_bed, segdup_bed: refs.segdup_bed, low_mappability_bed: refs.low_mappability_bed, umap_bed: refs.umap_bed ]
+        def missing = masks.findAll { _name, path -> !path }.keySet()
+        if (missing) {
+            def names = missing.collect { name -> "--${name}" }.join(', ')
+            error("VARIANT_FLAG_MASKS_MISSING: --run_variant_flags needs the mask BEDs ${names} " +
+                  "(or --reference_base for the datasheet assets/references/${params.genome}.yml), or set --run_variant_flags false.")
+        }
+        if (!params.skip_germline_flags && !refs.gnomad_echtvar) {
+            error("GNOMAD_ECHTVAR_MISSING: the germline flag reads gnomAD v4.1 genomes through echtvar: set --gnomad_echtvar " +
+                  "(or --reference_base for the datasheet), or --skip_germline_flags true.")
+        }
+        if (!params.skip_germline_flags && !refs.fasta) {
+            error("GERMLINE_FASTA_MISSING: the germline flag anchors indels on the GRCh38 FASTA for the gnomAD lookup: set --fasta " +
+                  "(UCSC names, .fai beside it) or --reference_base, or --skip_germline_flags true.")
+        }
+    }
+    if (params.run_null_calibration && !refs.fasta) {
+        error("NULL_FASTA_MISSING: --run_null_calibration keeps each SNV's trinucleotide, read from the GRCh38 FASTA: set --fasta " +
+              "(UCSC names, .fai beside it) or --reference_base.")
     }
     if (params.run_vep && !refs.vep_cache) {
         error("--run_vep needs --vep_cache (or --reference_base for the datasheet): an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")

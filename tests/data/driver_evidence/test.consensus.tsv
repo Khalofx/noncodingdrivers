@@ -1,0 +1,7 @@
+element_id	p_activedriverwgs	q_activedriverwgs	p_oncodrivefml	q_oncodrivefml	chrom	start	end	n_fragments	n_tested_callers	ebm_p	ebm_q	acat_p	acat_q	rra_score	rra_q	vote_count	combination_method	consensus_q	consensus_rank	is_consensus
+promoter_A	1e-08	5e-06	0.0001	0.02	chr5	100	150	1	2	3e-09	2e-08	2e-08	1e-07	0.01	0.5	2	ebm	2e-08	1	True
+enhancer_B	2e-06	0.0006	0.3	1.0	chr5	200	250	1	2	1e-05	3e-05	4e-06	1e-05	0.01	0.5	1	ebm	3e-05	2	True
+enhancer_C	0.004	0.3	0.02	0.5	chr5	300	350	1	2	0.001	0.002	0.006	0.009	0.01	0.5	0	ebm	0.002	3	True
+CTCF_D	0.2	1.0	0.5	1.0	chr5	400	450	1	2	0.3	0.36	0.3	0.36	0.01	0.5	0	ebm	0.36	5	False
+promoter_E			0.008	0.4	chr5	500	550	1	1	0.008	0.012	0.008	0.012	0.01	0.5	0	ebm	0.012	4	True
+enhancer_F	0.9	1.0			chr5	600	650	1	1	0.9	0.9	0.9	0.9	0.01	0.5	0	ebm	0.9	6	False

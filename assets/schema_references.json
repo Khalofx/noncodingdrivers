@@ -243,6 +243,67 @@
             "licence_summary": {
                 "type": "string",
                 "meta": ["licence_summary"]
+            },
+            "blacklist_bed": {
+                "type": "string",
+                "meta": ["blacklist_bed"]
+            },
+            "blacklist_source": {
+                "type": "string",
+                "meta": ["blacklist_source"]
+            },
+            "segdup_bed": {
+                "type": "string",
+                "meta": ["segdup_bed"]
+            },
+            "low_mappability_bed": {
+                "type": "string",
+                "meta": ["low_mappability_bed"]
+            },
+            "giab_stratifications_source": {
+                "type": "string",
+                "meta": ["giab_stratifications_source"]
+            },
+            "umap_bed": {
+                "type": "string",
+                "meta": ["umap_bed"]
+            },
+            "umap_source": {
+                "type": "string",
+                "meta": ["umap_source"]
+            },
+            "blacklist_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["blacklist_md5"]
+            },
+            "segdup_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["segdup_md5"]
+            },
+            "low_mappability_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["low_mappability_md5"]
+            },
+            "umap_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["umap_md5"]
+            },
+            "gnomad_echtvar": {
+                "type": "string",
+                "meta": ["gnomad_echtvar"]
+            },
+            "gnomad_echtvar_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["gnomad_echtvar_md5"]
+            },
+            "gnomad_echtvar_source": {
+                "type": "string",
+                "meta": ["gnomad_echtvar_source"]
             }
         },
         "required": [

@@ -22,17 +22,22 @@ datasheet records every file with its checksum and source; the same checksums ar
 The CADD score track for OncodriveFML (`--oncodrivefml_score`) is not in the datasheet: it is free
 for non-commercial use only and is never bundled or downloaded by the pipeline.
 
-| Datasheet key                                        | File under `reference_base`                                                   | Checksum (MD5)                                                         | Used by                    |
-| ---------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------- |
-| `fasta`, `fasta_fai`                                 | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names)                     | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows    |
-| `fasta_dict`                                         | `derived/hg38.chr.dict`                                                       | `eee72059c0f8b6407202baa38ba3be8a`                                     | Picard LiftoverVcf         |
-| `element_catalogue`                                  | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids)  | `39f838e6c81fdb0b152504f2d51939b5`                                     | all callers                |
-| `gtf`                                                | `gencode/gencode.v50.basic.annotation.gtf.gz`                                 | `11e77cf1d4b78b43f57d608e3f7f2202`                                     | nearest-gene table         |
-| `vep_cache`                                          | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`)                | archive `6e10959391069a9eebb8d8d165fd29be`                             | `--run_vep`                |
-| `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                  | official bgdata dataset                                                | OncodriveFML               |
-| `regulatory_peaks_dir`                               | `encode` (49 peak files, 12 tissues; per-file MD5 in `encode/PROVENANCE.tsv`) |                                                                        | `--run_regulatory_context` |
-| `liftover_chain_from_hg19`                           | `liftover/hg19ToHg38.over.chain.gz`                                           | `35887f73fe5e2231656504d1f6430900`                                     | GRCh37/hg19 rows           |
-| `liftover_source_fasta`, `liftover_source_fasta_fai` | `hg19/hg19.fa`, `hg19/hg19.fa.fai` (UCSC, 93 contigs)                         | `530d89d3ef07fdb2a9b3c701fb4ca486`, `e700bec606168273af0920bd1dd49eb9` | GRCh37/hg19 rows           |
+| Datasheet key                                        | File under `reference_base`                                                   | Checksum (MD5)                                                         | Used by                                |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
+| `fasta`, `fasta_fai`                                 | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names)                     | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows                |
+| `fasta_dict`                                         | `derived/hg38.chr.dict`                                                       | `eee72059c0f8b6407202baa38ba3be8a`                                     | Picard LiftoverVcf                     |
+| `element_catalogue`                                  | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids)  | `39f838e6c81fdb0b152504f2d51939b5`                                     | all callers                            |
+| `gtf`                                                | `gencode/gencode.v50.basic.annotation.gtf.gz`                                 | `11e77cf1d4b78b43f57d608e3f7f2202`                                     | nearest-gene table                     |
+| `vep_cache`                                          | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`)                | archive `6e10959391069a9eebb8d8d165fd29be`                             | `--run_vep`                            |
+| `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                  | official bgdata dataset                                                | OncodriveFML                           |
+| `regulatory_peaks_dir`                               | `encode` (49 peak files, 12 tissues; per-file MD5 in `encode/PROVENANCE.tsv`) |                                                                        | `--run_regulatory_context`             |
+| `liftover_chain_from_hg19`                           | `liftover/hg19ToHg38.over.chain.gz`                                           | `35887f73fe5e2231656504d1f6430900`                                     | GRCh37/hg19 rows                       |
+| `liftover_source_fasta`, `liftover_source_fasta_fai` | `hg19/hg19.fa`, `hg19/hg19.fa.fai` (UCSC, 93 contigs)                         | `530d89d3ef07fdb2a9b3c701fb4ca486`, `e700bec606168273af0920bd1dd49eb9` | GRCh37/hg19 rows                       |
+| `blacklist_bed`                                      | `masks/hg38-blacklist.v2.bed.gz` (ENCODE Blacklist v2, 636 regions)           | `83fe6bf8187a64dee8079b80f75ba289`                                     | variant flags, callable territory      |
+| `segdup_bed`                                         | `masks/GRCh38_segdups.bed.gz` (GIAB v3.6, 7,432 regions)                      | `72ec3f7db18ef9318c64b1df271703fe`                                     | variant flags                          |
+| `low_mappability_bed`                                | `masks/GRCh38_lowmappabilityall.bed.gz` (GIAB v3.6, 673,815 regions)          | `8a78766bb99abf1d25a5b307d49a0324`                                     | variant flags, mappability post-filter |
+| `umap_bed`                                           | `masks/k100.umap.bed.gz` (Umap k100 single-read)                              | `1ef87107f449ccaf7e537de9740692fb`                                     | variant flags, callable territory      |
+| `gnomad_echtvar`                                     | `gnomad/gnomad.v4.1.genomes.echtvar.zip` (gnomAD v4.1 genomes, echtvar 0.2.4) | `7bc89a78568a424d7694e2d351617bcd`                                     | germline flag                          |
 
 Two derived tables are not in the datasheet because the pipeline builds them from the files
 above in every run: the element coordinates for the anchor join (`ELEMENT_COORDS`, from the
@@ -113,6 +118,62 @@ offline.
 `homo_sapiens_vep_116_GRCh38.tar.gz` (MD5 `6e10959391069a9eebb8d8d165fd29be`, BSD sum
 `56036 26996736`) from `https://ftp.ebi.ac.uk/ensemblorg/pub/release-116/variation/indexed_vep_cache/`,
 unpacked into `vep_cache_116/`.
+
+### Variant-flag masks
+
+Four BEDs under `masks/`, used unchanged (UCSC names, GRCh38/hg38). Retrieved 27 October 2026.
+
+```bash
+cd $REF/masks
+GI=https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/genome-stratifications/v3.6/GRCh38@all
+curl -L -O $GI/SegmentalDuplications/GRCh38_segdups.bed.gz          # MD5 72ec3f7db18ef9318c64b1df271703fe
+curl -L -O $GI/Mappability/GRCh38_lowmappabilityall.bed.gz          # MD5 8a78766bb99abf1d25a5b307d49a0324
+curl -L -O https://bismap.hoffmanlab.org/raw/hg38/k100.umap.bed.gz  # MD5 1ef87107f449ccaf7e537de9740692fb (track line first)
+# ENCODE Blacklist v2: lists/hg38-blacklist.v2.bed.gz of Boyle-Lab/Blacklist at commit 61a04d2c5e49341d76735d485c61f0d1177d08a8
+curl -L -O https://raw.githubusercontent.com/Boyle-Lab/Blacklist/61a04d2c5e49341d76735d485c61f0d1177d08a8/lists/hg38-blacklist.v2.bed.gz   # MD5 83fe6bf8187a64dee8079b80f75ba289
+```
+
+The callable territory of the element-level flags (Umap k100 unique sequence minus Blacklist v2)
+is derived in every run (`CALLABLE_TERRITORY`, nf-core `bedtools/subtract`) and published under
+`references/`.
+
+### gnomAD v4.1 genomes echtvar archive
+
+Built once from the 24 official per-chromosome sites VCFs of gnomAD v4.1 genomes (chr1-22, X, Y;
+460.93 GiB in total), streamed from the gnomAD bucket and checked against the MD5 that Google
+Cloud Storage publishes for each object (`x-goog-hash`), so the raw VCFs are never stored. INFO
+is reduced to AC, AN, AF, nhomalt and `fafmax_faf95_max` (grpmax FAF95) with bcftools 1.23.1 (the
+image of the nf-core `bcftools` modules); FILTER is kept. The archive is then encoded with
+echtvar 0.2.4 (the image of nf-core `echtvar/encode`) and the field configuration below, which
+stores the frequencies to 5e-7 (multiplier 2,000,000) and writes -1 for a missing value. Built
+on 27 October 2026; per-chromosome source MD5s in `gnomad/SOURCE_MD5S.txt`; field configuration MD5 `06f2ebddcf38deebfbd8873ed5e40986`.
+
+```bash
+cd $REF/gnomad
+cat > gnomad_v4.1_genomes.echtvar.json <<'EOF'
+[
+  {"field": "FILTER", "alias": "gnomad_filter"},
+  {"field": "AC", "alias": "gnomad_ac", "missing_value": -1},
+  {"field": "AN", "alias": "gnomad_an", "missing_value": -1},
+  {"field": "nhomalt", "alias": "gnomad_nhomalt", "missing_value": -1},
+  {"field": "AF", "alias": "gnomad_af", "multiplier": 2000000, "zigzag": true, "missing_value": -1},
+  {"field": "fafmax_faf95_max", "alias": "gnomad_fafmax_faf95_max", "multiplier": 2000000, "zigzag": true, "missing_value": -1}
+]
+EOF
+U=https://storage.googleapis.com/gcp-public-data--gnomad/release/4.1/vcf/genomes
+for c in chr{1..22} chrX chrY; do      # run 8 chromosomes at a time; each stream is CPU-bound in bcftools
+  curl -sS --fail $U/gnomad.genomes.v4.1.sites.$c.vcf.bgz \
+    | tee >(md5sum > stripped/$c.md5) \
+    | bcftools annotate --threads 2 -x '^INFO/AC,INFO/AN,INFO/AF,INFO/nhomalt,INFO/fafmax_faf95_max' -Ob -o stripped/$c.bcf -
+  # compare stripped/$c.md5 with the base64-decoded md5 of: curl -sI $U/gnomad.genomes.v4.1.sites.$c.vcf.bgz | grep x-goog-hash
+done
+echtvar encode gnomad.v4.1.genomes.echtvar.zip gnomad_v4.1_genomes.echtvar.json stripped/chr{1..22}.bcf stripped/chrX.bcf stripped/chrY.bcf
+md5sum gnomad.v4.1.genomes.echtvar.zip      # 7bc89a78568a424d7694e2d351617bcd, 4,863,222,157 bytes, 759,336,320 variants (1,371 s)
+```
+
+echtvar annotates a variant gnomAD does not carry with `gnomad_filter=MISSING` and -1, and joins
+several FILTER values with commas (`AC0,AS_VQSR`). gnomAD data are released under CC0 1.0; the
+gnomAD terms ask for attribution and bind users not to attempt to reidentify participants.
 
 ### Contig rename map
 

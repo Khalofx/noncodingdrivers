@@ -1,0 +1,10 @@
+sample	chrom	pos	ref	alt	vtype
+P1	chr5	89061	T	C	SNP
+P2	chr5	89061	T	C	SNP
+P1	chr5	11537	T	C	SNP
+P2	chr5	10433	T	C	SNP
+P3	chr5	11629	A	-	DEL
+P3	chr5	14265	-	A	INS
+P1	chr5	250001	T	G	SNP
+P4	chr5	1295113	G	A	SNP
+P4	chrM	100	G	A	SNP

@@ -1,0 +1,64 @@
+{
+    "synth_tert - replicate 1 - seed 2": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "synth_tert",
+                        "cohort": "synth_tert",
+                        "assembly": "GRCh38"
+                    },
+                    1,
+                    "synth_tert.null1.mutations.tsv:md5,55a1f9f71205caaa4e86778085506dd0"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "synth_tert",
+                        "cohort": "synth_tert",
+                        "assembly": "GRCh38"
+                    },
+                    1,
+                    "synth_tert.null1.null_summary.tsv:md5,264db635d412d008d97101b8902a92f0"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-27T20:18:27.265926254",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "synth_tert - stub": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "synth_tert",
+                        "cohort": "synth_tert",
+                        "assembly": "GRCh38"
+                    },
+                    1,
+                    "synth_tert.null1.mutations.tsv:md5,8d79cdd66b4122206387c2aa7d507de0"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "synth_tert",
+                        "cohort": "synth_tert",
+                        "assembly": "GRCh38"
+                    },
+                    1,
+                    "synth_tert.null1.null_summary.tsv:md5,8426c625223e83745dbb9b8d078c1b09"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-27T20:18:36.138194348",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

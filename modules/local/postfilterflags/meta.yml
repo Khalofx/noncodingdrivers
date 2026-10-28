@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "postfilterflags"
+description: PCAWG-style post-filter flags per element (minimum support, mappability, maximum sample fraction) with value, threshold and status; flag only unless --postfilter_mode pcawg adds q_postfilter
+keywords:
+  - post-filter
+  - mappability
+  - noncoding
+tools:
+  - "postfilter_flags.py":
+      description: "Pipeline-owned script (bin/postfilter_flags.py)"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: Cohort meta map
+    - consensus:
+        type: file
+        description: Consensus table of COMBINEPVALUES
+        pattern: "*.consensus.tsv"
+        ontologies: []
+    - element_flags:
+        type: file
+        description: Element-level flags of VARIANT_FLAGS, or []
+        pattern: "*.element_flags.tsv"
+        ontologies: []
+
+output:
+  postfilter:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.postfilter.tsv":
+          type: file
+          description: One row per element with the post-filter values, thresholds and statuses (and q_postfilter in pcawg mode)
+          pattern: "*.postfilter.tsv"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

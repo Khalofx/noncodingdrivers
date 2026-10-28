@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "calibratecallers"
+description: Per-method genomic inflation factor, q < FDR counts and QQ points of the observed run and the null replicates (in-house, off by default); reported only
+keywords:
+  - calibration
+  - inflation factor
+  - qq plot
+  - noncoding
+tools:
+  - "calibrate_callers.py":
+      description: "Pipeline-owned script (bin/calibrate_callers.py): lambda = median chi2_1 quantile / 0.4549 per caller and combination"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - observed_consensus:
+        type: file
+        description: Consensus table of the observed run
+        pattern: "*.consensus.tsv"
+        ontologies: []
+    - observed_adwgs:
+        type: file
+        description: ActiveDriverWGS table of the observed run (element_muts_exp), or []
+        pattern: "*.activedriverwgs.tsv"
+        ontologies: []
+    - null_consensus:
+        type: file
+        description: Consensus tables of the null replicates, <cohort>.null<r>.consensus.tsv
+        pattern: "*.null*.consensus.tsv"
+        ontologies: []
+    - null_adwgs:
+        type: file
+        description: ActiveDriverWGS tables of the null replicates, or []
+        pattern: "*.null*.activedriverwgs.tsv"
+        ontologies: []
+
+output:
+  calibration:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.null_calibration.tsv":
+          type: file
+          description: Lambda and q < FDR count per run and method, and the null summary with its band status
+          pattern: "*.null_calibration.tsv"
+          ontologies: []
+  qq:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.null_qq.tsv":
+          type: file
+          description: Expected and observed -log10 p per run and method (thinned)
+          pattern: "*.null_qq.tsv"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

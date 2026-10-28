@@ -1,0 +1,21 @@
+{
+    "consensus and element flags - nominal scope": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.driver_evidence.tsv:md5,11a81e919fad03330521a60d44aa6eed"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-27T14:22:10.646680194",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

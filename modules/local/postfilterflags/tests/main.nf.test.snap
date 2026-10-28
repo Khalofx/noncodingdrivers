@@ -1,0 +1,21 @@
+{
+    "pcawg mode": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.postfilter.tsv:md5,f8c412395d5f58499eb5a3af4420fdad"
+                ]
+            ]
+        ],
+        "timestamp": "2026-10-27T14:21:51.980262906",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

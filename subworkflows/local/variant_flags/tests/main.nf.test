@@ -1,0 +1,109 @@
+nextflow_workflow {
+
+    name "Test Subworkflow VARIANT_FLAGS"
+    script "../main.nf"
+    workflow "VARIANT_FLAGS"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "variant_flags"
+
+    // Fixture (tests/data/variant_flags): real gnomAD v4.1 genome records in chr5:1-1.4 Mb. P1 and
+    // P2 carry the common SNV chr5:89061 T>C (fafmax_faf95_max 0.080); chr5:11537 T>C is rare
+    // (AC 2, no FAF) and chr5:10433 T>C fails gnomAD (AC0); the deletion chr5:11629 A>- (VCF
+    // 11628 TA>T, FAF 0.024) and the insertion chr5:14265 ->A (VCF C>CA, FAF 0.236) test the
+    // anchoring; gnomAD has no record at chr5:250001 (T>G here). Masks: the real masks clipped to the window
+    // (Blacklist v2 covers chr5:0-44,100, a GIAB segdup chr5:13,577-49,495). chrM is not in the
+    // FASTA window: its row keeps the mask flags and has no germline result.
+    test("masks, germline flags and element aggregation") {
+
+        when {
+            workflow {
+                """
+                def d  = "${projectDir}/tests/data/variant_flags"
+                def td = "\${params.pipelines_testdata_base_path}data/synthetic_tert"
+                input[0] = channel.of([ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.value([ [ id:'elements' ], file("\${d}/elements.bed", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'masks' ],
+                    file("\${td}/variant_flags/hg38-blacklist.v2.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/GRCh38_segdups.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/GRCh38_lowmappabilityall.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/k100.umap.chr5_1-1400000.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'gnomad' ], file("\${td}/variant_flags/gnomad.v4.1.genomes.chr5_1-1400000.echtvar.zip", checkIfExists: true) ])
+                input[4] = channel.value([ [ id:'GRCh38' ],
+                    file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa", checkIfExists: true),
+                    file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa.fai", checkIfExists: true) ])
+                input[5] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[6] = true
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def vf  = table(workflow.out.variant_flags[0][1])
+            def ef  = table(workflow.out.element_flags[0][1])
+            def row = { pos, sample -> vf.find { r -> r.pos == pos && r.sample == sample } }
+            def el  = { id -> ef.find { r -> r.element_id == id } }
+            assert workflow.success
+            assertAll(
+                { assert vf.size() == 9 },
+                { assert vf*.pos == [ '89061', '89061', '11537', '10433', '11629', '14265', '250001', '1295113', '100' ] },   // table order
+                { assert row('89061', 'P1').subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2' ]) == [ gnomad_filter: 'PASS', germline_pop_common: 'true', in_blacklist_v2: 'false' ] },
+                { assert row('89061', 'P2').germline_pop_common == 'true' },
+                { assert row('11537', 'P1').subMap([ 'gnomad_filter', 'gnomad_fafmax_faf95_max', 'germline_pop_common' ]) == [ gnomad_filter: 'PASS', gnomad_fafmax_faf95_max: 'NA', germline_pop_common: 'false' ] },
+                { assert row('10433', 'P2').subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2', 'in_low_mappability' ]) == [ gnomad_filter: 'AC0', germline_pop_common: 'false', in_blacklist_v2: 'true', in_low_mappability: 'true' ] },
+                { assert row('11629', 'P3').subMap([ 'vtype', 'gnomad_filter', 'germline_pop_common' ]) == [ vtype: 'DEL', gnomad_filter: 'PASS', germline_pop_common: 'true' ] },
+                { assert row('14265', 'P3').subMap([ 'vtype', 'gnomad_filter', 'germline_pop_common', 'in_segdup' ]) == [ vtype: 'INS', gnomad_filter: 'PASS', germline_pop_common: 'true', in_segdup: 'true' ] },
+                { assert row('250001', 'P1').subMap([ 'gnomad_filter', 'gnomad_af', 'germline_pop_common' ]) == [ gnomad_filter: 'NA', gnomad_af: 'NA', germline_pop_common: 'false' ] },
+                { assert vf.find { r -> r.chrom == 'chrM' }.subMap([ 'gnomad_filter', 'germline_pop_common', 'in_blacklist_v2' ]) == [ gnomad_filter: 'NA', germline_pop_common: 'NA', in_blacklist_v2: 'false' ] },   // contig absent from the FASTA window
+                { assert vf.every { r -> r.umap_unique_fraction ==~ /[01](\.\d+)?/ } },
+                { assert ef.size() == 5 },                                                      // every element, with or without mutations
+                { assert el('elem_tel').subMap([ 'n_mutations', 'n_patients', 'frac_in_blacklist_v2', 'frac_in_low_mappability', 'frac_germline_pop_common', 'callable_fraction' ]) ==
+                    [ n_mutations: '3', n_patients: '3', frac_in_blacklist_v2: '1', frac_in_low_mappability: '1', frac_germline_pop_common: '0.333333', callable_fraction: '0' ] },
+                { assert el('elem_common').subMap([ 'n_mutations', 'n_patients', 'max_sample_fraction', 'frac_germline_pop_common' ]) ==
+                    [ n_mutations: '2', n_patients: '2', max_sample_fraction: '0.5', frac_germline_pop_common: '1' ] },
+                { assert el('elem_empty').subMap([ 'n_mutations', 'max_sample_fraction', 'element_bp' ]) == [ n_mutations: '0', max_sample_fraction: 'NA', element_bp: '500' ] },
+                { assert snapshot(workflow.out.variant_flags, workflow.out.element_flags).match() }
+            )
+        }
+    }
+
+    test("masks only - germline flags skipped") {
+
+        when {
+            workflow {
+                """
+                def d  = "${projectDir}/tests/data/variant_flags"
+                def td = "\${params.pipelines_testdata_base_path}data/synthetic_tert"
+                input[0] = channel.of([ [ id:'nogermline', cohort:'nogermline', assembly:'GRCh38' ], file("\${d}/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.value([ [ id:'elements' ], file("\${d}/elements.bed", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'masks' ],
+                    file("\${td}/variant_flags/hg38-blacklist.v2.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/GRCh38_segdups.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/GRCh38_lowmappabilityall.chr5_1-1400000.bed", checkIfExists: true),
+                    file("\${td}/variant_flags/k100.umap.chr5_1-1400000.bed", checkIfExists: true) ])
+                input[3] = channel.empty()
+                input[4] = channel.empty()
+                input[5] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[6] = false
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def vf = table(workflow.out.variant_flags[0][1])
+            def ef = table(workflow.out.element_flags[0][1])
+            assert workflow.success
+            assertAll(
+                { assert vf.size() == 9 },
+                { assert vf.every { r -> r.germline_pop_common == 'NA' && r.gnomad_filter == 'NA' } },
+                { assert vf.find { r -> r.pos == '10433' }.in_blacklist_v2 == 'true' },
+                { assert ef.find { r -> r.element_id == 'elem_tel' }.frac_germline_pop_common == 'NA' },
+                { assert workflow.trace.tasks()*.name.every { n -> !(n =~ /GNOMAD_ANNO|SITES_VCF|ANCHOR_BASES/) } }
+            )
+        }
+    }
+}

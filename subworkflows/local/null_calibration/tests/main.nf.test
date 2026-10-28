@@ -1,0 +1,53 @@
+nextflow_workflow {
+
+    name "Test Subworkflow NULL_CALIBRATION"
+    script "../main.nf"
+    workflow "NULL_CALIBRATION"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "null_calibration"
+
+    // Stub: the wiring of two replicates through SIMULATENULL, the reused DRIVER_DISCOVERY and
+    // CALIBRATECALLERS (one calibration per cohort, one null cohort id per replicate).
+    test("synth_tert - two replicates - stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                def td = "\${params.pipelines_testdata_base_path}data/synthetic_tert"
+                def d  = "${projectDir}/tests/data/calibratecallers"
+                def meta = [ id:'test', cohort:'test', assembly:'GRCh38' ]
+                input[0]  = channel.of([ meta, file("\${td}/mutations.tsv", checkIfExists: true) ])
+                input[1]  = channel.of([ meta, file("\${d}/test.consensus.tsv", checkIfExists: true) ])
+                input[2]  = channel.of([ meta, file("\${d}/test.activedriverwgs.tsv", checkIfExists: true) ])
+                input[3]  = channel.value([ [ id:'elements' ], file("\${td}/elements.bed", checkIfExists: true) ])
+                input[4]  = channel.value([ [ id:'GRCh38' ], file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa", checkIfExists: true),
+                                            file("\${td}/harmonisation/GRCh38.chr5_1-1400000.fa.fai", checkIfExists: true) ])
+                input[5]  = channel.empty()
+                input[6]  = []
+                input[7]  = []
+                input[8]  = [ 'activedriverwgs', 'mutenricher' ]
+                input[9]  = 2
+                input[10] = 100
+                """
+            }
+        }
+
+        then {
+            def names = workflow.trace.tasks()*.name
+            assert workflow.success
+            assertAll(
+                { assert names.count { n -> n.contains('SIMULATENULL') } == 2 },
+                { assert names.count { n -> n.contains('CALIBRATECALLERS') } == 1 },
+                { assert names.count { n -> n.contains('DRIVERS_ON_NULL:ACTIVEDRIVERWGS') } == 2 },
+                { assert !names.any { n -> n.contains('MUTENRICHER') } },
+                { assert workflow.out.summary*.get(1).sort() == [ 1, 2 ] },
+                { assert workflow.out.calibration.size() == 1 && workflow.out.calibration[0][0].id == 'test' }
+            )
+        }
+    }
+}

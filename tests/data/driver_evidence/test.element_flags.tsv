@@ -1,0 +1,7 @@
+element_id	n_mutations	n_patients	max_sample_fraction	frac_in_blacklist_v2	frac_in_segdup	frac_in_low_mappability	mean_umap_unique_fraction	frac_germline_pop_common	element_bp	callable_bp	callable_fraction
+promoter_A	10	10	0.1	0.0	0.0	0.0	1.0	0.0	50	50	1.0
+enhancer_B	21	19	0.142857	0.0	1.0	0.857143	0.142857	0.0	50	10	0.2
+enhancer_C	2	2	0.5	0.0	0.0	0.0	1.0	0.5	50	50	1.0
+CTCF_D	4	1	1.0	0.0	0.0	0.0	1.0	0.0	50	50	1.0
+promoter_E	0	0	NA	NA	NA	NA	NA	NA	50	50	1.0
+enhancer_F	3	3	0.333333	0.0	0.0	0.666667	0.3	0.0	50	20	0.4
