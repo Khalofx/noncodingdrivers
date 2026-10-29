@@ -6,7 +6,8 @@ process MOTIFBREAKR {
     // the JASPAR PFMs, motifbreakR scores both alleles and calculatePvalue() gives allele p-values.
     // Annotation only: nothing downstream filters or ranks on the output.
     conda "${moduleDir}/environment.yml"
-    container 'ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0'   // built from containers/motifbreakr (explicit conda lock)
+    // ghcr.io/khalofx/noncodingdrivers-motifbreakr:2.24.0, built from containers/motifbreakr (explicit conda lock); pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-motifbreakr@sha256:8f6d759729e82d7d759ac0d6d2a19c00c00242efd29a643742348d2585125116'
 
     input:
     tuple val(meta), path(candidates)   // candidate table: chrom, pos, ref, alt, vtype (+ sample, element_id)

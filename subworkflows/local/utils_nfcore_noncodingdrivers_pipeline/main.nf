@@ -399,24 +399,45 @@ def peakFileMeta(peak) {
 // Generate methods description for MultiQC
 //
 def toolCitationText() {
-    // TODO nf-core: Optionally add in-text citation tools to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
+    // In-text citations of the tools of this run (MultiQC methods description)
     def citation_text = [
             "Tools used in the workflow included:",
+            "bcftools (Danecek et al. 2021),",
+            "BEDTools (Quinlan and Hall 2010),",
+            params.run_activedriverwgs ? "ActiveDriverWGS (Zhu et al. 2020)," : "",
+            params.run_oncodrivefml ? "OncodriveFML (Mularoni et al. 2016) with CADD v1.7 scores (Schubach et al. 2024)," : "",
+            params.run_mutenricher ? "MutEnricher (Soltis et al. 2020)," : "",
+            "the empirical Brown's method (Poole et al. 2016),",
+            params.skip_acat ? "" : "ACAT (Liu et al. 2019),",
+            "RobustRankAggreg (Kolde et al. 2012),",
+            params.run_variant_flags ? "echtvar (Pedersen et al. 2023) with gnomAD v4.1 (Chen et al. 2024)," : "",
+            params.run_vep ? "Ensembl VEP (McLaren et al. 2016)," : "",
+            params.run_motifbreakr ? "motifbreakR (Coetzee et al. 2015) with JASPAR (Rauluseviciute et al. 2024)," : "",
             "MultiQC (Ewels et al. 2016)",
             "."
-        ].join(' ').trim()
+        ].join(' ').replaceAll(/ +/, ' ').trim()
 
     return citation_text
 }
 
 def toolBibliographyText() {
-    // TODO nf-core: Optionally add bibliographic entries to this list.
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
+    // Bibliography of the tools of this run (MultiQC methods description)
     def reference_text = [
-            "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>"
+            "<li>Danecek, P., et al. (2021). Twelve years of SAMtools and BCFtools. GigaScience, 10(2). doi: <a href=\"https://doi.org/10.1093/gigascience/giab008\">10.1093/gigascience/giab008</a></li>",
+            "<li>Quinlan, A. R., & Hall, I. M. (2010). BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics, 26(6). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btq033\">10.1093/bioinformatics/btq033</a></li>",
+            params.run_activedriverwgs ? "<li>Zhu, H., et al. (2020). Candidate cancer driver mutations in distal regulatory elements and long-range chromatin interaction networks. Molecular Cell, 77(6). doi: <a href=\"https://doi.org/10.1016/j.molcel.2019.12.027\">10.1016/j.molcel.2019.12.027</a></li>" : "",
+            params.run_oncodrivefml ? "<li>Mularoni, L., et al. (2016). OncodriveFML: a general framework to identify coding and non-coding regions with cancer driver mutations. Genome Biology, 17. doi: <a href=\"https://doi.org/10.1186/s13059-016-0994-0\">10.1186/s13059-016-0994-0</a></li>" : "",
+            params.run_oncodrivefml ? "<li>Schubach, M., et al. (2024). CADD v1.7: using protein language models, regulatory CNNs and other nucleotide-level scores to improve genome-wide variant predictions. Nucleic Acids Research, 52(D1). doi: <a href=\"https://doi.org/10.1093/nar/gkad989\">10.1093/nar/gkad989</a></li>" : "",
+            params.run_mutenricher ? "<li>Soltis, A. R., et al. (2020). MutEnricher: a flexible toolset for somatic mutation enrichment analysis of tumor whole genomes. BMC Bioinformatics, 21. doi: <a href=\"https://doi.org/10.1186/s12859-020-03695-z\">10.1186/s12859-020-03695-z</a></li>" : "",
+            "<li>Poole, W., et al. (2016). Combining dependent P-values with an empirical adaptation of Brown's method. Bioinformatics, 32(17). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw438\">10.1093/bioinformatics/btw438</a></li>",
+            params.skip_acat ? "" : "<li>Liu, Y., et al. (2019). ACAT: a fast and powerful p value combination method for rare-variant analysis in sequencing studies. American Journal of Human Genetics, 104(3). doi: <a href=\"https://doi.org/10.1016/j.ajhg.2019.01.002\">10.1016/j.ajhg.2019.01.002</a></li>",
+            "<li>Kolde, R., et al. (2012). Robust rank aggregation for gene list integration and meta-analysis. Bioinformatics, 28(4). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btr709\">10.1093/bioinformatics/btr709</a></li>",
+            params.run_variant_flags ? "<li>Pedersen, B. S., et al. (2023). Echtvar: compressed variant representation for rapid annotation and filtering of SNPs and indels. Nucleic Acids Research, 51(1). doi: <a href=\"https://doi.org/10.1093/nar/gkac931\">10.1093/nar/gkac931</a></li>" : "",
+            params.run_variant_flags ? "<li>Chen, S., et al. (2024). A genomic mutational constraint map using variation in 76,156 human genomes. Nature, 625. doi: <a href=\"https://doi.org/10.1038/s41586-023-06045-0\">10.1038/s41586-023-06045-0</a></li>" : "",
+            params.run_vep ? "<li>McLaren, W., et al. (2016). The Ensembl Variant Effect Predictor. Genome Biology, 17. doi: <a href=\"https://doi.org/10.1186/s13059-016-0974-4\">10.1186/s13059-016-0974-4</a></li>" : "",
+            params.run_motifbreakr ? "<li>Coetzee, S. G., Coetzee, G. A., & Hazelett, D. J. (2015). motifbreakR: an R/Bioconductor package for predicting variant effects at transcription factor binding sites. Bioinformatics, 31(23). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btv470\">10.1093/bioinformatics/btv470</a></li>" : "",
+            params.run_motifbreakr ? "<li>Rauluseviciute, I., et al. (2024). JASPAR 2024: 20th anniversary of the open-access database of transcription factor binding profiles. Nucleic Acids Research, 52(D1). doi: <a href=\"https://doi.org/10.1093/nar/gkad1059\">10.1093/nar/gkad1059</a></li>" : "",
+            "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics, 32(19), 3047–3048. doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw354\">10.1093/bioinformatics/btw354</a></li>"
         ].join(' ').trim()
 
     return reference_text
@@ -446,9 +467,8 @@ def methodsDescriptionText(mqc_methods_yaml) {
     meta["tool_citations"] = ""
     meta["tool_bibliography"] = ""
 
-    // TODO nf-core: Only uncomment below if logic in toolCitationText/toolBibliographyText has been filled!
-    // meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
-    // meta["tool_bibliography"] = toolBibliographyText()
+    meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
+    meta["tool_bibliography"] = toolBibliographyText()
 
 
     def methods_text = mqc_methods_yaml.text

@@ -179,6 +179,6 @@ gnomAD terms ask for attribution and bind users not to attempt to reidentify par
 
 `assets/references/GRCh38.rename_chrs.map` (479 rows, MD5 `91ac4e7b7e10ae19a8ffbe5270642711`) maps
 the Ensembl/NCBI primary names (`1`..`22`, `X`, `Y`, `MT`) and the RefSeq accessions of the GRCh38
-contigs (from the map of the earlier pipeline) to the UCSC names of the analysis FASTA. It is
+contigs (the map used for the frozen regression baseline) to the UCSC names of the analysis FASTA. It is
 applied to vcf and sarek rows with `bcftools annotate --rename-chrs`; contigs not in the map keep
 their name.

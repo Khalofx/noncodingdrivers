@@ -6,8 +6,9 @@ process ACTIVEDRIVERWGS {
     // in bioconda-recipes (b95d6dd); absent from conda-forge noarch and linux-64 repodata.
     // So this module has no conda directive.
     // The image is built from containers/activedriverwgs/Dockerfile (R 4.5.3 + CRAN
-    // ActiveDriverWGS 1.2.1 + BSgenome.Hsapiens.UCSC.hg38 1.4.5). Pin by digest in Step 7.
-    container 'ghcr.io/khalofx/noncodingdrivers-activedriverwgs:1.2.1'
+    // ActiveDriverWGS 1.2.1 + BSgenome.Hsapiens.UCSC.hg38 1.4.5).
+    // ghcr.io/khalofx/noncodingdrivers-activedriverwgs:1.2.1, pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-activedriverwgs@sha256:56d69a0bb7489510a314fb812f0d5758926b637761cf7bf6708f8d7ebd82d5c7'
 
     input:
     tuple val(meta), path(mutations)     // canonical cohort table: sample chrom pos ref alt vtype (GRCh38, chr-prefixed)
@@ -25,16 +26,9 @@ process ACTIVEDRIVERWGS {
     script:
     def args = task.ext.args ?: ''              // --ref-genome hg38 --shard-size N (conf/modules.config)
     prefix   = task.ext.prefix ?: "${meta.id}"
-    // Transitional escape hatch for a site R install (Karakoram): ext.rbin / ext.rlib point at the
-    // site Rscript and its prepared library. Container runs use the image's Rscript and library.
-    // Removed in Step 7 once the image is the only supported runtime.
-    def rbin = task.ext.rbin ?: 'Rscript'
-    def rlib = task.ext.rlib ?: ''
-    def libs = rlib ? ".libPaths(c('${rlib}', .libPaths()));" : ''
-    def rlib_arg = rlib ? "--rlib ${rlib}" : ''
     """
-    ${rbin} -e "${libs} cat(as.character(packageVersion('ActiveDriverWGS')))" > activedriverwgs.version.txt
-    ${rbin} -e "cat(paste(R.version\\\$major, R.version\\\$minor, sep='.'))" > r.version.txt
+    Rscript -e "cat(as.character(packageVersion('ActiveDriverWGS')))" > activedriverwgs.version.txt
+    Rscript -e "cat(paste(R.version\\\$major, R.version\\\$minor, sep='.'))" > r.version.txt
 
     # Canonical table -> ActiveDriverWGS input (chr, pos1, pos2, ref, alt, patient), pos1 == pos2.
     # format_muts accepts only single-base A/C/G/T or '-' alleles and one bad row kills a whole
@@ -65,12 +59,11 @@ process ACTIVEDRIVERWGS {
          END{ if(n == 0){ print "ERROR: no valid primary-chromosome elements" > "/dev/stderr"; exit 2 } }' \\
         ${elements} > adwgs_elements.bed
 
-    ${rbin} \$(command -v run_activedriverwgs.R) \\
+    run_activedriverwgs.R \\
         --mutations adwgs_input.tsv \\
         --elements adwgs_elements.bed \\
         --out ${prefix}.activedriverwgs.tsv \\
         --cores ${task.cpus} \\
-        ${rlib_arg} \\
         ${args}
     """
 

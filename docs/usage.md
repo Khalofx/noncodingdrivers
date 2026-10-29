@@ -4,65 +4,69 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
+The pipeline tests every element of a non-coding element catalogue for an excess of somatic
+mutations in a cohort and explains the significant elements. Its inputs are pre-called somatic
+variants on GRCh38 (VCF, nf-core/sarek output or MAF) and a reference set described by a datasheet.
+Nothing in the pipeline filters a mutation or changes a p-value after the combination step: the
+variant flags, post-filter flags, null calibration and annotation layers add files beside the
+consensus table.
 
 ## Samplesheet input
 
 The samplesheet is a comma-separated file with a header row. Each row is one input file of a
-cohort, given as one of four entry tiers. Rows with the same `cohort` are merged into one cohort
-mutation table before the callers run.
+cohort. Rows with the same `cohort` are merged into one cohort mutation table before the callers
+run.
 
 ```bash
 --input '[path to samplesheet file]'
 ```
 
-| Column          | Description                                                                                                                                  |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                                |
-| `entry`         | `mutations`, `vcf`, `sarek` or `maf` (below).                                                                                                |
-| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                               |
-| `cancer_type`   | Optional label.                                                                                                                              |
-| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (`vcf`, `sarek`, `maf` only, with `--allow_hg19_liftover`).       |
-| `mutations`     | `mutations` rows: canonical table, tab-separated with columns `sample chrom pos ref alt vtype` (GRCh38, UCSC names, MAF allele conventions). |
-| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                                 |
-| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                                  |
-| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                              |
+| Column          | Description                                                                                                                             |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                           |
+| `entry`         | `vcf`, `sarek` or `maf` (below).                                                                                                        |
+| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                          |
+| `cancer_type`   | Optional label.                                                                                                                         |
+| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (with `--allow_hg19_liftover`).                              |
+| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                            |
+| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                             |
+| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                         |
+| `mutations`     | Internal: the canonical-table tier used by the test profile and the regression gates. It is not supported for analyses; leave it empty. |
 
 ### Entry tiers
 
-- **`mutations`**: a canonical table, used as given. Deletions start at their first deleted base
-  with `alt` `-`; insertions sit on the base before them with `ref` `-`; `vtype` is `SNP`, `DNP`,
-  `TNP`, `ONP`, `INS` or `DEL`.
 - **`vcf`**: one sample's somatic calls. A VCF with several sample columns needs `vcf_tumour_id`.
 - **`sarek`**: a tumour/normal VCF (for example nf-core/sarek output); `vcf_tumour_id` names the
   tumour column.
 - **`maf`**: a MAF with any number of tumours (`Tumor_Sample_Barcode`); each tumour becomes one
   sample. Characters outside `[A-Za-z0-9._-]` in barcodes become `_`.
 
-`vcf`, `sarek` and `maf` rows go through `INPUT_HARMONISATION`: contig names are mapped to UCSC
-names, maf rows are converted with maf2vcf.pl, GRCh37/hg19 rows are lifted with Picard
-LiftoverVcf, then bcftools normalises (multiallelic records split, indels left-aligned, records
-whose REF disagrees with the FASTA dropped), keeps PASS or missing-FILTER records on chr1-22, X
-and Y, and the records are written in the canonical conventions above. The per-sample PASS VCFs
-are published under `harmonisation/vcf/` and are what MutEnricher (`--run_mutenricher`) reads.
+Every row goes through `INPUT_HARMONISATION`: contig names are mapped to UCSC names, maf rows are
+converted with maf2vcf.pl, GRCh37/hg19 rows are lifted with Picard LiftoverVcf, then bcftools
+normalises (multiallelic records split, indels left-aligned, records whose REF disagrees with the
+FASTA dropped) and keeps PASS or missing-FILTER records on chr1-22, X and Y. The records are
+written to the cohort table `sample chrom pos ref alt vtype`: deletions start at their first
+deleted base with `alt` `-`, insertions sit on the base before them with `ref` `-`, and `vtype` is
+`SNP`, `DNP`, `TNP`, `ONP`, `INS` or `DEL`. The per-sample PASS VCFs are published under
+`harmonisation/vcf/` and are what MutEnricher (`--run_mutenricher`) reads.
 
 ### Assembly check
 
-Every `vcf`, `sarek` and `maf` row is checked against the FASTA of its declared assembly before
-anything else reads it (EBI `vcf_assembly_checker`). A row in which fewer than
-`--assembly_min_match` (default 0.99) of the REF alleles match stops the run with
-`ASSEMBLY_MISMATCH`; for maf rows the check reads the MAF SNVs themselves. A row with fewer than
-`--assembly_min_records` (default 50) checkable SNVs keeps its declared assembly with an
-`ASSEMBLY_LOW_EVIDENCE` warning. Summaries are published under `harmonisation/assembly_check/`.
+Every row is checked against the FASTA of its declared assembly before anything else reads it (EBI
+`vcf_assembly_checker`). A row in which fewer than `--assembly_min_match` (default 0.99) of the REF
+alleles match stops the run with `ASSEMBLY_MISMATCH`; for maf rows the check reads the MAF SNVs
+themselves. A row with fewer than `--assembly_min_records` (default 50) checkable SNVs keeps its
+declared assembly with an `ASSEMBLY_LOW_EVIDENCE` warning. Summaries are published under
+`harmonisation/assembly_check/`.
 
 GRCh37/hg19 rows stop the run with `ASSEMBLY_NOT_ENABLED` unless `--allow_hg19_liftover true` is
 set; they then need the hg19 FASTA (`HG19_FASTA_MISSING` otherwise) and the chain (see
 [references](references.md)). Rejected liftover records are published under
-`harmonisation/liftover_rejects/`; a `mutations` table is never lifted.
+`harmonisation/liftover_rejects/`. Lifted rows are labelled as such in the evidence table
+(`native_or_lifted`).
 
 ```csv title="samplesheet.csv"
 sample,entry,cohort,cancer_type,assembly,mutations,vcf,index,maf,vcf_tumour_id
-liver_table,mutations,LIVER,HCC,GRCh38,liver.mutations.tsv,,,,
 D01,vcf,LIVER,HCC,GRCh38,,D01.vcf.gz,D01.vcf.gz.tbi,,
 D02,sarek,LIVER,HCC,GRCh38,,D02.mutect2.filtered.vcf.gz,D02.mutect2.filtered.vcf.gz.tbi,,D02_T
 pcawg_liver,maf,LIVER,HCC,hg19,,,,liver.hg19.maf.gz,
@@ -70,9 +74,74 @@ pcawg_liver,maf,LIVER,HCC,hg19,,,,liver.hg19.maf.gz,
 
 ## References
 
-The GRCh38 reference set comes from the datasheet `assets/references/GRCh38.yml`; set
-`--reference_base` to the folder holding the files, or give each file explicitly. See
-[references](references.md) for the datasheet, the checksums and the recipes that build each asset.
+The GRCh38 reference set comes from the datasheet `assets/references/GRCh38.yml`: the analysis
+FASTA (UCSC names), the CDS-excluded element catalogue, the GENCODE v50 GTF, the Ensembl VEP 116
+cache, the ENCODE peak files, the OncodriveFML genome, the variant-flag masks and the gnomAD
+archive, each with its checksum. Set `--reference_base` to the folder holding the files, or give
+each file explicitly; an explicit parameter wins over its datasheet value. See
+[references](references.md) for the checksums and the recipes that build each asset. CADD is never
+in the datasheet: it is supplied by the user (`--oncodrivefml_score`).
+
+## Callers and licences
+
+- **ActiveDriverWGS** (`--run_activedriverwgs`, default `true`): SNVs only, against a +/- 50 kb
+  background with trinucleotide context. Elements are run in shards of `--adwgs_shard_size` (5,000)
+  and the FDR is recomputed over all shards.
+- **OncodriveFML** (`--run_oncodrivefml`, default `false`): functional-impact bias of the element's
+  mutations, scored with CADD v1.7 (`--oncodrivefml_score`, bgzipped with a `.tbi`). OncodriveFML
+  is AGPL-3.0, and its authors' README adds that it may not be copied or distributed for commercial
+  purposes or for redistribution without a licence from Universitat Pompeu Fabra; CADD is free for
+  non-commercial use only. The pipeline therefore runs it only with
+  `--accept_oncodrivefml_licence true`, and its image is not published: build it from
+  `containers/oncodrivefml/` and point the process at it in a config file:
+
+  ```bash
+  docker build -t oncodrivefml-local:2.5.0 containers/oncodrivefml
+  ```
+
+  ```groovy title="oncodrivefml.config"
+  process { withName: 'ONCODRIVEFML' { container = 'oncodrivefml-local:2.5.0' } }
+  ```
+
+- **MutEnricher** (`--run_mutenricher`, default `false`): QC only. Its native region table is
+  published and never enters the combination; it reads the per-sample VCFs.
+
+The per-caller p-values are combined per element with the empirical Brown's method
+(`--combination_method ebm`, default) or ACAT (`acat`); both are always published, and the chosen
+one sets `consensus_q` and `is_consensus` (Benjamini–Hochberg, `--fdr_threshold` 0.1). Robust rank
+aggregation and the caller votes are sensitivity columns. `--skip_acat true` leaves out ACAT where
+the package is unavailable.
+
+### Software licences
+
+| Software                                              | Licence                                                     |
+| ----------------------------------------------------- | ----------------------------------------------------------- |
+| ActiveDriverWGS                                       | GPL-3.0-only                                                |
+| OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)     |
+| CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence |
+| MutEnricher                                           | MIT                                                         |
+| EmpiricalBrownsMethod                                 | MIT                                                         |
+| ACAT                                                  | GPL-3.0-only                                                |
+| RobustRankAggreg                                      | GPL-2.0-only                                                |
+| motifbreakR                                           | GPL-2.0-only                                                |
+| universalmotif                                        | GPL-3.0-only                                                |
+| JASPAR 2026 CORE vertebrates (bundled motifs)         | CC BY 4.0                                                   |
+| bcftools, htslib                                      | MIT                                                         |
+| bedtools                                              | MIT                                                         |
+| csvtk                                                 | MIT                                                         |
+| echtvar                                               | MIT                                                         |
+| GNU Awk                                               | GPL-3.0-or-later                                            |
+| Picard                                                | MIT                                                         |
+| vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                  |
+| EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                  |
+| Ensembl VEP                                           | Apache-2.0                                                  |
+| MultiQC                                               | GPL-3.0-or-later                                            |
+| SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                |
+| gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                             |
+| ENCODE Blacklist v2                                   | GPL-3.0 (repository licence)                                |
+| GIAB v3.6 stratifications                             | U.S. Government work (NIST)                                 |
+| Umap k100                                             | GPL                                                         |
+| Pipeline code (`bin/`, local modules)                 | MIT                                                         |
 
 ## Flags, evidence and null calibration
 
@@ -92,6 +161,34 @@ None of these options filters a mutation or changes a p- or q-value; they add fi
   `--null_replicates` neutral copies of each cohort (seed `--seed` + replicate), each costing about
   as much as the observed run, and reports the inflation factor of every caller and combination
   against `--null_lambda_band`.
+
+## Annotation layers
+
+They run on the significant elements only (`is_consensus`); a cohort without one publishes no
+candidate or annotation file.
+
+- Candidate mutations per patient on the fragments of each significant element, and the nearest
+  gene from the element midpoint to the GENCODE gene TSSs with a strand-aware signed distance
+  (always; `--gencode_gtf` from the datasheet, or a pre-built `--gene_tss_bed`).
+- ENCODE regulatory context per tissue and layer (`--run_regulatory_context`;
+  `--regulatory_peaks_dir`, layout `<dir>/<tissue>/<layer>.<accession>.bed.gz`).
+- Ensembl VEP 116.3 on the candidate mutations (`--run_vep`; offline cache `--vep_cache`). The
+  `--regulatory` option of VEP is never used.
+- motifbreakR on the candidate SNVs (`--run_motifbreakr`; JASPAR 2026 CORE vertebrates bundled,
+  `--jaspar_motifs` to replace them).
+- SigProfiler cohort-level signature QC (`--run_sigprofiler`; `--sigprofiler_genome` for a
+  pre-installed GRCh38 genome on offline nodes).
+
+## Karakoram
+
+`-profile karakoram` (`conf/karakoram.config`) sets SLURM on the `cpu` partition, Apptainer with
+the project image cache, the validated reference folder as `--reference_base` and the CADD file as
+`--oncodrivefml_score`. ActiveDriverWGS runs with 48 CPUs and 72 GB for up to 120 h. The
+per-sample harmonisation tasks run with the local executor inside the head job, so the head job
+needs about 10 CPUs and 72 GB. Compute nodes cannot rely on the Nextflow plugin registry: run with
+`NXF_OFFLINE=true` and the nf-schema plugin cached, and export `APPTAINER_CACHEDIR` to a writable
+folder (the site default is not writable). A digest-pinned image is cached under a new name, so the
+private OncodriveFML image needs `apptainer registry login docker://ghcr.io` once per account.
 
 ## Running the pipeline
 
@@ -180,6 +277,13 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `test`
   - A profile with a complete configuration for automated testing
   - Includes links to test data so needs no other parameters
+- `test_full`
+  - SYNTH-NC, a synthetic genome-wide cohort (60 donors, 231,472 SNVs, five planted drivers and
+    one spectrum decoy) from the test-datasets repository
+  - Needs the full-size references: `--reference_base` and `--oncodrivefml_score`, or a site
+    profile that sets them (`-profile test_full,karakoram`)
+- `karakoram`
+  - The site profile of the Karakoram cluster (SLURM and Apptainer); see [Karakoram](#karakoram)
 - `docker`
   - A generic configuration profile to be used with [Docker](https://docker.com/)
 - `singularity`
@@ -195,7 +299,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `wave`
   - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
-  - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
+  - A generic configuration profile to be used with [Conda](https://conda.io/docs/). ActiveDriverWGS, OncodriveFML and MutEnricher have no conda package, so the callers cannot run under this profile, and ACAT needs `--skip_acat true` until an `r-acat` package is available. Use a container profile.
 
 ### `-resume`
 

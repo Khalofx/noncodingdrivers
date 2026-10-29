@@ -8,7 +8,8 @@ process COMBINEPVALUES {
     // github.com/yaowuliu/ACAT @ e737d7d (GPL-3) until an r-acat conda-forge recipe exists.
     // With -profile conda, ACAT is absent, so run with --skip_acat true.
     conda "${moduleDir}/environment.yml"
-    container 'ghcr.io/khalofx/noncodingdrivers-combinepvalues:1.0.0'   // built from containers/combinepvalues/Dockerfile
+    // ghcr.io/khalofx/noncodingdrivers-combinepvalues:1.0.0, built from containers/combinepvalues/Dockerfile; pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-combinepvalues@sha256:674325cba47f2a1eb07ddf9cb6de04f7e333f1262e184f1be86c9b2793840974'
 
     input:
     tuple val(meta), path(matched)                // element_id + p_<caller> (+ q_<caller>) per element

@@ -5,7 +5,8 @@ process POSTFILTERFLAGS {
     // PCAWG-style post-filter flags per element (D33; bin/postfilter_flags.py): minimum support,
     // mappability, maximum sample fraction. Flag only by default; --postfilter_mode pcawg adds
     // q_postfilter and never changes consensus_q.
-    container 'ghcr.io/khalofx/noncodingdrivers-utils:1.0.0'
+    // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
+    container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
     tuple val(meta), path(consensus), path(element_flags)

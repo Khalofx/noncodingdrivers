@@ -38,7 +38,6 @@ nextflow_process {
 
     // Real run on the committed synthetic fixture. Needs the ActiveDriverWGS image (R + BSgenome hg38);
     // the docker/singularity CI jobs pull it; the conda job cannot run it (no conda package).
-    // On Karakoram before the image exists: tests/nextflow.config honours NCD_ADWGS_RBIN / NCD_ADWGS_RLIB.
     test("homo_sapiens - mutations.tsv - elements.bed") {
 
         when {

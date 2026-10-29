@@ -16,6 +16,7 @@ components:
   - bedtools/coverage
   - bedtools/map
   - ensemblvep/vep
+  - motifbreakr
 input:
   - ch_consensus:
       type: file

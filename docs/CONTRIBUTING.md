@@ -162,8 +162,6 @@ If you update images or graphics, follow the nf-core [style guidelines](https://
 
 ## Pipeline specific contribution guidelines
 
-<!-- TODO nf-core: Add any pipeline specific contribution guidelines here, such as coding styles, procedures, checklists etc. -->
-
 ## Module standard (noncodingdrivers)
 
 Every process follows one recipe, so later steps are mechanical. The full rules are R0–R10 in the build guide, Step 2.

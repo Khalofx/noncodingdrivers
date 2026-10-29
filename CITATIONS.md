@@ -22,6 +22,7 @@
 - BEDTools — Quinlan AR, Hall IM. Bioinformatics 2010. doi:10.1093/bioinformatics/btq033
 - BEDOPS — Neph S, et al. Bioinformatics 2012. doi:10.1093/bioinformatics/bts277
 - csvtk — https://github.com/shenwei356/csvtk
+- EBI vcf-validator (vcf_assembly_checker) — https://github.com/EBIvariation/vcf-validator
 - Picard — https://broadinstitute.github.io/picard/
 - vcf2maf / maf2vcf — https://github.com/mskcc/vcf2maf
 - GNU Awk — https://www.gnu.org/software/gawk/
@@ -30,13 +31,17 @@
 - universalmotif — https://bioconductor.org/packages/universalmotif/
 - JASPAR — Rauluseviciute I, et al. Nucleic Acids Res 2024. doi:10.1093/nar/gkad1059
 - PCAWG non-coding drivers — Rheinbay E, et al. Nature 2020. doi:10.1038/s41586-020-1965-x
-- Ensembl Regulatory Build — https://www.ensembl.org/info/genome/funcgen/regulatory_build.html
-- GENCODE — https://www.gencodegenes.org/
+- Ensembl Regulatory Build — Zerbino DR, et al. Genome Biol 2015. doi:10.1186/s13059-015-0621-5
+- GENCODE — Frankish A, et al. Nucleic Acids Res 2023. doi:10.1093/nar/gkac1071
+- ENCODE (regulatory context peak files) — ENCODE Project Consortium. Nature 2020. doi:10.1038/s41586-020-2493-4
 - echtvar — Pedersen BS, et al. Nucleic Acids Res 2023. doi:10.1093/nar/gkac931
 - gnomAD v4.1 genomes — Chen S, et al. Nature 2024. doi:10.1038/s41586-023-06045-0; https://gnomad.broadinstitute.org (this tool includes data from the gnomAD v4.1 release)
 - ENCODE Blacklist v2 — Amemiya HM, Kundaje A, Boyle AP. Sci Rep 2019. doi:10.1038/s41598-019-45839-z
 - GIAB genome stratifications v3.6 — Dwarshuis N, et al. Nat Commun 2024. doi:10.1038/s41467-024-53260-y
 - Umap — Karimzadeh M, et al. Nucleic Acids Res 2018. doi:10.1093/nar/gky677
+- SigProfilerMatrixGenerator (optional QC) — Bergstrom EN, et al. BMC Genomics 2019. doi:10.1186/s12864-019-6041-2
+- SigProfilerExtractor (optional QC) — Islam SMA, et al. Cell Genom 2022. doi:10.1016/j.xgen.2022.100179
+- SigProfilerAssignment (optional QC) — Díaz-Gay M, et al. Bioinformatics 2023. doi:10.1093/bioinformatics/btad756
 
 - [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
 
