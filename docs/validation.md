@@ -9,7 +9,27 @@ in `tests/regression/baseline.json`. The cohort data are not redistributed (the 
 PCAWG tables are unverified), so the regression runs are made on the Karakoram cluster, where the
 baseline folders are kept read-only. All runs are GRCh38.
 
-<!-- S7-RELEASE-RUNS -->
+## Release runs (v1.0.0)
+
+Pipeline commit `d171e8f` on Karakoram, with every container pinned by digest, ActiveDriverWGS in
+its image instead of a site R installation, and the updated nf-core modules (bcftools 1.25).
+
+| Run                                                   | Check                                                           | Result                                                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------- | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test_full` (SYNTH-NC, 60 donors, from test-datasets) | Planted drivers at q < 0.1 (`baseline.json`: EBM 4/5, ACAT 5/5) | EBM 4/5 (E1-E4), ACAT 5/5; ranks E1 1, E2 2, E3 4, E4 5, E5 8 (EBM q 0.31); spectrum decoy E6 rank 3                                                                                                                                                                                                                                           |
+|                                                       | Against the SYNTH-NC run of the flags release                   | mutation table, OncodriveFML table, variant and element flags, callable territory, post-filters, candidates and nearest gene identical; evidence table identical apart from the 4 null-calibration rows of that run; ActiveDriverWGS p within 1.44e-12 and every consensus value within 3.15e-12 (relative)                                    |
+|                                                       | Evidence table                                                  | 61,950 rows, 0 schema errors                                                                                                                                                                                                                                                                                                                   |
+|                                                       | Cost                                                            | 44 min, 28.2 CPU-h, 403 tasks                                                                                                                                                                                                                                                                                                                  |
+| Liver-HCC-public, 261 donors, annotation layers on    | Consensus against the annotation-layer run                      | 541,936 elements; EBM 31 and ACAT 28 significant, the same sets; TERT promoter rank 5 under both; `is_consensus` and `consensus_rank` identical; every q-value within 1.4e-14; ActiveDriverWGS p within 1.06e-10, EBM p within 7.0e-11, ACAT p within 1.01e-8 (below)                                                                          |
+|                                                       | Annotation layers                                               | 315 candidate rows from 129 donors and 31 nearest-gene rows identical; regulatory context 1,519 rows identical; Ensembl VEP for 213/213 variants, consequence table identical (the TP53-adjacent CTCF site keeps its 3 splice variants); TERT C228T ELK4 (MA0076.3) gain; motifbreakR 699 SNV x TF rows at 175 SNVs identical; MultiQC renders |
+|                                                       | Flags and evidence against the flags run                        | variant flags (3,379,254 rows), element flags, callable territory and post-filters identical; evidence table identical apart from the 4 null-calibration rows of that run                                                                                                                                                                      |
+|                                                       | Cost                                                            | 4 h 20 min, 180.9 CPU-h, 191 tasks                                                                                                                                                                                                                                                                                                             |
+
+**ACAT near p = 1.** The largest ACAT difference is at `enhancer_ENSR00001170012` (ACAT p
+0.0571933325 against 0.0571933319, q 1 in both). Its two caller p-values are 0.9983
+(ActiveDriverWGS) and 0.00159 (OncodriveFML), so their Cauchy terms nearly cancel and a change of
+1e-12 in the ActiveDriverWGS p moves the combined p in the eighth digit. No significant set, rank
+or q-value changes.
 
 ## Driver core: callers and combination
 
@@ -193,5 +213,6 @@ these runs; the germline columns of such rows are NA.
   `bcftools norm` (75 deletions and 1 insertion in Liver-HCC-public).
 - **ActiveDriverWGS** in its image instead of a site R install: relative 1.1e-13.
 - **ACAT** from the package instead of an in-house implementation: within the recorded bounds.
+- **ACAT near p = 1** amplifies the ActiveDriverWGS image difference to at most 1.01e-8 in an ACAT p-value (release runs), with no change of any q-value, set or rank.
 - **Null calibration band**: `--null_lambda_band 0.8,1.2`, one-sided; a lambda below 0.8 is
   reported as `conservative`, never as a failure.
