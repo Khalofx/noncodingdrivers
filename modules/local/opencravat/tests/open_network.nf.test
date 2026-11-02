@@ -1,0 +1,37 @@
+nextflow_process {
+
+    name "Test Process OPENCRAVAT - open network"
+    script "../main.nf"
+    process "OPENCRAVAT"
+    config "./open_network.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "opencravat"
+
+    // Networked: the task's closed proxy is off, so only the image's configuration (metrics,
+    // store and publish addresses = the closed local port) stands between OpenCRAVAT and the network
+    test("five synthetic variants - open network, no request leaves") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/opencravat/syn5.opencravat_input.txt", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def network   = path(process.out.network[0][1]).readLines().drop(1).collect { line -> line.split('\t', -1).toList() }
+            def telemetry = path(process.out.telemetry[0][1]).readLines().drop(1).collectEntries { line -> line.tokenize('\t') }
+            assert process.success
+            assertAll(
+                { assert network.size() > 0 },
+                { assert network.every { row -> row[1] in [ '127.0.0.1', '::1', 'localhost' ] && row[4] == 'yes' } },
+                { assert telemetry.http_proxy == 'none (test: open network)' },
+                { assert telemetry.non_local_connection_targets == '0' },
+                { assert (telemetry.metrics_payloads_saved_locally_and_deleted as int) >= 1 }
+            )
+        }
+    }
+}

@@ -501,6 +501,7 @@ def toolCitationText() {
             params.run_vep ? "Ensembl VEP (McLaren et al. 2016)," : "",
             params.run_motifbreakr ? "motifbreakR (Coetzee et al. 2015) with JASPAR (Rauluseviciute et al. 2024)," : "",
             params.run_alphagenome_avi ? "AlphaGenome Variant Impact scores (Avsec et al. 2026; Cheng et al. 2026) through the VEP AVI plugin," : "",
+            params.run_opencravat ? "OpenCRAVAT (Pagel et al. 2020)," : "",
             "MultiQC (Ewels et al. 2016)",
             ".",
             callerRolesText()
@@ -549,6 +550,9 @@ def toolBibliographyText() {
         (params.run_alphagenome_avi ? [
             "<li>Avsec, Ž., et al. (2026). Advancing regulatory variant effect prediction with AlphaGenome. Nature, 649(8099), 1206–1218. doi: <a href=\"https://doi.org/10.1038/s41586-025-10014-0\">10.1038/s41586-025-10014-0</a></li>",
             "<li>Cheng, J., et al. (2026). AlphaGenome Atlas: in silico mutagenesis of the entire human genome improves prioritization and interpretation of non-coding variants. medRxiv (preprint). doi: <a href=\"https://doi.org/10.64898/2026.09.16.26363192\">10.64898/2026.09.16.26363192</a></li>"
+        ] : []) +
+        (params.run_opencravat ? [
+            "<li>Pagel, K. A., et al. (2020). Integrated informatics analysis of cancer-related variants. JCO Clinical Cancer Informatics, (4), 310–317. doi: <a href=\"https://doi.org/10.1200/CCI.19.00132\">10.1200/CCI.19.00132</a></li>"
         ] : []) +
         [
             "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics, 32(19), 3047–3048. doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw354\">10.1093/bioinformatics/btw354</a></li>"

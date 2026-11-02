@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "opencravat"
+description: Annotate candidate mutations (GRCh38) with OpenCRAVAT 3.2.4 and the annotators baked into the pipeline image (ccre_screen, repeat, clinvar), with no liftover, telemetry sent nowhere and every connection attempt audited; annotation only
+keywords:
+  - variant annotation
+  - non-coding
+  - clinvar
+  - ccre
+tools:
+  - "opencravat":
+      description: "OpenCRAVAT: a modular annotation tool for genomic variants"
+      homepage: "https://opencravat.org"
+      documentation: "https://open-cravat.readthedocs.io"
+      tool_dev_url: "https://github.com/KarchinLab/open-cravat"
+      doi: "10.1200/CCI.19.00132"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'Liver-HCC-public', cohort:'Liver-HCC-public', assembly:'GRCh38' ]`
+    - variants:
+        type: file
+        description: OpenCRAVAT native input (chrom, pos, strand, ref, alt, sample), GRCh38, chr-named (assets/awk/opencravat_input.awk)
+        pattern: "*.txt"
+        ontologies: []
+
+output:
+  report:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.opencravat.report.tsv":
+          type: file
+          description: OpenCRAVAT text report (variant, gene, sample and mapping sections); not published, OPENCRAVAT_TABLE writes the published table from it
+          pattern: "*.opencravat.report.tsv"
+          ontologies: []
+  sqlite:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.opencravat.sqlite":
+          type: file
+          description: OpenCRAVAT result database (not published)
+          pattern: "*.opencravat.sqlite"
+          ontologies: []
+  log:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.opencravat.log":
+          type: file
+          description: OpenCRAVAT run log
+          pattern: "*.opencravat.log"
+          ontologies: []
+  network:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.opencravat.network.tsv":
+          type: file
+          description: Every connection attempt and host lookup of the run (call, host, port, n_calls, is_local); the task fails if a target is not local
+          pattern: "*.opencravat.network.tsv"
+          ontologies: []
+  telemetry:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.opencravat.telemetry.tsv":
+          type: file
+          description: The run's telemetry record (configured addresses, proxy, non-local targets, metrics payloads saved locally and deleted)
+          pattern: "*.opencravat.telemetry.tsv"
+          ontologies: []
+  versions_opencravat:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "opencravat":
+          type: string
+          description: The name of the tool
+      - "grep '^open-cravat' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+  versions_hg38:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "opencravat-hg38":
+          type: string
+          description: The OpenCRAVAT hg38 gene mapper module
+      - "grep '^hg38' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the module
+  versions_ccre_screen:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "opencravat-ccre_screen":
+          type: string
+          description: The OpenCRAVAT ccre_screen annotator
+      - "grep '^ccre_screen' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the module
+  versions_repeat:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "opencravat-repeat":
+          type: string
+          description: The OpenCRAVAT repeat annotator
+      - "grep '^repeat' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the module
+  versions_clinvar:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "opencravat-clinvar":
+          type: string
+          description: The OpenCRAVAT clinvar annotator
+      - "grep '^clinvar' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the module
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The process the versions were collected from
+      - opencravat:
+          type: string
+          description: The tool name
+      - "grep '^open-cravat' opencravat.versions.tsv | cut -f2":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

@@ -1,0 +1,87 @@
+nextflow_process {
+
+    name "Test OPENCRAVAT_INPUT and OPENCRAVAT_TABLE (gawk adapters of the OpenCRAVAT layer)"
+    script "../../../../modules/nf-core/gawk/main.nf"
+    process "GAWK"
+    config "./adapters.config"
+
+    tag "explain"
+    tag "opencravat"
+
+    test("OPENCRAVAT_INPUT - one line per distinct sample x variant") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', prefix:'test.opencravat_input' ], file("${projectDir}/tests/data/avi/candidates.tsv", checkIfExists: true), 'txt' ]
+                input[1] = file("${projectDir}/assets/awk/opencravat_input.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.output[0][1]).readLines()
+            assert process.success
+            assertAll(
+                { assert lines.size() == 9 },                      // ten candidate rows, one sample x variant twice
+                { assert lines.every { line -> line.split('\t', -1).size() == 6 && line.split('\t')[2] == '+' } },
+                { assert lines.contains('chr5\t1295140\t+\tC\t-\tS4') },
+                { assert snapshot(process.out.output).match() }
+            )
+        }
+    }
+
+    // Report fixture: OpenCRAVAT 3.2.4 on the five synthetic variants (tests/data/opencravat/README.md);
+    // the candidate table adds chr5:1295160 C>T, which the report does not hold
+    test("OPENCRAVAT_TABLE - report joined back to the candidates, hg19 columns dropped") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/opencravat"
+                input[0] = [ [ id:'test', prefix:'test.opencravat' ], [ file("\${d}/candidates.tsv", checkIfExists: true), file("\${d}/syn5.opencravat.report.tsv", checkIfExists: true) ], 'tsv' ]
+                input[1] = file("${projectDir}/assets/awk/opencravat_table.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.output[0][1]).readLines()
+            def cols  = lines[0].split('\t', -1).toList()
+            def rows  = lines.drop(1).collect { line -> [ cols, line.split('\t', -1).toList() ].transpose().collectEntries() }
+            assert process.success
+            assertAll(
+                { assert cols.take(9) == [ 'variant_id', 'chrom', 'pos', 'ref', 'alt', 'vtype', 'element_ids', 'n_samples', 'oc_status' ] },
+                { assert !cols.any { col -> col.startsWith('hg19__') || col.startsWith('original_input__') || col == 'base__uid' } },
+                { assert [ 'ccre_screen__classification', 'clinvar__clinical_significance', 'encode_tfbs__factor', 'repeat__repeat_class' ].every { col -> col in cols } },
+                { assert rows.size() == 6 },
+                { assert rows.countBy { row -> row.oc_status } == [ annotated: 5, not_in_report: 1 ] },
+                { assert rows.find { row -> row.variant_id == 'chr5:1295113:G:A' }.ccre_screen__classification == 'PLS' },
+                { assert rows.find { row -> row.variant_id == 'chr5:1295160:C:T' }.findAll { key, _value -> key.contains('__') }.values().every { value -> value == 'NA' } },
+                { assert lines.every { line -> line.split('\t', -1).size() == cols.size() } },
+                { assert snapshot(process.out.output).match() }
+            )
+        }
+    }
+
+    test("OPENCRAVAT_TABLE - a report without Original Input columns fails") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/opencravat"
+                input[0] = [ [ id:'test', prefix:'test.opencravat' ], [ file("\${d}/candidates.tsv", checkIfExists: true), file("\${d}/no_original_input.report.tsv", checkIfExists: true) ], 'tsv' ]
+                input[1] = file("${projectDir}/assets/awk/opencravat_table.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            assert process.failed
+            assert (process.stdout + process.stderr + file("${metaDir}/nextflow.log").readLines()).any { line -> line.contains('no Original Input chrom/pos/ref/alt columns') }
+        }
+    }
+}

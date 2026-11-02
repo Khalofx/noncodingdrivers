@@ -318,7 +318,7 @@ workflow NONCODINGDRIVERS {
         file("${projectDir}/assets/awk", checkIfExists: true),
         motifs,
         [ regctx: params.run_regulatory_context, vep: params.run_vep, motifs: params.run_motifbreakr,
-          vep_cache_version: params.vep_cache_version, avi: params.run_alphagenome_avi ],
+          vep_cache_version: params.vep_cache_version, avi: params.run_alphagenome_avi, opencravat: params.run_opencravat ],
         avi_files
     )
     ch_multiqc_files = ch_multiqc_files.mix(EXPLAIN.out.mqc)

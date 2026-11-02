@@ -1,0 +1,65 @@
+nextflow_process {
+
+    name "Test Process OPENCRAVAT"
+    script "../main.nf"
+    process "OPENCRAVAT"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "opencravat"
+
+    // Five synthetic variants (tests/data/opencravat): TERT promoter chr5:1295113 G>A and
+    // chr5:1295135 G>A, chr1:1000000 T>A, a deletion and an insertion
+    test("five synthetic variants - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/opencravat/syn5.opencravat_input.txt", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+        }
+    }
+
+    // Real run in the image (ghcr.io/khalofx/noncodingdrivers-opencravat 3.2.4, pinned by digest)
+    test("five synthetic variants") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/opencravat/syn5.opencravat_input.txt", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def report    = path(process.out.report[0][1]).readLines()
+            def variants  = report.drop(report.findIndexOf { line -> line == '#Report level: variant' } + 1)
+                                  .dropWhile { line -> line.startsWith('#') }.takeWhile { line -> !line.startsWith('#') }.findAll { line -> line }.drop(2)
+            def network   = path(process.out.network[0][1]).readLines().drop(1).collect { line -> line.split('\t', -1).toList() }
+            def telemetry = path(process.out.telemetry[0][1]).readLines().drop(1).collectEntries { line -> line.tokenize('\t') }
+            assert process.success
+            assertAll(
+                { assert variants.size() == 5 },
+                { assert variants.find { line -> line.split('\t', -1).toList()[1..4] == [ 'chr5', '1295113', 'G', 'A' ] }.contains('\tPLS\t') },
+                // every connection attempt was local; the metrics POST went to the closed port
+                { assert network.every { row -> row[4] == 'yes' } },
+                { assert network.any { row -> row[0] == 'connect' && row[1] == '127.0.0.1' && row[2] == '9' } },
+                { assert telemetry.metrics_url == 'http://127.0.0.1:9' && telemetry.store_url == 'http://127.0.0.1:9' },
+                { assert telemetry.non_local_connection_targets == '0' },
+                // OpenCRAVAT kept its payload after the failed POST; the task deleted it
+                { assert (telemetry.metrics_payloads_saved_locally_and_deleted as int) >= 1 },
+                { assert !file(process.out.report[0][1]).parent.resolve('oc_metrics').exists() },
+                { assert snapshot(process.out.findAll { key, _value -> key.startsWith('versions') }).match() }
+            )
+        }
+    }
+}

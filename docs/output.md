@@ -16,7 +16,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Variant flags](#variant-flags) - Mask and germline flags of every mutation row, element-level fractions and callable fraction
 - [Post-filter flags and evidence table](#post-filter-flags-and-evidence-table) - PCAWG-style post-filter flags and the long-form `driver_evidence.tsv`
 - [Null calibration](#null-calibration) - Per-caller inflation factor on neutral copies of each cohort (opt-in)
-- [Candidates and annotation layers](#candidates-and-annotation-layers) - Mutations, nearest gene, regulatory context, VEP (with AlphaGenome AVI scores) and motifbreakR for the significant elements
+- [Candidates and annotation layers](#candidates-and-annotation-layers) - Mutations, nearest gene, regulatory context, VEP (with AlphaGenome AVI scores), motifbreakR and OpenCRAVAT for the significant elements
 - [Signature QC](#signature-qc) - SigProfiler on the cohort (opt-in)
 - [MultiQC](#multiqc) - Run summary report
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
@@ -153,6 +153,10 @@ filters or re-ranks an element.
 - `motifbreakr/` (`--run_motifbreakr`)
   - `<cohort>.motifbreakr.tsv`: the native motifbreakR result for the candidate SNVs.
   - `<cohort>.motifbreakr.per_tf.tsv`: one row per SNV x transcription factor: the best motif, `ref_pvalue`, `alt_pvalue`, `best_pvalue`, `direction` (`gain`, `loss` or `none`), `fold_change`, and `p_below_resolution` for p-values below the resolution of `calculatePvalue()` (flagged, never floored; their `fold_change` is NA).
+- `opencravat/` (`--run_opencravat`): OpenCRAVAT 3.2.4 on the candidate mutations, annotation only.
+  - `<cohort>.opencravat.tsv`: one row per distinct candidate variant: `variant_id`, `chrom`, `pos`, `ref`, `alt`, `vtype`, `element_ids`, `n_samples`, `oc_status` (`annotated` or `not_in_report`), then the variant-level OpenCRAVAT columns named `<module>__<column>`: `base__*` (OpenCRAVAT's normalised hg38 position and alleles, gene, transcript, sequence ontology, all mappings, sample count), `ccre_screen__*` (SCREEN cCRE accession and `classification`, e.g. PLS, pELS, dELS, CTCF-only), `clinvar__*` (ClinVar significance, review status, disease names, oncogenicity and somatic classifications) and `repeat__*` (RepeatMasker class, family and name). NA = no annotation. No hg19 coordinate is produced.
+  - `<cohort>.opencravat.network.tsv`: every connection attempt and host lookup of the run (`call`, `host`, `port`, `n_calls`, `is_local`); a non-local target fails the run.
+  - `<cohort>.opencravat.telemetry.tsv`: the run's telemetry record: the configured metrics, store and publish addresses (`http://127.0.0.1:9`), the proxy, the number of non-local targets (0) and the number of metrics payloads OpenCRAVAT saved locally, which the task deleted.
 - `references/`
   - `gencode.v50.basic.annotation.tss.bed`: the gene TSSs used for the nearest-gene table.
 

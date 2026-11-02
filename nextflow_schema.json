@@ -699,6 +699,12 @@
                     "description": "AlphaGenome AVI SNV score file (bgzip-compressed TSV: chrom, pos, ref, alt, raw, phred) with its tabix .tbi beside it. Default: the datasheet value under --reference_base.",
                     "help_text": "The plugin accepts only a .tbi index (not .csi). The run stops before any task when the file or its .tbi is missing, because VEP itself only warns and exits 0 when the plugin cannot load."
                 },
+                "run_opencravat": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-clipboard-list",
+                    "description": "Annotate the candidate mutations with OpenCRAVAT 3.2.4 (GRCh38 only, no liftover; annotators ccre_screen, repeat and clinvar baked into the image). Usage telemetry goes nowhere: its address is a closed local port and every connection attempt is audited.",
+                    "help_text": "Annotation only. The report is joined back to the candidates by chrom, pos, ref and alt. The image holds no hg19 annotator and no UCSC liftOver chain, so no hg19 coordinates are produced. Module licences and the telemetry statement: docs/usage.md."
+                },
                 "run_sigprofiler": {
                     "type": "boolean",
                     "fa_icon": "fas fa-chart-bar",
