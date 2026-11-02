@@ -22,6 +22,10 @@ lint:
   nf_test_content:
     # assembly gates: every test stops the run before a versions.yml is written
     - tests/assembly_mismatch.nf.test
+    # AVI parameter gates: every test stops the run before any task, so no versions.yml exists
+    - tests/variant_layers.nf.test
+    # process test of the ENSEMBLVEP_VEP ext.args closure (a native probe process): no outdir, no versions.yml
+    - tests/vep_ext_args.nf.test
   files_exist:
     - conf/igenomes.config
     - conf/igenomes_ignored.config
