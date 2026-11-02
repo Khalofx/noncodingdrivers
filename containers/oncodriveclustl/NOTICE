@@ -1,0 +1,20 @@
+noncodingdrivers OncodriveCLUSTL image: modified OncodriveCLUSTL 1.2.0
+
+OncodriveCLUSTL is the property of the Institute for Research in Biomedicine (IRB Barcelona) and is
+distributed under the GNU Affero General Public License, version 3 or (at your option) any later
+version (AGPL-3.0-or-later). The full licence text is in AGPL-3.0.txt next to this file.
+
+Modification (2 November 2026, noncodingdrivers project): the file
+    oncodriveclustl/data/CGC_all_Oct15_10_29_09_2018.tsv
+of the installed package (a COSMIC Cancer Gene Census list bundled in the PyPI wheel) was replaced
+by its header line ("Gene Symbol<TAB>Tier"). OncodriveCLUSTL reads it only to fill its CGC
+column; for --genome hg38 that column is written as "Non Available" in every case, so analysis
+results are unchanged. No other file was modified.
+
+Corresponding source:
+  - OncodriveCLUSTL 1.2.0: https://pypi.org/project/oncodriveclustl/1.2.0/
+    (sdist sha256 6ede4f8b2dc7550fa0ef407ccd13ed8c4427e9e5d6184742e36a2b7d879ae64c,
+    wheel sha256 bdcf096290f11169737cbef10505acbb7e48aa7745cc796d996d5ee6b19be947) and
+    https://github.com/bbglab/oncodriveclustl, tag 1.2.0 (commit 5ad6d2e)
+  - the recipe of this image and the modification: containers/oncodriveclustl in
+    https://github.com/Khalofx/noncodingdrivers

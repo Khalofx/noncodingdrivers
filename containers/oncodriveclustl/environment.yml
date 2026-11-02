@@ -1,0 +1,13 @@
+# Conda part of the noncodingdrivers OncodriveCLUSTL image: the interpreter, pip, the build tools for
+# the sdist-only bg* packages (installed with --no-build-isolation), pycurl (binary; bgdata needs
+# it) and procps-ng (Nextflow's task wrapper calls ps). The image installs conda-lock.linux-64.txt,
+# the explicit lock resolved from this file, then requirements.lock (pip, --require-hashes).
+channels:
+  - conda-forge
+dependencies:
+  - conda-forge::python=3.12
+  - conda-forge::pip
+  - conda-forge::setuptools
+  - conda-forge::wheel
+  - conda-forge::pycurl
+  - conda-forge::procps-ng

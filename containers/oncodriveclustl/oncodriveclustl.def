@@ -1,0 +1,43 @@
+Bootstrap: docker
+From: mambaorg/micromamba:2.0.5
+
+# Apptainer recipe of the noncodingdrivers OncodriveCLUSTL image, built from the same explicit
+# locks as the Dockerfile in this folder (identical package set, same CGC-list modification and
+# licence files). Build on a host that allows unprivileged or fakeroot builds, from this folder:
+#   apptainer build --fakeroot noncodingdrivers-oncodriveclustl-1.2.0.sif oncodriveclustl.def
+# The published image is ghcr.io/khalofx/noncodingdrivers-oncodriveclustl:1.2.0 (build-containers).
+
+%files
+    conda-lock.linux-64.txt /opt/build/conda-lock.linux-64.txt
+    requirements.lock /opt/build/requirements.lock
+    AGPL-3.0.txt /opt/build/AGPL-3.0.txt
+    NOTICE /opt/build/NOTICE
+
+%post
+    set -eu
+    # /opt, not /tmp: Apptainer binds the host /tmp over the image's /tmp during %post
+    micromamba install -y -p /opt/conda -f /opt/build/conda-lock.linux-64.txt
+    micromamba clean -a -y
+    /opt/conda/bin/pip install --no-cache-dir --no-deps --no-build-isolation --require-hashes -r /opt/build/requirements.lock
+    /opt/conda/bin/pip check
+    cgc=$(/opt/conda/bin/python -c "import os, oncodriveclustl; print(os.path.join(os.path.dirname(oncodriveclustl.__file__), 'data', 'CGC_all_Oct15_10_29_09_2018.tsv'))")
+    printf 'Gene Symbol\tTier\n' > "$cgc"
+    mkdir -p /usr/share/licenses/oncodriveclustl
+    cp /opt/build/AGPL-3.0.txt /opt/build/NOTICE /usr/share/licenses/oncodriveclustl/
+    rm -rf /opt/build
+    /opt/conda/bin/oncodriveclustl --help > /dev/null
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+
+%test
+    oncodriveclustl --help > /dev/null
+    python -c "import importlib.metadata as m; v = m.version('oncodriveclustl'); assert v == '1.2.0', v"
+    grep -q 'GNU AFFERO GENERAL PUBLIC LICENSE' /usr/share/licenses/oncodriveclustl/AGPL-3.0.txt
+    ps --version
+
+%labels
+    Name noncodingdrivers-oncodriveclustl
+    Version 1.2.0
+    License AGPL-3.0-or-later AND MIT
+    Source https://github.com/Khalofx/noncodingdrivers
