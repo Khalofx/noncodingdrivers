@@ -4,7 +4,7 @@
 #       /pipeline/containers/smoke-test.sh <name>
 set -euo pipefail
 
-name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml, combinepvalues or motifbreakr}"
+name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml, oncodriveclustl, combinepvalues or motifbreakr}"
 
 # Nextflow's task wrapper runs ps inside every task container to collect CPU and memory metrics.
 command -v ps > /dev/null || { echo "ps (procps) is missing from the ${name} image" >&2; exit 1; }
@@ -35,6 +35,16 @@ case "${name}" in
     oncodrivefml)
         oncodrivefml --help > /dev/null
         python -c "import importlib.metadata as m; v = m.version('oncodrivefml'); assert v == '2.5.0', v"
+        ;;
+    oncodriveclustl)
+        oncodriveclustl --help > /dev/null
+        python -c "import importlib.metadata as m; v = m.version('oncodriveclustl'); assert v == '1.2.0', v"
+        python -c "import oncodriveclustl.main, bgreference, bgsignature, bgdata, pycurl"
+        # full AGPL-3.0 text and the modification notice ship with the image
+        grep -q 'GNU AFFERO GENERAL PUBLIC LICENSE' /usr/share/licenses/oncodriveclustl/AGPL-3.0.txt
+        grep -q 'CGC_all_Oct15_10_29_09_2018.tsv' /usr/share/licenses/oncodriveclustl/NOTICE
+        # the COSMIC Cancer Gene Census list bundled in the wheel is reduced to its header line
+        python -c "import os, oncodriveclustl; p = os.path.join(os.path.dirname(oncodriveclustl.__file__), 'data', 'CGC_all_Oct15_10_29_09_2018.tsv'); t = open(p).read(); assert t == 'Gene Symbol\\tTier\\n', repr(t)"
         ;;
     combinepvalues)
         Rscript -e "library(EmpiricalBrownsMethod); library(RobustRankAggreg); library(ACAT)"
