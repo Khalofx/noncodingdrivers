@@ -45,7 +45,16 @@ nextflow_pipeline {
                 { assert prov.md5_check == 'match' && prov.cosmic_release == 'v999' },
                 { assert genes.TERT_promoter_fixture.nearest_protein_coding_gene == 'TERT' },
                 { assert summ.TERT_promoter_fixture.self_promoter_genes == 'TERT' },
-                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains("used as staged") } }
+                { assert file("${metaDir}/nextflow.log").text.contains("used as staged") },
+                { assert snapshot(
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml"),
+                    // the context-layer tables (synthetic inputs; deterministic)
+                    [ 'cosmic/SYNTH-TERT.cosmic.mutation_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.element_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.provenance.json',
+                      'cosmic/restricted/SYNTH-TERT.cosmic.exact_matches.tsv', 'cosmic/restricted/NOTICE.txt', 'cancer_genes/SYNTH-TERT.cancer_gene_context.tsv',
+                      'enhancer_gene/SYNTH-TERT.enhancer_gene_links.tsv', 'enhancer_gene/SYNTH-TERT.enhancer_gene_summary.tsv',
+                      'ccre/SYNTH-TERT.ccre_v4.tsv', 'ccre/SYNTH-TERT.ccre_v4_summary.tsv', 'ccre/SYNTH-TERT.ccre_v4_celltype.tsv' ].collect { f -> path("$outputDir/${f}") }
+                ).match() }
             )
         }
     }
