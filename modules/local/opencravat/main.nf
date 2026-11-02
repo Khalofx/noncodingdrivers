@@ -15,7 +15,7 @@ process OPENCRAVAT {
     // and deletes the copy of the metrics that OpenCRAVAT saves after the failed POST (it holds a
     // MAC-derived machine id).
     // ghcr.io/khalofx/noncodingdrivers-opencravat:3.2.4, pinned by digest
-    container 'ghcr.io/khalofx/noncodingdrivers-opencravat@sha256:TODO_PIN_AFTER_PUBLICATION'
+    container 'ghcr.io/khalofx/noncodingdrivers-opencravat@sha256:5c7c4d7075418e45b40afd3dd1eaa222d7a1cd66145d40e2bc28a448e50a5eb6'
 
     input:
     tuple val(meta), path(variants)     // OpenCRAVAT native input: chrom, pos, strand, ref, alt, sample (GRCh38)
