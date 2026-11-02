@@ -36,7 +36,11 @@
 - PCAWG non-coding drivers — Rheinbay E, et al. Nature 2020. doi:10.1038/s41586-020-1965-x
 - Ensembl Regulatory Build — Zerbino DR, et al. Genome Biol 2015. doi:10.1186/s13059-015-0621-5
 - GENCODE — Frankish A, et al. Nucleic Acids Res 2023. doi:10.1093/nar/gkac1071
-- ENCODE (regulatory context peak files) — ENCODE Project Consortium. Nature 2020. doi:10.1038/s41586-020-2493-4
+- ENCODE (regulatory context peak files, ENCODE-rE2G and SCREEN V4 files) — ENCODE Project Consortium. Nature 2020. doi:10.1038/s41586-020-2493-4
+- ENCODE-rE2G (enhancer-gene links, `--run_enhancer_gene_links`) — Gschwind AR, et al. Nature 2026;657:179-190. doi:10.1038/s41586-026-10781-4
+- SCREEN Registry V4 cCREs (`--run_ccre_overlay`) — Moore JE, et al. Nature 2026. doi:10.1038/s41586-025-09909-9
+- COSMIC (Non-Coding Variants; user-supplied, `--run_cosmic_context`) — Sondka Z, et al. Nucleic Acids Res 2024;52(D1):D1210-D1217. doi:10.1093/nar/gkad986
+- COSMIC Cancer Gene Census (when given as `--cancer_gene_list`) — Sondka Z, et al. Nat Rev Cancer 2018;18(11):696-705. doi:10.1038/s41568-018-0060-1
 - echtvar — Pedersen BS, et al. Nucleic Acids Res 2023. doi:10.1093/nar/gkac931
 - gnomAD v4.1 genomes — Chen S, et al. Nature 2024. doi:10.1038/s41586-023-06045-0; https://gnomad.broadinstitute.org (this tool includes data from the gnomAD v4.1 release)
 - ENCODE Blacklist v2 — Amemiya HM, Kundaje A, Boyle AP. Sci Rep 2019. doi:10.1038/s41598-019-45839-z
