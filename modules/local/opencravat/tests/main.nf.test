@@ -57,7 +57,7 @@ nextflow_process {
                 { assert telemetry.non_local_connection_targets == '0' },
                 // OpenCRAVAT kept its payload after the failed POST; the task deleted it
                 { assert (telemetry.metrics_payloads_saved_locally_and_deleted as int) >= 1 },
-                { assert !file(process.out.report[0][1]).parent.resolve('oc_metrics').exists() },
+                { assert !new File(new File(process.out.report[0][1].toString()).parentFile, 'oc_metrics').exists() },
                 { assert snapshot(process.out.findAll { key, _value -> key.startsWith('versions') }).match() }
             )
         }
