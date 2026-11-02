@@ -5,6 +5,10 @@ p_activedriverwgs	p	ActiveDriverWGS	1.2.1	cohort
 q_activedriverwgs	q	ActiveDriverWGS (Benjamini-Hochberg over all shards)	1.2.1	cohort
 p_oncodrivefml	p	OncodriveFML	2.5.0	cohort
 q_oncodrivefml	q	OncodriveFML	2.5.0	cohort
+p_oncodriveclustl	p	OncodriveCLUSTL (P_ANALYTICAL; reported alongside unless named in --consensus_callers)	1.2.0	cohort
+q_oncodriveclustl	q	OncodriveCLUSTL (Q_ANALYTICAL, Benjamini-Hochberg over the elements with a p-value, all shards)	1.2.0	cohort
+oncodriveclustl_n_clusters	count	OncodriveCLUSTL: clusters observed in the element (CLUSTERS)	1.2.0	cohort
+oncodriveclustl_clustered_mutations	count	OncodriveCLUSTL: SNVs in the element's clusters (CLUSTERED_MUT)	1.2.0	cohort
 ebm_p	p	EmpiricalBrownsMethod	1.34.0	cohort
 ebm_q	q	EmpiricalBrownsMethod (Benjamini-Hochberg)	1.34.0	cohort
 acat_p	p	ACAT	0.91	cohort

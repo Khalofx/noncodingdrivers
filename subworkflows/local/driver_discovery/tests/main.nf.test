@@ -15,6 +15,8 @@ nextflow_workflow {
     tag "csvtk/join"
     tag "combinepvalues"
     tag "mutenricher"
+    tag "oncodriveclustl"
+    tag "bedtools/intersect"
 
     test("synthetic TERT cohort - activedriverwgs + oncodrivefml - stub") {
 
@@ -125,6 +127,127 @@ nextflow_workflow {
             assertAll(
                 { assert workflow.out.mutenricher.size() == 1 },
                 { assert workflow.out.harmonized.size() == 2 },
+                { assert workflow.out.consensus.size() == 1 }
+            )
+        }
+    }
+
+    // A caller reported alongside changes nothing combined: with ActiveDriverWGS the only combined
+    // caller, the consensus without the two OncodriveCLUSTL columns has the bytes of the
+    // ActiveDriverWGS-only run (next test). OncodriveCLUSTL gets the prefiltered rows: its table holds
+    // exactly the ids with >= 2 SNVs (elem_split counts its two fragments together).
+    test("synthetic TERT cohort - activedriverwgs + oncodriveclustl (alongside)") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.empty()
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/oncodriveclustl/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.empty()
+                input[7] = [ 'activedriverwgs', 'oncodriveclustl' ]
+                """
+            }
+        }
+
+        then {
+            def lines  = path(workflow.out.consensus[0][1]).readLines()
+            def cols   = lines[0].tokenize('\t')
+            def rows   = lines.drop(1).collect { line -> line.split('\t', -1) }
+            def clustl = workflow.out.raw.find { _meta, f -> file(f).name.endsWith('.oncodriveclustl.tsv') }
+            def crows  = path(clustl[1]).readLines()
+            def ch     = crows[0].tokenize('\t')
+            def cids   = crows.drop(1).collect { line -> line.split('\t', -1)[ch.indexOf('ENSID')] }.sort()
+            def tert   = rows.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
+            def strip  = { table, drop ->
+                def header = table[0].split('\t', -1) as List
+                def keep   = (0..<header.size()).findAll { i -> !(header[i] in drop) }
+                table.collect { line -> def f = line.split('\t', -1); keep.collect { i -> f[i] }.join('\t') }.join('\n') + '\n'
+            }
+            def md5 = { String text -> java.security.MessageDigest.getInstance('MD5').digest(text.getBytes('UTF-8')).encodeHex().toString() }
+            assert workflow.success
+            assertAll(
+                { assert [ 'p_oncodriveclustl', 'q_oncodriveclustl' ].every { c -> c in cols } },
+                { assert cids == [ 'TERT_promoter_fixture', 'elem_B', 'elem_D', 'elem_split' ] },
+                { assert tert[cols.indexOf('p_oncodriveclustl')] != 'NA' && tert[cols.indexOf('consensus_rank')] == '1' },
+                { assert rows.every { row -> row[cols.indexOf('n_tested_callers')] == '1' && row[cols.indexOf('ebm_p')] == row[cols.indexOf('p_activedriverwgs')] } },
+                { assert workflow.out.harmonized.size() == 2 },
+                { assert md5(strip(lines, [ 'p_oncodriveclustl', 'q_oncodriveclustl' ])) == '57d0e3e707209f140ebe712a22dd21c9' }
+            )
+        }
+    }
+
+    test("synthetic TERT cohort - activedriverwgs only") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.empty()
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/oncodriveclustl/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.empty()
+                input[7] = [ 'activedriverwgs' ]
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert path(workflow.out.consensus[0][1]).md5 == '57d0e3e707209f140ebe712a22dd21c9' }
+            )
+        }
+    }
+
+    // Every caller enabled, default --consensus_callers: the anchor join waits for the three harmonised
+    // callers (combined and alongside); MutEnricher stays QC-only
+    test("synthetic TERT cohort - all callers, default consensus callers - stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.of([ [ id:'SYNTH-TERT', cohort:'SYNTH-TERT', assembly:'GRCh38' ],
+                                        file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz", checkIfExists: true),
+                                        file("${projectDir}/tests/data/mutenricher/vcfs/*.vcf.gz.tbi", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'elements', assembly:'GRCh38' ],
+                                           file("${projectDir}/tests/data/oncodriveclustl/elements.bed", checkIfExists: true) ])
+                input[3] = channel.value([ [ id:'cadd_subset' ],
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/oncodrivefml/cadd_subset.tsv.gz.tbi", checkIfExists: true) ])
+                input[4] = file("${projectDir}/tests/data/oncodrivefml/oncodrivefml_test.conf", checkIfExists: true)
+                input[5] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                input[6] = channel.value([ [ id:'mappable' ],
+                                           file("${projectDir}/tests/data/mutenricher/mappable.bed.gz", checkIfExists: true),
+                                           file("${projectDir}/tests/data/mutenricher/mappable.bed.gz.tbi", checkIfExists: true) ])
+                input[7] = [ 'activedriverwgs', 'oncodrivefml', 'oncodriveclustl', 'mutenricher' ]
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert workflow.out.harmonized.size() == 3 },
+                { assert workflow.out.raw.size() == 3 },
+                { assert workflow.out.mutenricher.size() == 1 },
                 { assert workflow.out.consensus.size() == 1 }
             )
         }

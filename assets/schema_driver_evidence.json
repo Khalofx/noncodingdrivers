@@ -19,7 +19,7 @@
             },
             "evidence_item": {
                 "type": "string",
-                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
+                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|p_oncodriveclustl|q_oncodriveclustl|oncodriveclustl_n_clusters|oncodriveclustl_clustered_mutations|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
                 "description": "Evidence item (assets/evidence_sources.tsv)"
             },
             "value": {

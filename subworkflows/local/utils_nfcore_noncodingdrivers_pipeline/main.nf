@@ -376,7 +376,8 @@ def validateDriverParameters(refs) {
 def harmonisedCallerFlags() {
     return [
         activedriverwgs: params.run_activedriverwgs,
-        oncodrivefml   : params.run_oncodrivefml
+        oncodrivefml   : params.run_oncodrivefml,
+        oncodriveclustl: params.run_oncodriveclustl
     ]
 }
 
@@ -475,6 +476,7 @@ def toolCitationText() {
             "BEDTools (Quinlan and Hall 2010),",
             params.run_activedriverwgs ? "ActiveDriverWGS (Zhu et al. 2020)," : "",
             params.run_oncodrivefml ? "OncodriveFML (Mularoni et al. 2016) with CADD v1.7 scores (Schubach et al. 2024)," : "",
+            params.run_oncodriveclustl ? "OncodriveCLUSTL (Arnedo-Pac et al. 2019)," : "",
             params.run_mutenricher ? "MutEnricher (Soltis et al. 2020)," : "",
             "the empirical Brown's method (Poole et al. 2016),",
             params.skip_acat ? "" : "ACAT (Liu et al. 2019),",
@@ -493,7 +495,7 @@ def toolCitationText() {
 def callerRolesText() {
     // Which callers were combined and which were reported alongside. Empty when every enabled
     // caller is a combined default caller, so the default methods text is unchanged.
-    def names = [ activedriverwgs: 'ActiveDriverWGS', oncodrivefml: 'OncodriveFML' ]
+    def names = [ activedriverwgs: 'ActiveDriverWGS', oncodrivefml: 'OncodriveFML', oncodriveclustl: 'OncodriveCLUSTL' ]
     def roles = callerRoles()
     def combined  = roles.findAll { _caller, role -> role == 'combined' }.keySet() as List
     def alongside = roles.findAll { _caller, role -> role == 'reported_alongside' }.keySet() as List
@@ -515,6 +517,7 @@ def toolBibliographyText() {
             params.run_activedriverwgs ? "<li>Zhu, H., et al. (2020). Candidate cancer driver mutations in distal regulatory elements and long-range chromatin interaction networks. Molecular Cell, 77(6). doi: <a href=\"https://doi.org/10.1016/j.molcel.2019.12.027\">10.1016/j.molcel.2019.12.027</a></li>" : "",
             params.run_oncodrivefml ? "<li>Mularoni, L., et al. (2016). OncodriveFML: a general framework to identify coding and non-coding regions with cancer driver mutations. Genome Biology, 17. doi: <a href=\"https://doi.org/10.1186/s13059-016-0994-0\">10.1186/s13059-016-0994-0</a></li>" : "",
             params.run_oncodrivefml ? "<li>Schubach, M., et al. (2024). CADD v1.7: using protein language models, regulatory CNNs and other nucleotide-level scores to improve genome-wide variant predictions. Nucleic Acids Research, 52(D1). doi: <a href=\"https://doi.org/10.1093/nar/gkad989\">10.1093/nar/gkad989</a></li>" : "",
+            params.run_oncodriveclustl ? "<li>Arnedo-Pac, C., et al. (2019). OncodriveCLUSTL: a sequence-based clustering method to identify cancer drivers. Bioinformatics, 35(22), 4788–4790. doi: <a href=\"https://doi.org/10.1093/bioinformatics/btz501\">10.1093/bioinformatics/btz501</a> (erratum: <a href=\"https://doi.org/10.1093/bioinformatics/btz588\">10.1093/bioinformatics/btz588</a>)</li>" : "",
             params.run_mutenricher ? "<li>Soltis, A. R., et al. (2020). MutEnricher: a flexible toolset for somatic mutation enrichment analysis of tumor whole genomes. BMC Bioinformatics, 21. doi: <a href=\"https://doi.org/10.1186/s12859-020-03695-z\">10.1186/s12859-020-03695-z</a></li>" : "",
             "<li>Poole, W., et al. (2016). Combining dependent P-values with an empirical adaptation of Brown's method. Bioinformatics, 32(17). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw438\">10.1093/bioinformatics/btw438</a></li>",
             params.skip_acat ? "" : "<li>Liu, Y., et al. (2019). ACAT: a fast and powerful p value combination method for rare-variant analysis in sequencing studies. American Journal of Human Genetics, 104(3). doi: <a href=\"https://doi.org/10.1016/j.ajhg.2019.01.002\">10.1016/j.ajhg.2019.01.002</a></li>",

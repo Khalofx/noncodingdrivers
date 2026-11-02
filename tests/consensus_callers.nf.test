@@ -88,4 +88,75 @@ nextflow_pipeline {
             )
         }
     }
+
+    test("--consensus_callers - oncodriveclustl named but not run") {
+        when {
+            params {
+                outdir            = "$outputDir"
+                consensus_callers = 'activedriverwgs,oncodrivefml,oncodriveclustl'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('--consensus_callers names oncodriveclustl but --run_oncodriveclustl is false') } }
+            )
+        }
+    }
+
+    // Opting OncodriveCLUSTL into the combination runs, with the opt-in warning
+    test("--consensus_callers - oncodriveclustl combined (opt-in warning) - stub") {
+        options "-stub"
+        when {
+            params {
+                outdir              = "$outputDir"
+                run_oncodriveclustl = true
+                consensus_callers   = 'activedriverwgs,oncodrivefml,oncodriveclustl'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.success },
+                // log.warn reaches the Nextflow log, not the captured console output
+                { assert path("$outputDir/../meta/nextflow.log").text.contains('oncodriveclustl has not passed calibration on real cohorts') }
+            )
+        }
+    }
+
+    // -profile test with OncodriveCLUSTL reported alongside (default --consensus_callers): its p/q
+    // columns are carried, the combined columns are those of the two default callers, the evidence
+    // table carries its rows and roles, and MultiQC gets the caller-roles table.
+    test("-profile test - oncodriveclustl reported alongside") {
+        when {
+            params {
+                outdir              = "$outputDir"
+                run_oncodriveclustl = true
+            }
+        }
+        then {
+            def consensus = path("$outputDir/consensus/SYNTH-TERT.consensus.tsv").readLines()
+            def cols      = consensus[0].tokenize('\t')
+            def rows      = consensus.drop(1).collect { line -> line.split('\t', -1) }
+            def tert      = rows.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
+            def evidence  = path("$outputDir/evidence/SYNTH-TERT.driver_evidence.tsv").readLines()
+            def ecols     = evidence[0].tokenize('\t')
+            def erows     = evidence.drop(1).collect { line -> [ ecols, line.split('\t', -1).toList() ].transpose().collectEntries() }
+            def roles     = erows.findAll { r -> r.evidence_item.startsWith('caller_role_') }.collectEntries { r -> [ (r.evidence_item): r.status ] }
+            def clustl    = path("$outputDir/callers/oncodriveclustl/SYNTH-TERT.oncodriveclustl.tsv").readLines()
+            def mqc       = new File("$outputDir/multiqc/multiqc_data").listFiles().collect { f -> f.name }
+            assert workflow.success
+            assertAll(
+                { assert [ 'p_oncodriveclustl', 'q_oncodriveclustl' ].every { c -> c in cols } },
+                { assert rows.size() == 6 },
+                { assert rows.every { row -> (row[cols.indexOf('n_tested_callers')] as int) <= 2 } },
+                { assert tert[cols.indexOf('consensus_rank')] == '1' && tert[cols.indexOf('p_oncodriveclustl')] != 'NA' },
+                { assert clustl[0].startsWith('SYMBOL\tENSID\tCGC') && clustl.drop(1).every { line -> line.split('\t', -1)[2] == 'Non Available' } },
+                { assert roles == [ caller_role_activedriverwgs: 'combined', caller_role_oncodrivefml: 'combined', caller_role_oncodriveclustl: 'reported_alongside' ] },
+                { assert erows.any { r -> r.element_id == 'TERT_promoter_fixture' && r.evidence_item == 'oncodriveclustl_n_clusters' && r.status == 'observed' } },
+                { assert path("$outputDir/callers/oncodriveclustl/SYNTH-TERT.oncodriveclustl.clusters.tsv").exists() },
+                { assert mqc.any { name -> name.contains('caller_roles') } }
+            )
+        }
+    }
 }

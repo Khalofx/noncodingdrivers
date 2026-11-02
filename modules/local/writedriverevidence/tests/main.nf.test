@@ -19,7 +19,7 @@ nextflow_process {
                 """
                 def d = "${projectDir}/tests/data/driver_evidence"
                 input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.consensus.tsv", checkIfExists: true),
-                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native' ]
+                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native', [] ]
                 input[1] = file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true)
                 input[2] = '1.0.0dev'
                 """

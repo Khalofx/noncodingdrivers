@@ -14,6 +14,10 @@ not_tested (NA p), flagged | not_flagged (mask fractions above --mask-fraction, 
 above it), pass | fail | not_applied (post-filters), and the null-calibration band status. No
 evidence item is a tier: tiers are assigned downstream (reports repository).
 
+OncodriveCLUSTL (--oncodriveclustl, its native table): oncodriveclustl_n_clusters (CLUSTERS) and
+oncodriveclustl_clustered_mutations (CLUSTERED_MUT) per element; not_tested for an element absent from
+the table (below the mutation cutoff).
+
 Callers: every p_<caller>/q_<caller> pair of the consensus table is written, combined callers and
 callers reported alongside alike (known callers first, in CALLER_ORDER). --consensus-callers names
 the combined callers (the pipeline's --consensus_callers); when at least one caller of the table is
@@ -27,7 +31,9 @@ import sys
 import numpy as np
 import pandas as pd
 
-CALLER_ORDER = ("activedriverwgs", "oncodrivefml")
+CALLER_ORDER = ("activedriverwgs", "oncodrivefml", "oncodriveclustl")
+# Per-element counts from the native OncodriveCLUSTL table (--oncodriveclustl): item -> column
+CLUSTL_ITEMS = (("oncodriveclustl_n_clusters", "CLUSTERS"), ("oncodriveclustl_clustered_mutations", "CLUSTERED_MUT"))
 CONS_ITEMS = ("consensus_q", "consensus_rank", "ebm_p", "ebm_q", "acat_p", "acat_q", "n_tested_callers", "vote_count")
 FLAG_ITEMS = ("n_mutations", "n_patients", "max_sample_fraction", "frac_in_blacklist_v2", "frac_in_segdup",
               "frac_in_low_mappability", "mean_umap_unique_fraction", "frac_germline_pop_common", "callable_fraction")
@@ -62,6 +68,7 @@ def main():
     ap.add_argument("--fdr", type=float, default=0.1)
     ap.add_argument("--mask-fraction", type=float, default=0.5)
     ap.add_argument("--consensus-callers", help="comma-separated combined callers; default: every caller of the table")
+    ap.add_argument("--oncodriveclustl", help="native OncodriveCLUSTL table: cluster counts per element")
     ap.add_argument("--output", required=True)
     args = ap.parse_args()
 
@@ -79,6 +86,8 @@ def main():
     ids = cons["element_id"]
     ef = pd.read_csv(args.element_flags, sep="\t", dtype={"element_id": str}).set_index("element_id") if args.element_flags else None
     pf = pd.read_csv(args.postfilter, sep="\t", dtype=str).set_index("element_id") if args.postfilter else None
+    cl = (pd.read_csv(args.oncodriveclustl, sep="\t", dtype=str, keep_default_na=False).set_index("ENSID")
+          if args.oncodriveclustl else None)
 
     rows = []
 
@@ -99,6 +108,12 @@ def main():
             elif item.startswith("p_") or item.endswith("_p"):
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
             else:
+                add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
+        if cl is not None:
+            # elements below OncodriveCLUSTL's mutation cutoff are not in its table: not tested
+            cr = cl.loc[eid] if eid in cl.index else None
+            for item, col in CLUSTL_ITEMS:
+                v = pd.to_numeric(cr[col], errors="coerce") if cr is not None and cr[col] != "" else np.nan
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
         if ef is not None:
             fr = ef.loc[eid] if eid in ef.index else None

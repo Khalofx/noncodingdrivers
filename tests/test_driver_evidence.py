@@ -67,6 +67,7 @@ def test_source_versions_match_module_pins():
     text = lambda p: open(os.path.join(ROOT, p)).read()   # noqa: E731
     assert "noncodingdrivers-activedriverwgs:" + src["p_activedriverwgs"]["source_version"] in text("modules/local/activedriverwgs/main.nf")
     assert src["p_oncodrivefml"]["source_version"] in text("modules/local/oncodrivefml/main.nf")
+    assert "noncodingdrivers-oncodriveclustl:" + src["p_oncodriveclustl"]["source_version"] in text("modules/local/oncodriveclustl/main.nf")
     assert "bedtools=2.31.1" in text("modules/nf-core/bedtools/intersect/environment.yml")
     assert "echtvar=0.2.4" in text("modules/nf-core/echtvar/anno/environment.yml") and "echtvar 0.2.4" in src["frac_germline_pop_common"]["source_version"]
     assert "empiricalbrownsmethod=1.34.0" in text("modules/local/combinepvalues/environment.yml").lower()
@@ -90,3 +91,25 @@ def test_caller_reported_alongside_gets_role_rows_and_its_own_items(tmp_path):
                      "caller_role_oncodrivefml": (".", "0", "status", "reported_alongside")}
     # the alongside caller keeps its p and q rows
     assert any(r["element_id"] == "promoter_A" and r["evidence_item"] == "q_oncodrivefml" for r in rows)
+
+
+def test_oncodriveclustl_alongside_items_validate(tmp_path):
+    # OncodriveCLUSTL reported alongside: its p/q rows, its cluster counts and the role rows; schema-valid
+    ev = tmp_path / "clustl.driver_evidence.tsv"
+    subprocess.run([sys.executable, os.path.join(ROOT, "bin", "write_driver_evidence.py"), "--cohort", "test",
+                    "--consensus", os.path.join(D, "test.consensus_clustl.tsv"), "--sources", SOURCES, "--coordinates", "native",
+                    "--pipeline-version", "1.0.0dev", "--consensus-callers", "activedriverwgs,oncodrivefml",
+                    "--oncodriveclustl", os.path.join(D, "test.oncodriveclustl.tsv"), "--output", str(ev)], check=True)
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    errors = list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors(rows))
+    assert not errors, errors[0].message
+    get = lambda e, i: next(r for r in rows if r["element_id"] == e and r["evidence_item"] == i)   # noqa: E731
+    assert (get("promoter_A", "p_oncodriveclustl")["value"], get("promoter_A", "q_oncodriveclustl")["status"]) == ("0.0004", "significant")
+    assert (get("promoter_A", "oncodriveclustl_n_clusters")["value"], get("promoter_A", "oncodriveclustl_clustered_mutations")["value"]) == ("2", "8")
+    assert (get("enhancer_C", "oncodriveclustl_n_clusters")["value"], get("enhancer_C", "oncodriveclustl_n_clusters")["status"]) == ("0", "observed")
+    assert (get("promoter_E", "oncodriveclustl_n_clusters")["value"], get("promoter_E", "oncodriveclustl_n_clusters")["status"]) == ("NA", "not_tested")
+    assert get(".", "caller_role_oncodriveclustl")["status"] == "reported_alongside"
+    assert get(".", "caller_role_activedriverwgs")["status"] == "combined"
+    # the caller items keep the fixed order: ActiveDriverWGS, OncodriveFML, then OncodriveCLUSTL
+    items = [r["evidence_item"] for r in rows if r["element_id"] == "promoter_A"]
+    assert items.index("q_oncodrivefml") < items.index("p_oncodriveclustl") < items.index("oncodriveclustl_n_clusters")

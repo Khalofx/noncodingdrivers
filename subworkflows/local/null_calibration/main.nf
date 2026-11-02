@@ -18,7 +18,7 @@ workflow NULL_CALIBRATION {
     ch_fasta      // channel: [ val(meta3), path(fasta), path(fai) ] (value channel)
     ch_ofml_score // channel: [ val(meta4), path(score), path(tbi) ] (value channel), or empty
     ofml_config   // path, or []
-    ofml_genome   // path or value channel, or []
+    bgdata_genome // path or value channel (OncodriveFML, OncodriveCLUSTL), or []
     callers       // list: callers of the observed run
     replicates    // integer: null replicates per cohort
     seed          // integer: replicate r uses seed + r
@@ -33,7 +33,7 @@ workflow NULL_CALIBRATION {
     // Each replicate is its own cohort id, so the reused subworkflow keeps them apart
     def ch_null_tables = SIMULATENULL.out.mutations
         .map { meta, r, tsv -> [ meta + [ id: "${meta.id}.null${r}".toString(), cohort: "${meta.id}.null${r}".toString(), null_of: meta.id, replicate: r ], tsv ] }
-    DRIVERS_ON_NULL(ch_null_tables, channel.empty(), ch_elements, ch_ofml_score, ofml_config, ofml_genome, channel.empty(), null_callers)
+    DRIVERS_ON_NULL(ch_null_tables, channel.empty(), ch_elements, ch_ofml_score, ofml_config, bgdata_genome, channel.empty(), null_callers)
 
     def ch_null_cons = DRIVERS_ON_NULL.out.consensus
         .map { meta, consensus -> [ meta.null_of, consensus ] }

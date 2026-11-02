@@ -141,7 +141,7 @@ workflow NONCODINGDRIVERS {
     }
     def ch_ofml_score = channel.empty()
     def ofml_config   = []
-    def ofml_genome   = []
+    def bgdata_genome = []
     if (params.run_oncodrivefml) {
         ch_ofml_score = channel.value([
             [ id: 'oncodrivefml_score' ],
@@ -149,12 +149,15 @@ workflow NONCODINGDRIVERS {
             file("${params.oncodrivefml_score}.tbi", checkIfExists: true)
         ])
         ofml_config = file(params.oncodrivefml_conf ?: "${projectDir}/assets/oncodrivefml.CADD_GRCh38.conf", checkIfExists: true)
-        // Offline bgdata genome: a directory, or a .tar.gz of it unpacked by the nf-core untar module
+    }
+    if (params.run_oncodrivefml || params.run_oncodriveclustl) {
+        // Offline bgdata genome of OncodriveFML and OncodriveCLUSTL: a directory, or a .tar.gz of it
+        // unpacked by the nf-core untar module
         if (refs.oncodrivefml_genome && refs.oncodrivefml_genome.toString().endsWith('.tar.gz')) {
             UNTAR_ONCODRIVEFML_GENOME(channel.of([ [ id: 'oncodrivefml_genome' ], file(refs.oncodrivefml_genome, checkIfExists: true) ]))
-            ofml_genome = UNTAR_ONCODRIVEFML_GENOME.out.untar.map { _meta, genome -> genome }.first()
+            bgdata_genome = UNTAR_ONCODRIVEFML_GENOME.out.untar.map { _meta, genome -> genome }.first()
         } else if (refs.oncodrivefml_genome) {
-            ofml_genome = file(refs.oncodrivefml_genome, checkIfExists: true)
+            bgdata_genome = file(refs.oncodrivefml_genome, checkIfExists: true)
         }
     }
 
@@ -171,6 +174,7 @@ workflow NONCODINGDRIVERS {
     def callers = [
         params.run_activedriverwgs ? 'activedriverwgs' : null,
         params.run_oncodrivefml    ? 'oncodrivefml'    : null,
+        params.run_oncodriveclustl ? 'oncodriveclustl' : null,
         params.run_mutenricher     ? 'mutenricher'     : null
     ].findAll { caller -> caller != null }
     // Callers harmonised and joined on element_id: combined or reported alongside (--consensus_callers)
@@ -185,7 +189,7 @@ workflow NONCODINGDRIVERS {
         ch_elements,
         ch_ofml_score,
         ofml_config,
-        ofml_genome,
+        bgdata_genome,
         ch_mappable,
         callers
     )
@@ -207,7 +211,7 @@ workflow NONCODINGDRIVERS {
             channel.value([ [ id: 'GRCh38' ], file(refs.fasta, checkIfExists: true), file(refs.fasta_fai, checkIfExists: true) ]),
             ch_ofml_score,
             ofml_config,
-            ofml_genome,
+            bgdata_genome,
             callers,
             params.null_replicates,
             params.seed
@@ -228,6 +232,10 @@ workflow NONCODINGDRIVERS {
             .map { cohort, labels -> [ cohort, labels.unique().size() > 1 ? 'mixed' : labels[0] ] }
         def ch_cons_by_id = DRIVER_DISCOVERY.out.consensus.map { meta, consensus -> [ meta.id, meta, consensus ] }
         def ch_flags_by_id = ch_element_flags.map { meta, flags -> [ meta.id, flags ] }
+        // OncodriveCLUSTL native table (cluster counts per element), when the caller runs
+        def ch_clustl_by_id = DRIVER_DISCOVERY.out.raw
+            .filter { _meta, table -> table.name.endsWith('.oncodriveclustl.tsv') }
+            .map { meta, table -> [ meta.id, table ] }
         POSTFILTERFLAGS(
             ch_cons_by_id
                 .join(ch_flags_by_id, remainder: true)
@@ -241,9 +249,11 @@ workflow NONCODINGDRIVERS {
                 .join(POSTFILTERFLAGS.out.postfilter.map { meta, postfilter -> [ meta.id, postfilter ] })
                 .join(ch_null_calibration.map { meta, calibration -> [ meta.id, calibration ] }, remainder: true)
                 .filter { _id, meta, _consensus, _flags, _postfilter, _calibration -> meta != null }
+                .join(ch_clustl_by_id, remainder: true)
+                .filter { _id, meta, _consensus, _flags, _postfilter, _calibration, _clustl -> meta != null }
                 .join(ch_coordinates)
-                .map { _id, meta, consensus, flags, postfilter, calibration, coordinates ->
-                    [ meta, consensus, flags ?: [], postfilter, calibration ?: [], coordinates ]
+                .map { _id, meta, consensus, flags, postfilter, calibration, clustl, coordinates ->
+                    [ meta, consensus, flags ?: [], postfilter, calibration ?: [], coordinates, clustl ?: [] ]
                 },
             file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true),
             workflow.manifest.version
