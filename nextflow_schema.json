@@ -718,6 +718,99 @@
                     "description": "Pre-installed SigProfilerMatrixGenerator GRCh38 genome, for compute nodes without internet."
                 }
             }
+        },
+        "context_layer_options": {
+            "title": "Context layer options",
+            "type": "object",
+            "fa_icon": "fas fa-project-diagram",
+            "description": "Known-cancer and regulatory-target context of the significant elements (CONTEXT_LAYERS): COSMIC, a cancer gene list, ENCODE-rE2G enhancer-gene links and SCREEN Registry V4 cCREs. Each layer is off by default, publishes its own tables and never filters, re-ranks or weights a candidate.",
+            "properties": {
+                "run_cosmic_context": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-database",
+                    "description": "Match the candidate mutations exactly (GRCh38 position, reference and alternate allele) against your own COSMIC Non-Coding Variants file.",
+                    "help_text": "COSMIC data are licensed (registration for academic use, a QIAGEN licence for commercial use) and are never bundled or downloaded by the pipeline. Count tables without COSMIC identifiers are published in cosmic/; the COSMIC records of the matches only in cosmic/restricted/ with a NOTICE (do not redistribute). Use the current COSMIC release."
+                },
+                "cosmic_ncv": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.tsv(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "Your COSMIC Non-Coding Variants file under COSMIC's own name, Cosmic_NonCodingVariants_v<release>_GRCh38.tsv.gz (extracted from the download tar).",
+                    "help_text": "Not part of the reference datasheet: COSMIC is user-supplied and only the current release should be used. The name gives the release and the assembly; a GRCh37 file stops the run."
+                },
+                "cosmic_release": {
+                    "type": "string",
+                    "pattern": "^v\\d+$",
+                    "fa_icon": "fas fa-code-branch",
+                    "description": "COSMIC release of --cosmic_ncv, e.g. v104; must equal the release in the file name."
+                },
+                "cosmic_ncv_md5": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{32}$",
+                    "fa_icon": "fas fa-fingerprint",
+                    "description": "Optional MD5 of the --cosmic_ncv .tsv.gz; computed while the file is read, a mismatch stops the task. The computed MD5 is always recorded in the provenance JSON."
+                },
+                "cancer_gene_list": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-list",
+                    "description": "Cancer gene list (COSMIC Cancer Gene Census TSV with GENE_SYMBOL, TIER, ROLE_IN_CANCER; a table with a gene_symbol column; or one symbol per line). Labels the nearest gene, the nearest protein-coding gene and the ENCODE-rE2G targets of each significant element.",
+                    "help_text": "Matching uses the Ensembl gene id without version when the list has one for the gene, otherwise the exact, case-sensitive symbol. Needs the nearest-gene table (--gencode_gtf or --gene_tss_bed)."
+                },
+                "cancer_gene_list_name": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tag",
+                    "description": "Name of the gene list reported in the output, e.g. 'COSMIC CGC v104' (default: the file name)."
+                },
+                "run_enhancer_gene_links": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-project-diagram",
+                    "description": "Report ENCODE-rE2G enhancer-gene links of the significant element fragments for the requested tissues, with self-promoter links kept apart and the agreement with the nearest gene."
+                },
+                "enhancer_gene_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Folder with one sub-folder per tissue holding <biosample>.<accession>.bed.gz ENCODE-rE2G thresholded link files. Default: datasheet enhancer_gene_dir."
+                },
+                "enhancer_gene_tissues": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_]+(,[A-Za-z0-9_]+)*$",
+                    "fa_icon": "fas fa-lungs",
+                    "description": "Comma-separated tissue folders for --run_enhancer_gene_links (default: every staged supported tissue). A tissue without ENCODE-rE2G predictions stops the run; no other tissue is used as a substitute.",
+                    "help_text": "Supported tissues and their biosamples are listed in assets/references/encode_re2g.GRCh38.tsv and docs/usage.md."
+                },
+                "run_ccre_overlay": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-th",
+                    "description": "Report the SCREEN Registry V4 cCRE classes covering each significant element (cell-type-agnostic; per biosample with --ccre_celltype_tissues)."
+                },
+                "ccre_v4_bed": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.bed(\\.gz)?$",
+                    "fa_icon": "fas fa-file",
+                    "description": "SCREEN Registry V4 agnostic cCREs (ENCODE ENCFF420VPZ). Default: datasheet ccre_v4_bed, checked against its MD5."
+                },
+                "ccre_celltype_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "exists": true,
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Folder with one sub-folder per tissue holding <biosample>.<accession>.bed.gz SCREEN V4 biosample cCRE files. Default: datasheet ccre_celltype_dir."
+                },
+                "ccre_celltype_tissues": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_]+(,[A-Za-z0-9_]+)*$",
+                    "fa_icon": "fas fa-lungs",
+                    "description": "Comma-separated tissue folders for the biosample cCRE table ccre_v4_celltype.tsv (default: none)."
+                }
+            }
         }
     },
     "allOf": [
@@ -747,6 +840,9 @@
         },
         {
             "$ref": "#/$defs/annotation_options"
+        },
+        {
+            "$ref": "#/$defs/context_layer_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

@@ -1,0 +1,92 @@
+nextflow_pipeline {
+
+    name "Context layers: COSMIC, cancer gene list, ENCODE-rE2G and SCREEN V4 (all off by default)"
+    script "../main.nf"
+    tag "pipeline"
+    tag "context_layers"
+
+    // Every ENCODE-format, COSMIC-format and gene-list file is SYNTHETIC (tests/data/context,
+    // tests/data/cosmic); the synthetic rE2G files are not in assets/references/encode_re2g.GRCh38.tsv
+    // and are used as staged, with a warning.
+    test("-profile test - all context layers on") {
+
+        when {
+            params {
+                outdir                  = "$outputDir"
+                run_cosmic_context      = true
+                cosmic_ncv              = "${projectDir}/tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh38.tsv.gz"
+                cosmic_release          = 'v999'
+                cosmic_ncv_md5          = '27c29be67b74514d1eb75cf696856fe8'
+                cancer_gene_list        = "${projectDir}/tests/data/context/cancer_genes.census_layout.tsv"
+                cancer_gene_list_name   = 'synthetic Census layout'
+                run_enhancer_gene_links = true
+                enhancer_gene_dir       = "${projectDir}/tests/data/context/re2g"
+                enhancer_gene_tissues   = 'liver'
+                run_ccre_overlay        = true
+                ccre_v4_bed             = "${projectDir}/tests/data/context/screen_v4/GRCh38-cCREs.V4.synthetic.bed.gz"
+                ccre_celltype_dir       = "${projectDir}/tests/data/context/screen_v4/celltype"
+                ccre_celltype_tissues   = 'liver'
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def genes = table("$outputDir/cancer_genes/SYNTH-TERT.cancer_gene_context.tsv").collectEntries { r -> [ r.element_id, r ] }
+            def summ  = table("$outputDir/enhancer_gene/SYNTH-TERT.enhancer_gene_summary.tsv").collectEntries { r -> [ r.element_id, r ] }
+            def prov  = path("$outputDir/cosmic/SYNTH-TERT.cosmic.provenance.json").json
+            assert workflow.success
+            assertAll(
+                { assert [ 'cosmic/SYNTH-TERT.cosmic.mutation_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.element_summary.tsv',
+                           'cosmic/SYNTH-TERT.cosmic.provenance.json', 'cosmic/restricted/SYNTH-TERT.cosmic.exact_matches.tsv',
+                           'cosmic/restricted/NOTICE.txt', 'enhancer_gene/SYNTH-TERT.enhancer_gene_links.tsv',
+                           'ccre/SYNTH-TERT.ccre_v4.tsv', 'ccre/SYNTH-TERT.ccre_v4_summary.tsv', 'ccre/SYNTH-TERT.ccre_v4_celltype.tsv' ]
+                    .every { f -> file("$outputDir/${f}").exists() } },
+                { assert !file("$outputDir/cosmic/SYNTH-TERT.cosmic.exact_matches.tsv").exists() },   // COSMIC records only under restricted/
+                { assert prov.md5_check == 'match' && prov.cosmic_release == 'v999' },
+                { assert genes.TERT_promoter_fixture.nearest_protein_coding_gene == 'TERT' },
+                { assert summ.TERT_promoter_fixture.self_promoter_genes == 'TERT' },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains("used as staged") } }
+            )
+        }
+    }
+
+    test("-profile test - an unsupported ENCODE-rE2G tissue stops the run before any task") {
+
+        when {
+            params {
+                outdir                  = "$outputDir"
+                run_enhancer_gene_links = true
+                enhancer_gene_dir       = "${projectDir}/tests/data/context/re2g"
+                enhancer_gene_tissues   = 'liver,heart'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('ENHANCER_GENE_TISSUE_UNSUPPORTED') && line.contains('heart') } }
+            )
+        }
+    }
+
+    test("-profile test - a GRCh37 COSMIC file stops the run before any task") {
+
+        when {
+            params {
+                outdir             = "$outputDir"
+                run_cosmic_context = true
+                cosmic_ncv         = "${projectDir}/tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh37.tsv.gz"
+                cosmic_release     = 'v999'
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('COSMIC_ASSEMBLY') } }
+            )
+        }
+    }
+}
