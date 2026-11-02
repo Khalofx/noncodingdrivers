@@ -1,0 +1,7 @@
+element_id	tissue	biosample	accession	re2g_element	re2g_class	target_gene	target_gene_ensembl_id	target_gene_tss	is_self_promoter	re2g_score	overlap_bp
+TERT_promoter_fixture	liver	HepG2	ENCFFSYN001	chr5:1295000-1295500	promoter	TERT	ENSG00000164362	1295086	TRUE	1.0	500
+TERT_promoter_fixture	liver	liver	ENCFFSYN002	chr5:1295000-1295500	promoter	TERT	ENSG00000164362	1295086	TRUE	0.9	500
+TERT_promoter_fixture	liver	HepG2	ENCFFSYN001	chr5:1295000-1295500	promoter	CLPTM1L	ENSG00000049656	1345100	FALSE	0.35	500
+frag_F	liver	HepG2	ENCFFSYN001	chr5:1400550-1400650	intergenic	SLC6A3	ENSG00000142319	1445514	FALSE	0.42	100
+frag_F	liver	liver	ENCFFSYN002	chr5:1400550-1400650	intergenic	SLC6A3	ENSG00000142319	1445514	FALSE	0.3	100
+frag_F	liver	liver	ENCFFSYN002	chr5:1400050-1400150	intergenic	CLPTM1L	ENSG00000049656	1345100	FALSE	0.25	100

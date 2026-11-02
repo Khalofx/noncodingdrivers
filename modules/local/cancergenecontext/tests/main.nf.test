@@ -1,0 +1,72 @@
+nextflow_process {
+
+    name "Test Process CANCERGENECONTEXT"
+    script "../main.nf"
+    process "CANCERGENECONTEXT"
+
+    tag "modules"
+    tag "modules_local"
+    tag "cancergenecontext"
+
+    config "./nextflow.config"
+
+    // tests/data/context: nearest-gene table and protein-coding closest output of EXPLAIN on
+    // tests/data/explain (GENCODE v50 TSSs, chr5:1.15-1.45 Mb), the rE2G links of the synthetic
+    // link files, and two SYNTHETIC gene lists (Census layout, 5 genes; plain gene_symbol, 3 genes)
+    test("Census-layout list with rE2G links") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/context"
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.nearest_gene.tsv", checkIfExists: true),
+                             file("\${d}/test.nearest_protein_coding_tss.bed", checkIfExists: true), file("\${d}/test.enhancer_gene_links.tsv", checkIfExists: true) ]
+                input[1] = file("\${d}/cancer_genes.census_layout.tsv", checkIfExists: true)
+                input[2] = 'synthetic Census layout'
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def rows  = table(process.out.context[0][1]).collectEntries { r -> [ r.element_id, r ] }
+            assert process.success
+            assertAll(
+                // the nearest gene of the TERT promoter is the lncRNA ENSG00000300381; the nearest protein-coding gene is TERT
+                { assert rows.TERT_promoter_fixture.nearest_in_list == 'no' },
+                { assert rows.TERT_promoter_fixture.subMap([ 'nearest_protein_coding_gene', 'nearest_pc_in_list', 'nearest_pc_match_by', 'nearest_pc_list_tier' ]) ==
+                    [ nearest_protein_coding_gene: 'TERT', nearest_pc_in_list: 'yes', nearest_pc_match_by: 'ensembl_id', nearest_pc_list_tier: '1' ] },
+                { assert rows.TERT_promoter_fixture.re2g_targets_in_list == 'CLPTM1L,TERT' && rows.TERT_promoter_fixture.re2g_distal_targets_in_list == 'CLPTM1L' },
+                { assert rows.frag_F.nearest_protein_coding_gene == 'SLC6A3' && rows.frag_F.nearest_pc_match_by == 'symbol' },
+                { assert snapshot(process.out.context).match() }
+            )
+        }
+    }
+
+    test("plain list without rE2G links") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/context"
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.nearest_gene.tsv", checkIfExists: true),
+                             file("\${d}/test.nearest_protein_coding_tss.bed", checkIfExists: true), [] ]
+                input[1] = file("\${d}/cancer_genes.plain.tsv", checkIfExists: true)
+                input[2] = ''
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def rows  = table(process.out.context[0][1]).collectEntries { r -> [ r.element_id, r ] }
+            assert process.success
+            assertAll(
+                { assert rows.TERT_promoter_fixture.nearest_pc_in_list == 'no' },
+                { assert rows.frag_F.nearest_pc_in_list == 'yes' && rows.frag_F.list_name == 'cancer_genes.plain.tsv' && rows.frag_F.list_genes == '3' },
+                { assert rows.frag_F.re2g_targets_in_list == 'NA' },
+                { assert snapshot(process.out.context).match() }
+            )
+        }
+    }
+}

@@ -1,0 +1,6 @@
+sample	chrom	pos	ref	alt	vtype	element_id	fragment_start	fragment_end
+S1	chr5	1295113	G	A	SNP	TERT_promoter_fixture	1294989	1295601
+S2	chr5	1295113	G	A	SNP	TERT_promoter_fixture	1294989	1295601
+S3	chr5	1295135	G	A	SNP	TERT_promoter_fixture	1294989	1295601
+S1	chr5	1400100	A	-	DEL	frag_F	1400000	1400200
+S5	chr5	1400600	T	C	SNP	frag_F	1400500	1400700

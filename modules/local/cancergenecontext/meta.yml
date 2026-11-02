@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "cancergenecontext"
+description: Labels the nearest gene, the nearest protein-coding gene and the ENCODE-rE2G target genes of every significant element against a cancer gene list (COSMIC Cancer Gene Census layout or a plain list); annotation only
+keywords:
+  - cancer gene census
+  - nearest gene
+  - annotation
+tools:
+  - "cancer_gene_context.py":
+      description: "Pipeline-owned script (bin/cancer_gene_context.py)"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: Cohort meta map
+    - nearest:
+        type: file
+        description: Nearest-gene table of EXPLAIN
+        pattern: "*.nearest_gene.tsv"
+        ontologies: []
+    - nearest_pc:
+        type: file
+        description: bedtools closest -d -t first output of the element midpoints against the protein_coding TSSs, or []
+        pattern: "*.bed"
+        ontologies: []
+    - links:
+        type: file
+        description: Enhancer-gene links table of the ENCODE-rE2G layer, or []
+        pattern: "*.enhancer_gene_links.tsv"
+        ontologies: []
+  - gene_list:
+      type: file
+      description: Cancer gene list (Census GENE_SYMBOL/TIER/ROLE_IN_CANCER layout, a gene_symbol table, or one symbol per line; optionally gzipped)
+      pattern: "*"
+      ontologies: []
+  - list_name:
+      type: string
+      description: Name of the list reported in every row (default the file name)
+
+output:
+  context:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.cancer_gene_context.tsv":
+          type: file
+          description: One row per significant element with the list labels of its nearest gene, nearest protein-coding gene and rE2G targets, the list name and MD5
+          pattern: "*.cancer_gene_context.tsv"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

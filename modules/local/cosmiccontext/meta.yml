@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "cosmiccontext"
+description: Exact GRCh38 matching of the candidate mutations against the user's own COSMIC Non-Coding Variants file, with release and checksum provenance and exact sample-name self-overlap flags; annotation only
+keywords:
+  - cosmic
+  - noncoding
+  - annotation
+tools:
+  - "cosmic_context.py":
+      description: "Pipeline-owned script (bin/cosmic_context.py); the COSMIC data are user-supplied under the COSMIC licence"
+      homepage: "https://github.com/Khalofx/noncodingdrivers"
+      documentation: "https://github.com/Khalofx/noncodingdrivers"
+      tool_dev_url: "https://github.com/Khalofx/noncodingdrivers"
+      licence: ["MIT"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: Cohort meta map
+    - candidates:
+        type: file
+        description: Candidate table of EXPLAIN (sample x mutation x significant element fragment)
+        pattern: "*.candidates.tsv"
+        ontologies: []
+    - consensus:
+        type: file
+        description: Consensus table of COMBINEPVALUES (rank, span, consensus_q), or []
+        pattern: "*.consensus.tsv"
+        ontologies: []
+  - cosmic_ncv:
+      type: file
+      description: COSMIC Non-Coding Variants file under COSMIC's own name, Cosmic_NonCodingVariants_v<release>_GRCh38.tsv.gz
+      pattern: "Cosmic_NonCodingVariants_v*_GRCh38.tsv{,.gz}"
+      ontologies: []
+  - release:
+      type: string
+      description: COSMIC release of the file (v<number>); must equal the release in the file name
+  - expected_md5:
+      type: string
+      description: Expected MD5 of the COSMIC file, or an empty string; a mismatch stops the task
+
+output:
+  mutation_summary:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.cosmic.mutation_summary.tsv":
+          type: file
+          description: Counts per distinct candidate variant (COSMIC samples, confirmed-somatic samples, studies, PMIDs, exact sample-name overlaps, independence_status); no COSMIC identifiers
+          pattern: "*.cosmic.mutation_summary.tsv"
+          ontologies: []
+  element_summary:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.cosmic.element_summary.tsv":
+          type: file
+          description: Counts per significant element; no COSMIC identifiers
+          pattern: "*.cosmic.element_summary.tsv"
+          ontologies: []
+  provenance:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.cosmic.provenance.json":
+          type: file
+          description: Release, file name, computed and expected MD5, rows scanned, totals and matching rules
+          pattern: "*.cosmic.provenance.json"
+          ontologies: []
+  exact_matches:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.cosmic.exact_matches.tsv":
+          type: file
+          description: One row per collapsed COSMIC observation of a candidate variant (COSMIC records; restricted, do not redistribute)
+          pattern: "*.cosmic.exact_matches.tsv"
+          ontologies: []
+  notice:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "NOTICE.txt":
+          type: file
+          description: COSMIC licence notice for the restricted table
+          pattern: "NOTICE.txt"
+          ontologies: []
+  versions_python:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - ${task.process}:
+          type: string
+          description: The name of the process
+      - python:
+          type: string
+          description: The name of the tool
+      - "python3 --version | sed 's/Python //'":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

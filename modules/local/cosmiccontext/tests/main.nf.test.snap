@@ -1,0 +1,61 @@
+{
+    "synthetic v999 file - exact matches, self-overlap by exact name, md5 checked": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.mutation_summary.tsv:md5,f7f3b676fbd8c38e1dfc1e1353b8e168"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.element_summary.tsv:md5,019ea50217d99c0d706f6b23d77f6b79"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.exact_matches.tsv:md5,f041685247e683635c795cb26117ff1a"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.provenance.json:md5,c5b2d5ab027545a84adf52f0b6e0ee7c"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "NOTICE.txt:md5,e3590514552a9d022d6f43b31731129e"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T15:54:22.900454546",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}
