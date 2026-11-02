@@ -4,6 +4,8 @@ name: build-containers
 # OncodriveFML: the rights-holder image docker.io/bbglab/oncodrivefml:2.5.0 has no `ps`
 # (checked 2026-10-21), so the pipeline uses containers/oncodrivefml/, the baseline image recipe.
 # OncodriveCLUSTL: AGPL-3.0-or-later only, so its image is public (containers/oncodriveclustl/).
+# OpenCRAVAT: its build downloads the frozen OpenCRAVAT modules (about 2.1 GB) from the
+# OpenCRAVAT store; the smoke test then runs it with no network.
 
 on:
   push:
@@ -52,6 +54,8 @@ jobs:
             version: "2.24.0"
           - image: oncodriveclustl
             version: "1.2.0"
+          - image: opencravat
+            version: "3.2.4"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: docker/setup-buildx-action@v3
@@ -106,7 +110,7 @@ jobs:
           IMAGE: ${{ matrix.image }}
         run: |
           case "$IMAGE" in
-            utils|mutenricher|oncodrivefml|oncodriveclustl) cmd='pip freeze' ;;
+            utils|mutenricher|oncodrivefml|oncodriveclustl|opencravat) cmd='pip freeze' ;;
             *) cmd="Rscript -e 'ip <- installed.packages()[, c(\"Package\", \"Version\")]; write.table(ip, sep = \"\\t\", quote = FALSE, row.names = FALSE)'" ;;
           esac
           docker run --rm --network none --entrypoint bash "noncodingdrivers-test:${IMAGE}" -c "$cmd" > "${IMAGE}.packages.txt"

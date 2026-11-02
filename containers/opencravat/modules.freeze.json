@@ -1,0 +1,152 @@
+[
+    {
+        "name": "casecontrol",
+        "version": "1.2.0",
+        "type": "postaggregator"
+    },
+    {
+        "name": "ccre_screen",
+        "version": "1.0.2",
+        "type": "annotator"
+    },
+    {
+        "name": "clingen-converter",
+        "version": "1.0.1",
+        "type": "converter"
+    },
+    {
+        "name": "clinvar",
+        "version": "2026.10.01",
+        "type": "annotator"
+    },
+    {
+        "name": "cravat-converter",
+        "version": "1.1.2",
+        "type": "converter"
+    },
+    {
+        "name": "excelreporter",
+        "version": "2.1.1",
+        "type": "reporter"
+    },
+    {
+        "name": "go",
+        "version": "2025.11.01",
+        "type": "annotator"
+    },
+    {
+        "name": "hg38",
+        "version": "1.47.2",
+        "type": "mapper"
+    },
+    {
+        "name": "hg38wgs",
+        "version": "1.0.0",
+        "type": "common"
+    },
+    {
+        "name": "hgvs-converter",
+        "version": "1.1.0",
+        "type": "converter"
+    },
+    {
+        "name": "repeat",
+        "version": "2020.10.16",
+        "type": "annotator"
+    },
+    {
+        "name": "tagsampler",
+        "version": "1.1.6",
+        "type": "postaggregator"
+    },
+    {
+        "name": "textreporter",
+        "version": "2.1.0",
+        "type": "reporter"
+    },
+    {
+        "name": "varmeta",
+        "version": "1.0.0",
+        "type": "postaggregator"
+    },
+    {
+        "name": "vcf-converter",
+        "version": "2.2.1",
+        "type": "converter"
+    },
+    {
+        "name": "vcfinfo",
+        "version": "3.2.0",
+        "type": "postaggregator"
+    },
+    {
+        "name": "wgbase",
+        "version": "1.1.3",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgcasecontrols",
+        "version": "1.0.1",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgcasecontrolsummary",
+        "version": "1.0.1",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgcircossummary",
+        "version": "2.2.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgclinvar",
+        "version": "1.1.1",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgcodingvsnoncodingsummary",
+        "version": "2.0.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wggo",
+        "version": "1.2.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wggosummary",
+        "version": "2.4.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wglollipop",
+        "version": "2.2.3",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgncrna",
+        "version": "1.1.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgnote",
+        "version": "3.0.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgsosamplesummary",
+        "version": "2.2.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgsosummary",
+        "version": "1.5.0",
+        "type": "webviewerwidget"
+    },
+    {
+        "name": "wgvcfinfo",
+        "version": "1.0.3",
+        "type": "webviewerwidget"
+    }
+]

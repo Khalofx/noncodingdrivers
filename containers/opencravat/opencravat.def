@@ -1,0 +1,44 @@
+Bootstrap: docker
+From: mambaorg/micromamba:2.0.5
+
+# Apptainer recipe of the noncodingdrivers OpenCRAVAT image, built from the same conda lock, pip
+# lock and module freeze file as the Dockerfile in this folder. Build on a host that allows
+# fakeroot builds and reaches PyPI and the OpenCRAVAT store, from this folder:
+#   apptainer build --fakeroot noncodingdrivers-opencravat-3.2.4.sif opencravat.def
+# The published image is ghcr.io/khalofx/noncodingdrivers-opencravat:3.2.4 (build-containers).
+
+%files
+    conda-lock.linux-64.txt /opt/opencravat/build/conda-lock.linux-64.txt
+    pip-lock.txt /opt/opencravat/build/pip-lock.txt
+    modules.freeze.json /opt/opencravat/build/modules.freeze.json
+    cravat-system.yml /opt/opencravat/build/cravat-system.yml
+    setup-opencravat.sh /opt/opencravat/build/setup-opencravat.sh
+    netaudit/sitecustomize.py /opt/opencravat/netaudit/sitecustomize.py
+
+%post
+    set -eu
+    export PATH=/opt/conda/bin:$PATH PYTHONNOUSERSITE=1
+    # /opt, not /tmp: Apptainer binds the host /tmp over the image's /tmp during %post
+    micromamba install -y -p /opt/conda -f /opt/opencravat/build/conda-lock.linux-64.txt
+    micromamba clean -a -y
+    pip install --no-cache-dir --no-deps --require-hashes -r /opt/opencravat/build/pip-lock.txt
+    pip check
+    bash /opt/opencravat/build/setup-opencravat.sh
+
+%environment
+    export PATH=/opt/conda/bin:$PATH
+    export OPENCRAVAT_IMAGE_CONF=/opt/conda/lib/python3.11/site-packages/cravat/conf/cravat-system.yml
+    export OPENCRAVAT_NETAUDIT_DIR=/opt/opencravat/netaudit
+    export PYTHONNOUSERSITE=1
+
+%test
+    oc version
+    grep -q '^metrics_url: http://127.0.0.1:9$' "$OPENCRAVAT_IMAGE_CONF"
+    test -z "$(ls -A /opt/opencravat/metrics)"
+    ps --version
+
+%labels
+    Name noncodingdrivers-opencravat
+    Version 3.2.4
+    License MIT
+    Source https://github.com/Khalofx/noncodingdrivers

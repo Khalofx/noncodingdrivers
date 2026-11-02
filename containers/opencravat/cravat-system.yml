@@ -1,0 +1,18 @@
+# OpenCRAVAT system configuration of the noncodingdrivers image (containers/opencravat), installed
+# as <site-packages>/cravat/conf/cravat-system.yml. OpenCRAVAT 3.2.4 posts usage metrics after every
+# run and has no switch that stops it (save_metrics is not read on that path), so every remote
+# address here is a closed local port: nothing can leave. The OpenCRAVAT store is used only while
+# the image is built (setup-opencravat.sh) to install the modules listed in modules.freeze.json.
+modules_dir: /opt/opencravat/modules
+metrics_url: http://127.0.0.1:9
+store_url: http://127.0.0.1:9
+publish_url: http://127.0.0.1:9
+clingen_api_url: http://127.0.0.1:9
+hgvs_api_url: http://127.0.0.1:9
+metrics_dir: /opt/opencravat/metrics
+save_metrics: false
+user_email: ""
+user_email_opt_out: true
+work_dir: /opt/opencravat/workspace
+jobs_dir: /opt/opencravat/jobs
+log_dir: /opt/opencravat/logs

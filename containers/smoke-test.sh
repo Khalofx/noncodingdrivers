@@ -4,7 +4,7 @@
 #       /pipeline/containers/smoke-test.sh <name>
 set -euo pipefail
 
-name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml, oncodriveclustl, combinepvalues or motifbreakr}"
+name="${1:?Specify utils, activedriverwgs, mutenricher, oncodrivefml, oncodriveclustl, combinepvalues, motifbreakr or opencravat}"
 
 # Nextflow's task wrapper runs ps inside every task container to collect CPU and memory metrics.
 command -v ps > /dev/null || { echo "ps (procps) is missing from the ${name} image" >&2; exit 1; }
@@ -62,6 +62,45 @@ case "${name}" in
             echo 'TERT C228T ELK4 gain not reproduced' >&2
             exit 1
         fi
+        ;;
+    opencravat)
+        python -c "import importlib.metadata as m; v = m.version('open-cravat'); assert v == '3.2.4', v"
+        # telemetry neutralised in the image: every remote address is the closed local port, the
+        # metrics folder is empty
+        python - "$OPENCRAVAT_IMAGE_CONF" <<'PY'
+import sys, yaml
+conf = yaml.safe_load(open(sys.argv[1]))
+urls = {k: v for k, v in conf.items() if k.endswith("_url")}
+assert urls and all(v == "http://127.0.0.1:9" for v in urls.values()), urls
+assert conf["user_email_opt_out"] is True
+PY
+        test -z "$(ls -A /opt/opencravat/metrics)"
+        # oc run on three synthetic SNVs (one, chr1:1000000 T>A, is in no ClinVar record), audited:
+        # with no network the run must still finish, every connection attempt must be local and the
+        # metrics payload must stay on disk (its POST to the closed port failed)
+        tmp=$(mktemp -d)
+        printf 'sample\tchrom\tpos\tref\talt\tvtype\telement_id\nS1\tchr5\t1295113\tG\tA\tSNP\tpromoter_ENSR00000746745\nS2\tchr5\t1295135\tG\tA\tSNP\tpromoter_ENSR00000746745\nS1\tchr1\t1000000\tT\tA\tSNP\telem_B\n' > "$tmp/cand.tsv"
+        awk -F '\t' -v OFS='\t' -f /pipeline/assets/awk/opencravat_input.awk "$tmp/cand.tsv" > "$tmp/in.txt"
+        mkdir "$tmp/metrics" "$tmp/work"
+        sed -e "s|^metrics_dir:.*|metrics_dir: $tmp/metrics|" -e "s|^work_dir:.*|work_dir: $tmp/work|" "$OPENCRAVAT_IMAGE_CONF" > "$tmp/cravat-system.yml"
+        (cd "$tmp" && env OPENCRAVAT_SYSTEM_CONF_PATH="$tmp/cravat-system.yml" PYTHONPATH="$OPENCRAVAT_NETAUDIT_DIR" OC_NETAUDIT_LOG="$tmp/net.tsv" \
+            http_proxy=http://127.0.0.1:9 https_proxy=http://127.0.0.1:9 HTTP_PROXY=http://127.0.0.1:9 HTTPS_PROXY=http://127.0.0.1:9 \
+            oc run in.txt -l hg38 -n smoke -a ccre_screen repeat clinvar -t text -d out > run.log 2>&1) || { cat "$tmp/run.log" >&2; exit 1; }
+        grep -q '^Finished normally' "$tmp/run.log" || { cat "$tmp/run.log" >&2; echo 'oc run did not finish normally' >&2; exit 1; }
+        if awk -F '\t' '$3 !~ /^(127\.0\.0\.1|::1|localhost)$/ { bad = 1 } END { exit bad ? 0 : 1 }' "$tmp/net.tsv"; then
+            cat "$tmp/net.tsv" >&2; echo 'OpenCRAVAT tried to reach a non-local address' >&2; exit 1
+        fi
+        grep -q $'connect\t127.0.0.1\t9' "$tmp/net.tsv" || { echo 'no metrics POST to the closed local port was recorded' >&2; exit 1; }
+        test "$(find "$tmp/metrics" -name 'ocmetric_*.json' | wc -l)" -ge 1
+        test -z "$(ls -A /opt/opencravat/metrics)"
+        # no liftover anywhere: no UCSC chain file in the image and no hg19 column in the report
+        if find / -xdev \( -name '*.over.chain' -o -name '*.over.chain.gz' \) 2>/dev/null | grep -q .; then echo 'UCSC chain file found in the image' >&2; exit 1; fi
+        if grep -v '^#' "$tmp/out/smoke.tsv" | head -2 | grep -q 'hg19'; then echo 'hg19 columns in the OpenCRAVAT report' >&2; exit 1; fi
+        # the adapter joins the report back: TERT C228T in a SCREEN promoter-like cCRE
+        awk -F '\t' -v OFS='\t' -f /pipeline/assets/awk/opencravat_table.awk "$tmp/cand.tsv" "$tmp/out/smoke.tsv" > "$tmp/table.tsv"
+        awk -F '\t' 'NR == 1 { for (i = 1; i <= NF; i++) c[$i] = i; if (index($0, "hg19")) exit 1; next }
+            $c["variant_id"] == "chr5:1295113:G:A" && $c["oc_status"] == "annotated" && $c["ccre_screen__classification"] == "PLS" { ok = 1 }
+            END { exit ok ? 0 : 1 }' "$tmp/table.tsv" || { cat "$tmp/table.tsv" >&2; echo 'OpenCRAVAT table check failed' >&2; exit 1; }
         ;;
     *)
         echo "Unknown image: ${name}" >&2
