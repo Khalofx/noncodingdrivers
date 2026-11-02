@@ -366,6 +366,75 @@ def validateDriverParameters(refs) {
     if (params.run_vep && !refs.vep_cache) {
         error("--run_vep needs --vep_cache (or --reference_base for the datasheet): an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")
     }
+    validateConsensusCallers()
+}
+
+//
+// Callers that are harmonised and joined on element_id when enabled (MutEnricher is QC-only and
+// never joined), with their --run_ flag, and the default combined set of --consensus_callers
+//
+def harmonisedCallerFlags() {
+    return [
+        activedriverwgs: params.run_activedriverwgs,
+        oncodrivefml   : params.run_oncodrivefml
+    ]
+}
+
+def defaultConsensusCallers() {
+    return [ 'activedriverwgs', 'oncodrivefml' ]
+}
+
+def consensusCallerNames() {
+    return (params.consensus_callers ?: '').toString().tokenize(',').collect { name -> name.trim() }.findAll { name -> name }
+}
+
+//
+// Role of every enabled harmonised caller: 'combined' (named in --consensus_callers) or
+// 'reported_alongside' (p_/q_ columns carried in the consensus table, not combined)
+//
+def callerRoles() {
+    def named = consensusCallerNames()
+    return harmonisedCallerFlags()
+        .findAll { _caller, enabled -> enabled }
+        .collectEntries { caller, _enabled -> [ (caller): caller in named ? 'combined' : 'reported_alongside' ] }
+}
+
+//
+// --consensus_callers: names checked here (the schema pattern also restricts them). A default
+// caller that is not run is dropped silently (OncodriveFML is off by default); a non-default
+// caller must be run when it is named, and combining it prints the opt-in warning.
+//
+def validateConsensusCallers() {
+    def flags   = harmonisedCallerFlags()
+    def named   = consensusCallerNames()
+    def default_callers = defaultConsensusCallers()
+    if (!named) {
+        error("--consensus_callers is empty: name at least one caller whose p-values are combined (default: ${default_callers.join(',')}).")
+    }
+    if ('mutenricher' in named) {
+        error("--consensus_callers names mutenricher: MutEnricher is QC-only (its native table is published, never harmonised or combined).")
+    }
+    def unknown = named.findAll { name -> !flags.containsKey(name) }
+    if (unknown) {
+        error("--consensus_callers names unknown caller(s) ${unknown.join(', ')}: choose from ${flags.keySet().join(', ')}.")
+    }
+    def duplicates = named.findAll { name -> named.count(name) > 1 }.unique()
+    if (duplicates) {
+        error("--consensus_callers names ${duplicates.join(', ')} more than once.")
+    }
+    def not_run = named.findAll { name -> !(name in default_callers) && !flags[name] }
+    if (not_run) {
+        error("--consensus_callers names ${not_run.join(', ')} but --run_${not_run[0]} is false: enable the caller or remove it from --consensus_callers.")
+    }
+    def combined = named.findAll { name -> flags[name] }
+    if (!combined) {
+        error("None of the callers named in --consensus_callers (${named.join(', ')}) is run: enable one of them with its --run_ flag.")
+    }
+    combined.findAll { name -> !(name in default_callers) }.each { name ->
+        log.warn("--consensus_callers combines ${name}, which the default reports alongside. ${name} has not passed calibration on real cohorts: " +
+                 "the opt-in gate (null calibration and spike-in recovery on SYNTH-NC and Liver-HCC-public, docs/validation.md) is not met, " +
+                 "and combining it changes the EBM covariance set and every consensus q-value.")
+    }
 }
 
 //
@@ -414,10 +483,28 @@ def toolCitationText() {
             params.run_vep ? "Ensembl VEP (McLaren et al. 2016)," : "",
             params.run_motifbreakr ? "motifbreakR (Coetzee et al. 2015) with JASPAR (Rauluseviciute et al. 2024)," : "",
             "MultiQC (Ewels et al. 2016)",
-            "."
+            ".",
+            callerRolesText()
         ].join(' ').replaceAll(/ +/, ' ').trim()
 
     return citation_text
+}
+
+def callerRolesText() {
+    // Which callers were combined and which were reported alongside. Empty when every enabled
+    // caller is a combined default caller, so the default methods text is unchanged.
+    def names = [ activedriverwgs: 'ActiveDriverWGS', oncodrivefml: 'OncodriveFML' ]
+    def roles = callerRoles()
+    def combined  = roles.findAll { _caller, role -> role == 'combined' }.keySet() as List
+    def alongside = roles.findAll { _caller, role -> role == 'reported_alongside' }.keySet() as List
+    if (!alongside && combined.every { caller -> caller in defaultConsensusCallers() }) {
+        return ''
+    }
+    def text = "Element p-values of ${combined.collect { caller -> names[caller] }.join(' and ')} were combined"
+    if (alongside) {
+        text += "; ${alongside.collect { caller -> names[caller] }.join(' and ')} ${alongside.size() > 1 ? 'were' : 'was'} reported alongside and not combined"
+    }
+    return text + "."
 }
 
 def toolBibliographyText() {

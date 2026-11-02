@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/khalofx/noncodingdrivers/master/assets/schema_driver_evidence.json",
     "title": "khalofx/noncodingdrivers driver_evidence.tsv",
-    "description": "Long-form evidence table (WRITEDRIVEREVIDENCE): one row per cohort x element x evidence item. Every field is text; numbers are written with up to six significant digits, NA when missing. Cohort-level rows (null calibration) have element_id '.'. No field is a tier.",
+    "description": "Long-form evidence table (WRITEDRIVEREVIDENCE): one row per cohort x element x evidence item. Every field is text; numbers are written with up to six significant digits, NA when missing. Cohort-level rows (null calibration, caller roles) have element_id '.'. No field is a tier.",
     "type": "array",
     "items": {
         "type": "object",
@@ -19,7 +19,7 @@
             },
             "evidence_item": {
                 "type": "string",
-                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+)$",
+                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
                 "description": "Evidence item (assets/evidence_sources.tsv)"
             },
             "value": {
@@ -46,7 +46,9 @@
                     "within_band",
                     "excluded_for_inflation",
                     "conservative",
-                    "not_assessable"
+                    "not_assessable",
+                    "combined",
+                    "reported_alongside"
                 ]
             },
             "threshold": {

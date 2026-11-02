@@ -1,6 +1,8 @@
 //
 // DRIVER_DISCOVERY: cohort mutation table -> driver callers -> harmonised calls -> anchored on
 // element_id -> combined p-values (published R packages; --combination_method sets consensus_q).
+// Callers named in --consensus_callers are combined; other harmonised callers are reported
+// alongside (their p_/q_ columns are carried in the consensus table, not combined).
 // MutEnricher (QC-only) reads per-sample VCFs; its native table is published and never combined.
 //
 include { ACTIVEDRIVERWGS           } from '../../../modules/local/activedriverwgs'
@@ -44,7 +46,9 @@ workflow DRIVER_DISCOVERY {
         MUTENRICHER(ch_cohort_vcfs, ch_elements, ch_mappable)
         ch_mutenricher = MUTENRICHER.out.results
     }
-    def combined_callers = callers.findAll { caller -> caller != 'mutenricher' }
+    // Every harmonised caller is joined; COMBINEPVALUES combines those named in --consensus_callers
+    // (ext.args --callers) and carries the others' p_/q_ columns (reported alongside)
+    def harmonised_callers = callers.findAll { caller -> caller != 'mutenricher' }
 
     // Format adapter per caller: native columns -> element_id, p_<caller>, q_<caller>
     HARMONIZECALLS(ch_raw)
@@ -52,12 +56,12 @@ workflow DRIVER_DISCOVERY {
     // Outer join of every caller's table with the element coordinates on element_id. Tables are
     // ordered by file name so the joined column order does not depend on which caller finished first.
     def ch_to_join = HARMONIZECALLS.out.harmonized
-        .groupTuple(size: combined_callers.size())
+        .groupTuple(size: harmonised_callers.size())
         .combine(ch_coords)
         .map { meta, calls, _meta2, coords -> [ meta, calls.sort { f -> f.name } + [ coords ] ] }
     ANCHOR_JOIN(ch_to_join)
 
-    // EBM, ACAT, RRA, votes and BH; --combination_method selects consensus_q
+    // EBM, ACAT, RRA, votes and BH over the --consensus_callers; --combination_method selects consensus_q
     COMBINEPVALUES(ANCHOR_JOIN.out.out_file)
 
     emit:

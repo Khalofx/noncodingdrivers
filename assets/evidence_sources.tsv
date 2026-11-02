@@ -26,3 +26,4 @@ postfilter_max_sample_fraction	fraction	POSTFILTERFLAGS	pipeline	cohort
 postfilter_status	status	POSTFILTERFLAGS: fail when any post-filter fails, pass when all pass	pipeline	cohort
 q_postfilter	q	POSTFILTERFLAGS --postfilter_mode pcawg: Benjamini-Hochberg after failing elements set to p = 1	pipeline	cohort
 null_lambda	lambda	CALIBRATECALLERS: median null inflation factor of one method (cohort-level row, element_id '.')	pipeline	cohort
+caller_role	status	COMBINEPVALUES --callers (--consensus_callers): 1 combined, 0 reported alongside (cohort-level row, element_id '.'; written when a caller is reported alongside)	pipeline	cohort

@@ -414,6 +414,15 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-forward",
                     "description": "Do not compute ACAT (use when the ACAT package is unavailable, e.g. -profile conda). Not allowed with --combination_method acat."
+                },
+                "consensus_callers": {
+                    "type": "string",
+                    "default": "activedriverwgs,oncodrivefml",
+                    "pattern": "^(activedriverwgs|oncodrivefml)(,(activedriverwgs|oncodrivefml))*$",
+                    "errorMessage": "--consensus_callers is a comma-separated list of: activedriverwgs, oncodrivefml (MutEnricher is QC-only and is never combined)",
+                    "fa_icon": "fas fa-layer-group",
+                    "description": "Callers whose p-values are combined (EBM, ACAT, RRA, votes). Every other enabled caller is reported alongside: its p_/q_ columns are carried in the consensus table but not combined.",
+                    "help_text": "Default: ActiveDriverWGS and OncodriveFML, each when it runs, so the default consensus is unchanged by any caller reported alongside. A caller outside the default may be named only after it passed the opt-in gate for the element catalogue (null calibration and spike-in recovery on SYNTH-NC and Liver-HCC-public, recorded in docs/validation.md); the pipeline warns when one is combined. A non-default caller named here must also be enabled with its --run_ flag. MutEnricher is QC-only and cannot be combined."
                 }
             }
         },

@@ -173,7 +173,8 @@ workflow NONCODINGDRIVERS {
         params.run_oncodrivefml    ? 'oncodrivefml'    : null,
         params.run_mutenricher     ? 'mutenricher'     : null
     ].findAll { caller -> caller != null }
-    def combined_callers = callers.findAll { caller -> caller != 'mutenricher' }
+    // Callers harmonised and joined on element_id: combined or reported alongside (--consensus_callers)
+    def harmonised_callers = callers.findAll { caller -> caller != 'mutenricher' }
 
     //
     // SUBWORKFLOW: callers -> harmonised calls -> anchored on element_id -> combined p-values
@@ -251,7 +252,7 @@ workflow NONCODINGDRIVERS {
     }
     RUNSUMMARYMQC(
         DRIVER_DISCOVERY.out.consensus
-            .join(DRIVER_DISCOVERY.out.raw.groupTuple(size: combined_callers.size()))
+            .join(DRIVER_DISCOVERY.out.raw.groupTuple(size: harmonised_callers.size()))
     )
     ch_multiqc_files = ch_multiqc_files.mix(RUNSUMMARYMQC.out.sections.map { _meta, sections -> sections })
 

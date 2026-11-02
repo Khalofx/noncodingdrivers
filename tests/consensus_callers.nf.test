@@ -1,0 +1,91 @@
+nextflow_pipeline {
+
+    name "Test --consensus_callers validation"
+    script "../main.nf"
+    tag "pipeline"
+    tag "consensus_callers"
+
+    // Each invalid --consensus_callers stops the run in PIPELINE_INITIALISATION, before any task.
+    // Unknown names and mutenricher fail the schema pattern; the rest fail validateConsensusCallers.
+
+    test("--consensus_callers - unknown caller") {
+        when {
+            params {
+                outdir            = "$outputDir"
+                consensus_callers = 'activedriverwgs,dndscv'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('--consensus_callers is a comma-separated list of') } }
+            )
+        }
+    }
+
+    test("--consensus_callers - mutenricher is QC-only") {
+        when {
+            params {
+                outdir            = "$outputDir"
+                consensus_callers = 'activedriverwgs,mutenricher'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('MutEnricher is QC-only') } }
+            )
+        }
+    }
+
+    test("--consensus_callers - duplicate caller") {
+        when {
+            params {
+                outdir            = "$outputDir"
+                consensus_callers = 'activedriverwgs,oncodrivefml,activedriverwgs'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('--consensus_callers names activedriverwgs more than once') } }
+            )
+        }
+    }
+
+    test("--consensus_callers - no named caller is run") {
+        when {
+            params {
+                outdir                      = "$outputDir"
+                run_oncodrivefml            = false
+                consensus_callers           = 'oncodrivefml'
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('None of the callers named in --consensus_callers (oncodrivefml) is run') } }
+            )
+        }
+    }
+
+    test("--consensus_callers - empty") {
+        when {
+            params {
+                outdir            = "$outputDir"
+                consensus_callers = ','
+            }
+        }
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('--consensus_callers') } }
+            )
+        }
+    }
+}
