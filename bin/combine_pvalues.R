@@ -14,12 +14,19 @@
 #
 # Usage: combine_pvalues.R --input matched.tsv --out consensus.tsv [--method ebm|acat]
 #                          [--fdr 0.1] [--skip-acat] [--versions versions.tsv]
+#                          [--callers activedriverwgs,oncodrivefml]
 # Input: tab-separated, one row per element, an element_id column, one p_<caller> column per
-# primary caller and optional q_<caller> columns. Other columns are carried through.
+# caller and optional q_<caller> columns. Other columns are carried through.
+# --callers names the callers whose p-values are combined (the pipeline's --consensus_callers).
+# Without it every p_<caller> column is combined. A named caller without a column did not run
+# and is skipped; p_/q_ columns of callers not named are carried through unchanged (callers
+# reported alongside). Every combined quantity (EBM, ACAT, RRA, BH, n_tested_callers,
+# vote_count) and the row set (elements tested by at least one combined caller) use the
+# combined callers only, in the column order of the input table.
 
 args <- commandArgs(trailingOnly = TRUE)
 opt  <- list(input = NULL, out = NULL, method = "ebm", fdr = "0.1", skip_acat = FALSE,
-             versions = "combinepvalues.versions.tsv")
+             versions = "combinepvalues.versions.tsv", callers = NULL)
 i <- 1
 while (i <= length(args)) {
     key <- gsub("-", "_", sub("^--", "", args[i]))
@@ -46,6 +53,14 @@ writeLines(c(paste(pkgs, vapply(pkgs, function(p) as.character(packageVersion(p)
 d <- read.delim(opt[["input"]], stringsAsFactors = FALSE, check.names = FALSE,
                 na.strings = c("NA", ""), colClasses = c(element_id = "character"))
 pcols <- grep("^p_", names(d), value = TRUE)
+if (!is.null(opt[["callers"]])) {
+    named <- strsplit(opt[["callers"]], ",", fixed = TRUE)[[1]]
+    named <- named[nzchar(named)]
+    if (length(named) == 0) stop("--callers is empty")
+    # intersect() keeps the input column order, so the default set reproduces the run without --callers
+    pcols <- intersect(pcols, paste0("p_", named))
+    if (length(pcols) == 0) stop("none of the callers named by --callers (", opt[["callers"]], ") has a p_ column in ", opt[["input"]])
+}
 if (length(pcols) == 0) stop("no p_<caller> columns in ", opt[["input"]])
 P <- as.matrix(d[, pcols, drop = FALSE])
 storage.mode(P) <- "double"
