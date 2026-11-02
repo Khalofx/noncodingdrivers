@@ -8,7 +8,7 @@ nextflow_process {
     tag "explain"
     tag "alphagenome_avi"
 
-    // Fixture (tests/data/avi, invented scores, not AlphaGenome output): nine candidate rows, eight
+    // Fixture (tests/data/avi, invented scores, not AlphaGenome output): ten candidate rows, eight
     // distinct variants. Scored: chr1:1000000 T>A (1.0), chr5:1295113 G>A (11.1, two samples, two
     // VEP rows), chr5:1295113 G>T (33.3) and chr5:1295135 G>A (4.4, in two elements). Not scored:
     // a deletion, an insertion and a GG>AA substitution (non-SNVs) and chr5:1295160 C>T (an SNV the
