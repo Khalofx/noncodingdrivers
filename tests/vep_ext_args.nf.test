@@ -1,0 +1,59 @@
+nextflow_process {
+
+    name "ENSEMBLVEP_VEP ext.args (conf/modules.config) with and without the AlphaGenome AVI layer"
+    script "./probes/ensemblvep_ext_args.nf"
+    process "ENSEMBLVEP_VEP"
+    config "./probes/nextflow.config"
+
+    tag "vep_ext_args"
+    tag "alphagenome_avi"
+
+    // The Step 7 (dev b56908a) value of ext.args, character for character. With the layer off the
+    // ENSEMBLVEP_VEP command, and so its task hash, must not change.
+    def step7 = '--offline --format ensembl --tab --fields "Uploaded_variation,Location,Allele,Gene,SYMBOL,Feature,Feature_type,BIOTYPE,CANONICAL,Consequence,IMPACT,DISTANCE,Existing_variation,gnomADg_AF" --symbol --canonical --biotype --check_existing --af_gnomadg --distance 5000 --force_overwrite'
+
+    test("AVI layer off: the Step 7 string") {
+
+        when {
+            params {
+                run_alphagenome_avi = false
+            }
+            process {
+                """
+                input[0] = [ [ id:'test' ], file("${projectDir}/tests/data/avi/candidates.tsv", checkIfExists: true), [] ]
+                input[1] = []
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.args[0][1]).text == step7
+        }
+    }
+
+    test("AVI layer on: two extra fields, the image's plugin folder and the staged score file") {
+
+        when {
+            params {
+                run_alphagenome_avi = true
+            }
+            process {
+                """
+                input[0] = [ [ id:'test' ], file("${projectDir}/tests/data/avi/candidates.tsv", checkIfExists: true), [] ]
+                input[1] = [
+                    file("${projectDir}/tests/data/avi/avi_scores.tsv.gz", checkIfExists: true),
+                    file("${projectDir}/tests/data/avi/avi_scores.tsv.gz.tbi", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert path(process.out.args[0][1]).text ==
+                step7.replace('gnomADg_AF"', 'gnomADg_AF,AVI_PHRED,AVI_RAW"') +
+                ' --dir_plugins $(dirname $(readlink -f $(command -v vep))) --plugin AVI,file=avi_scores.tsv.gz,raw=1'
+        }
+    }
+}

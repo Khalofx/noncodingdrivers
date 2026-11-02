@@ -1,0 +1,69 @@
+nextflow_pipeline {
+
+    name "Variant annotation layers: parameter gates of AlphaGenome AVI (before any task)"
+    script "../main.nf"
+    tag "pipeline"
+    tag "alphagenome_avi"
+
+    // VEP itself only warns and exits 0 when the AVI plugin cannot load (no plugin folder, no .tbi),
+    // so these gates stop the run in PIPELINE_INITIALISATION, before the first task.
+    test("-profile test - --run_alphagenome_avi without --run_vep stops before any task") {
+
+        when {
+            params {
+                outdir              = "$outputDir"
+                run_alphagenome_avi = true
+                alphagenome_avi     = "${projectDir}/tests/data/avi/avi_scores.tsv.gz"
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('AVI_NEEDS_VEP') } }
+            )
+        }
+    }
+
+    test("-profile test - --run_alphagenome_avi without a score file stops before any task") {
+
+        when {
+            params {
+                outdir              = "$outputDir"
+                run_vep             = true
+                vep_cache           = "${projectDir}/tests/data/vep_cache_stub"
+                run_alphagenome_avi = true
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('AVI_FILE_MISSING') } }
+            )
+        }
+    }
+
+    test("-profile test - an AVI score file without its .tbi stops before any task") {
+
+        when {
+            params {
+                outdir              = "$outputDir"
+                run_vep             = true
+                vep_cache           = "${projectDir}/tests/data/vep_cache_stub"
+                run_alphagenome_avi = true
+                alphagenome_avi     = "${projectDir}/tests/data/avi/no_index/avi_scores.tsv.gz"
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('AVI_INDEX_MISSING') } }
+            )
+        }
+    }
+}

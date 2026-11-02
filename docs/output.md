@@ -16,7 +16,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Variant flags](#variant-flags) - Mask and germline flags of every mutation row, element-level fractions and callable fraction
 - [Post-filter flags and evidence table](#post-filter-flags-and-evidence-table) - PCAWG-style post-filter flags and the long-form `driver_evidence.tsv`
 - [Null calibration](#null-calibration) - Per-caller inflation factor on neutral copies of each cohort (opt-in)
-- [Candidates and annotation layers](#candidates-and-annotation-layers) - Mutations, nearest gene, regulatory context, VEP and motifbreakR for the significant elements
+- [Candidates and annotation layers](#candidates-and-annotation-layers) - Mutations, nearest gene, regulatory context, VEP (with AlphaGenome AVI scores) and motifbreakR for the significant elements
 - [Signature QC](#signature-qc) - SigProfiler on the cohort (opt-in)
 - [MultiQC](#multiqc) - Run summary report
 - [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
@@ -143,7 +143,10 @@ filters or re-ranks an element.
   - `<cohort>.candidates.tsv`: one row per patient x mutation x significant element: `sample chrom pos ref alt vtype`, `element_id` and the fragment the mutation lies in (`fragment_start`, `fragment_end`). Mutations between the fragments of an element (excluded coding bases) are not candidates.
   - `<cohort>.nearest_gene.tsv`: one row per significant element: the nearest GENCODE gene TSS to the element midpoint (`nearest_gene`, `nearest_gene_ensembl_id`, `gene_type`, `nearest_tss`, `gene_strand`), the strand-aware signed `distance_to_tss` and its absolute value, `relative_position` (`overlapping_tss`, `upstream` or `downstream`) and `nearest_gene_status`.
   - `intermediate/<cohort>.significant.sorted.bed`: the fragments of the significant elements.
-  - `vep/<cohort>.candidates.vep.tab.gz` and `_summary.html` (`--run_vep`): Ensembl VEP 116.3 consequences of the candidate mutations (tab format, offline cache; `--regulatory` is not used).
+  - `vep/<cohort>.candidates.vep.tab.gz` and `_summary.html` (`--run_vep`): Ensembl VEP 116.3 consequences of the candidate mutations (tab format, offline cache; `--regulatory` is not used). With `--run_alphagenome_avi` the table has two more columns, `AVI_PHRED` and `AVI_RAW` (VEP AVI plugin; `-` when not scored).
+  - `avi/` (`--run_alphagenome_avi`): AlphaGenome Variant Impact scores, annotation and hypothesis only.
+    - `<cohort>.avi.tsv`: one row per distinct candidate variant: `variant_id` (`chrom:pos:ref:alt`), `chrom`, `pos`, `ref`, `alt`, `vtype`, `element_ids` (comma-separated), `n_samples`, `avi_phred`, `avi_raw` (NA when not scored) and `avi_status`: `scored`, `not_scored_non_snv` (insertion, deletion or multi-base substitution: the scores cover SNVs only), `not_in_avi_file` (an SNV the score file does not hold) or `not_in_vep_output`.
+    - `<cohort>.avi.element_summary.tsv`: one row per element with candidate variants: `n_candidate_variants`, `n_snv`, `n_scored`, `max_avi_phred` with its `top_variant` (NA when nothing is scored) and `n_phred_ge_20` (`AVI_PHRED` 20 = top 1 % of all possible substitutions; a description, not a threshold).
 - `regulatory_context/` (`--run_regulatory_context`)
   - `<cohort>.regulatory_context.tsv`: one row per significant element x staged ENCODE file: `tissue`, `layer`, `accession`, `n_fragments`, `n_peaks`, `covered_bp`, `element_bp`, `covered_frac`, `max_signal` with its `signal_source` (narrowPeak `signalValue` or DNase hotspot `max_density`; comparable within a layer only) and `status` (`overlap` or `no_overlap`). A tissue x layer that was not staged has no row.
   - `per_file/`: the bedtools coverage and signal BEDs behind each row.

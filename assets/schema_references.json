@@ -242,6 +242,33 @@
                 "pattern": "^[0-9a-f]{32}$",
                 "meta": ["liftover_source_fasta_gz_md5"]
             },
+            "alphagenome_avi": {
+                "type": "string",
+                "meta": ["alphagenome_avi"]
+            },
+            "alphagenome_avi_md5": {
+                "type": "string",
+                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "meta": ["alphagenome_avi_md5"]
+            },
+            "alphagenome_avi_tbi_md5": {
+                "type": "string",
+                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "meta": ["alphagenome_avi_tbi_md5"]
+            },
+            "alphagenome_avi_archive_md5": {
+                "type": "string",
+                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "meta": ["alphagenome_avi_archive_md5"]
+            },
+            "alphagenome_avi_source": {
+                "type": "string",
+                "meta": ["alphagenome_avi_source"]
+            },
+            "alphagenome_avi_licence": {
+                "type": "string",
+                "meta": ["alphagenome_avi_licence"]
+            },
             "cadd_snv_version": {
                 "type": "string",
                 "meta": ["cadd_snv_version"]

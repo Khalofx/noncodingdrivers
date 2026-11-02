@@ -22,6 +22,11 @@ datasheet records every file with its checksum and source; the same checksums ar
 The CADD score track for OncodriveFML (`--oncodrivefml_score`) is not in the datasheet: it is free
 for non-commercial use only and is never bundled or downloaded by the pipeline.
 
+The AlphaGenome AVI SNV scores (`alphagenome_avi`) are in the datasheet but are downloaded by the
+user (Google sign-in; `docs/usage.md`) and never bundled. Until that download has been inspected,
+the file name, the three `alphagenome_avi*_md5` keys and the download date are placeholders: the
+MD5 keys hold `pending-user-download`, which the datasheet test accepts for these keys only.
+
 | Datasheet key                                        | File under `reference_base`                                                   | Checksum (MD5)                                                         | Used by                                |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
 | `fasta`, `fasta_fai`                                 | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names)                     | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows                |
@@ -38,6 +43,7 @@ for non-commercial use only and is never bundled or downloaded by the pipeline.
 | `low_mappability_bed`                                | `masks/GRCh38_lowmappabilityall.bed.gz` (GIAB v3.6, 673,815 regions)          | `8a78766bb99abf1d25a5b307d49a0324`                                     | variant flags, mappability post-filter |
 | `umap_bed`                                           | `masks/k100.umap.bed.gz` (Umap k100 single-read)                              | `1ef87107f449ccaf7e537de9740692fb`                                     | variant flags, callable territory      |
 | `gnomad_echtvar`                                     | `gnomad/gnomad.v4.1.genomes.echtvar.zip` (gnomAD v4.1 genomes, echtvar 0.2.4) | `7bc89a78568a424d7694e2d351617bcd`                                     | germline flag                          |
+| `alphagenome_avi`                                    | `alphagenome/avi_scores_snvs.tsv.gz` (user-downloaded; name pending)          | pending the download (S7A.15)                                          | `--run_alphagenome_avi`                |
 
 Two derived tables are not in the datasheet because the pipeline builds them from the files
 above in every run: the element coordinates for the anchor join (`ELEMENT_COORDS`, from the
@@ -184,6 +190,22 @@ md5sum gnomad.v4.1.genomes.echtvar.zip      # 7bc89a78568a424d7694e2d351617bcd, 
 echtvar annotates a variant gnomAD does not carry with `gnomad_filter=MISSING` and -1, and joins
 several FILTER values with commas (`AC0,AS_VQSR`). gnomAD data are released under CC0 1.0; the
 gnomAD terms ask for attribution and bind users not to attempt to reidentify participants.
+
+### AlphaGenome AVI SNV scores
+
+"AVI SNV scores - AVI scores and Phred-scaled scores in Tabix format" (`avi_scores_snvs_tabix.zip`,
+88.5 GB) from <https://deepmind.google.com/science/alphagenome/downloads>, listed there as a
+permissive-use download (commercial and non-commercial use); a Google sign-in is needed. Unpacked
+into `alphagenome/`; the score file must be bgzip TSV with the columns chrom, pos, ref, alt, raw,
+phred (the order `AVI.pm` reads) and a tabix `.tbi` (the plugin does not accept `.csi`). No
+versioned release identifier exists for the scores, so provenance is the download date and the
+MD5s of the archive, the score file and the index (`alphagenome_avi_archive_md5`,
+`alphagenome_avi_md5`, `alphagenome_avi_tbi_md5`). Pending (to-do S7A.15): none of these has been
+recorded yet. The plugin itself (`AVI.pm`, MD5 `798aff5678f249fdb2f8b32c76e4733b`, Apache-2.0) is
+part of the pinned ensembl-vep 116.3 image.
+
+For tests a synthetic file in the same layout, with invented scores, is written by
+`tests/data/avi/make_avi_fixture.sh <candidates.tsv> <out.tsv.gz>` (bgzip and tabix on PATH).
 
 ### Contig rename map
 

@@ -684,6 +684,21 @@
                     "fa_icon": "fas fa-file",
                     "description": "JASPAR-format PFM file for motifbreakR. Default: assets/motifs/jaspar_core_vertebrates_2026.pfm (JASPAR 2026 CORE vertebrates, 1,019 profiles)."
                 },
+                "run_alphagenome_avi": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-star-half-alt",
+                    "description": "Add AlphaGenome Variant Impact (AVI) scores (AVI_PHRED, AVI_RAW) to the VEP table of the candidate SNVs and write per-variant and per-element AVI tables. Needs --run_vep; annotation and hypothesis only.",
+                    "help_text": "Read by the Ensembl VEP AVI plugin from a user-downloaded score file (AlphaGenome permissive-use download, GRCh38 SNVs). Insertions, deletions and multi-base substitutions are never scored. Nothing filters or re-ranks on these scores."
+                },
+                "alphagenome_avi": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.b?gz$",
+                    "fa_icon": "fas fa-file",
+                    "description": "AlphaGenome AVI SNV score file (bgzip-compressed TSV: chrom, pos, ref, alt, raw, phred) with its tabix .tbi beside it. Default: the datasheet value under --reference_base.",
+                    "help_text": "The plugin accepts only a .tbi index (not .csi). The run stops before any task when the file or its .tbi is missing, because VEP itself only warns and exits 0 when the plugin cannot load."
+                },
                 "run_sigprofiler": {
                     "type": "boolean",
                     "fa_icon": "fas fa-chart-bar",

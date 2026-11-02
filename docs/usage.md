@@ -173,6 +173,8 @@ covariance set (elements tested by every combined caller) and therefore every co
 | vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                  |
 | EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                  |
 | Ensembl VEP                                           | Apache-2.0                                                  |
+| VEP AVI plugin (`AVI.pm`, in the VEP image)           | Apache-2.0                                                  |
+| AlphaGenome AVI SNV scores (user-downloaded)          | permissive-use download: commercial and non-commercial use  |
 | MultiQC                                               | GPL-3.0-or-later                                            |
 | SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                |
 | gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                             |
@@ -214,8 +216,43 @@ candidate or annotation file.
   `--regulatory` option of VEP is never used.
 - motifbreakR on the candidate SNVs (`--run_motifbreakr`; JASPAR 2026 CORE vertebrates bundled,
   `--jaspar_motifs` to replace them).
+- AlphaGenome Variant Impact (AVI) scores of the candidate SNVs (`--run_alphagenome_avi`, needs
+  `--run_vep`; score file `--alphagenome_avi`, downloaded by you, see below).
 - SigProfiler cohort-level signature QC (`--run_sigprofiler`; `--sigprofiler_genome` for a
   pre-installed GRCh38 genome on offline nodes).
+
+### AlphaGenome AVI scores
+
+The Ensembl VEP AVI plugin (`AVI.pm`, part of the pinned ensembl-vep 116.3 image) adds `AVI_PHRED`
+and `AVI_RAW` to the VEP table of the candidate mutations; `candidates/avi/` then holds one row
+per candidate variant and one per element (`docs/output.md`). The scores cover GRCh38
+single-nucleotide substitutions only: insertions, deletions and multi-base substitutions are never
+scored, and the element table says how many candidates could not be. `AVI_PHRED` is a
+genome-wide PHRED-scaled quantile (20 = top 1 % of all possible substitutions); higher means a
+larger predicted effect. The scores are annotation and hypothesis: AlphaGenome was trained and
+benchmarked on germline variation, its validity for somatic non-coding drivers is not established,
+and nothing in the pipeline filters or re-ranks on them.
+
+The score file is not bundled and the pipeline never downloads it. To stage it:
+
+1. Sign in with your Google account at <https://deepmind.google.com/science/alphagenome/downloads>,
+   accept the terms and download "AVI SNV scores" (`avi_scores_snvs_tabix.zip`, 88.5 GB) in your
+   own browser session. Do not share the sign-in. It is listed as a permissive-use download
+   (commercial and non-commercial use); read the terms on sharing outputs when you download.
+2. Put the archive in `<reference_base>/alphagenome/`, unzip it (allow about 180 GB free while
+   unpacking; that the archive is stored uncompressed is a third-party report, not checked here)
+   and list its contents. The score file must be bgzip-compressed TSV with
+   the columns chrom, pos, ref, alt, raw, phred (the order the plugin reads) and have a tabix
+   `.tbi` index beside it: the plugin does not accept a `.csi`.
+3. Record the MD5 of the archive, the score file and the `.tbi` and the download date. With the
+   datasheet, set `alphagenome_avi` (file name) and the three `alphagenome_avi*_md5` keys in
+   `assets/references/GRCh38.yml`; otherwise pass `--alphagenome_avi <file>`.
+
+The run stops before any task when `--run_alphagenome_avi` is set without `--run_vep`, without a
+score file or without its `.tbi` (`AVI_NEEDS_VEP`, `AVI_FILE_MISSING`, `AVI_INDEX_MISSING`),
+because VEP itself only warns and exits 0 when the plugin cannot load. The plugin folder is the
+one that holds the `vep` script in the image (`--dir_plugins`). The plugin's `links=1` option,
+which points to the non-commercial AlphaGenome Atlas, is not used.
 
 ## Karakoram
 

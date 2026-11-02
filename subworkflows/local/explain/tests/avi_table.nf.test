@@ -1,0 +1,92 @@
+nextflow_process {
+
+    name "Test AVI_TABLE and AVI_ELEMENT_SUMMARY (gawk adapters of the AlphaGenome AVI layer)"
+    script "../../../../modules/nf-core/gawk/main.nf"
+    process "GAWK"
+    config "./adapters.config"
+
+    tag "explain"
+    tag "alphagenome_avi"
+
+    // Fixture (tests/data/avi, invented scores, not AlphaGenome output): nine candidate rows, eight
+    // distinct variants. Scored: chr1:1000000 T>A (1.0), chr5:1295113 G>A (11.1, two samples, two
+    // VEP rows), chr5:1295113 G>T (33.3) and chr5:1295135 G>A (4.4, in two elements). Not scored:
+    // a deletion, an insertion and a GG>AA substitution (non-SNVs) and chr5:1295160 C>T (an SNV the
+    // score file does not hold).
+    test("AVI_TABLE - VEP table with the AVI plugin columns") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/avi"
+                input[0] = [ [ id:'test', prefix:'test.avi' ], [ file("\${d}/candidates.tsv", checkIfExists: true), file("\${d}/vep_avi.tab.gz", checkIfExists: true) ], 'tsv' ]
+                input[1] = file("${projectDir}/assets/awk/avi_table.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.output[0][1]).readLines()
+            def cols  = lines[0].tokenize('\t')
+            def rows  = lines.drop(1).collect { line -> [ cols, line.split('\t', -1).toList() ].transpose().collectEntries() }
+            assert process.success
+            assertAll(
+                { assert cols == [ 'variant_id', 'chrom', 'pos', 'ref', 'alt', 'vtype', 'element_ids', 'n_samples', 'avi_phred', 'avi_raw', 'avi_status' ] },
+                { assert rows.size() == 8 },
+                { assert rows.countBy { row -> row.avi_status } == [ scored: 4, not_scored_non_snv: 3, not_in_avi_file: 1 ] },
+                { assert rows.find { row -> row.variant_id == 'chr5:1295113:G:A' }.subMap([ 'n_samples', 'avi_phred', 'avi_raw' ]) == [ n_samples: '2', avi_phred: '11.1', avi_raw: '1.111' ] },
+                { assert rows.find { row -> row.variant_id == 'chr5:1295135:G:A' }.element_ids == 'promoter_ENSR00000746745,elem_C' },
+                { assert rows.findAll { row -> row.vtype in [ 'DEL', 'INS', 'DNP' ] }.every { row -> row.avi_phred == 'NA' && row.avi_status == 'not_scored_non_snv' } },
+                { assert snapshot(process.out.output).match() }
+            )
+        }
+    }
+
+    // VEP exits 0 when the plugin cannot load; the adapter turns the missing column into an error
+    test("AVI_TABLE - VEP table without AVI_PHRED fails") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/avi"
+                input[0] = [ [ id:'test', prefix:'test.avi' ], [ file("\${d}/candidates.tsv", checkIfExists: true), file("\${d}/vep_no_avi.tab.gz", checkIfExists: true) ], 'tsv' ]
+                input[1] = file("${projectDir}/assets/awk/avi_table.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            assert process.failed
+            assert (process.stdout + process.stderr + file("${metaDir}/nextflow.log").readLines()).any { line -> line.contains('the VEP table has no AVI_PHRED column: the AVI plugin did not load') }
+        }
+    }
+
+    test("AVI_ELEMENT_SUMMARY - per-element counts and maximum") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', prefix:'test.avi.element_summary' ], file("${projectDir}/tests/data/avi/avi.tsv", checkIfExists: true), 'tsv' ]
+                input[1] = file("${projectDir}/assets/awk/avi_element_summary.awk", checkIfExists: true)
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.output[0][1]).readLines()
+            def cols  = lines[0].tokenize('\t')
+            def rows  = lines.drop(1).collect { line -> [ cols, line.split('\t', -1).toList() ].transpose().collectEntries() }
+            assert process.success
+            assertAll(
+                { assert cols == [ 'element_id', 'n_candidate_variants', 'n_snv', 'n_scored', 'max_avi_phred', 'top_variant', 'n_phred_ge_20' ] },
+                { assert rows*.element_id == [ 'elem_B', 'elem_C', 'promoter_ENSR00000746745' ] },
+                { assert rows.find { row -> row.element_id == 'promoter_ENSR00000746745' }.subMap([ 'n_candidate_variants', 'n_snv', 'n_scored', 'max_avi_phred', 'top_variant', 'n_phred_ge_20' ]) ==
+                    [ n_candidate_variants: '7', n_snv: '4', n_scored: '3', max_avi_phred: '33.3', top_variant: 'chr5:1295113:G:T', n_phred_ge_20: '1' ] },
+                { assert snapshot(process.out.output).match() }
+            )
+        }
+    }
+}

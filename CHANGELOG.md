@@ -65,6 +65,14 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   `bedtools/map`), Ensembl VEP 116.3 on candidate mutations (`--run_vep`; nf-core
   `ensemblvep/vep`, offline cache) and motifbreakR 2.24.0 on candidate SNVs (`--run_motifbreakr`;
   JASPAR 2026 CORE vertebrates bundled).
+- AlphaGenome Variant Impact scores of the candidate SNVs (`--run_alphagenome_avi`, off by
+  default, needs `--run_vep`): the Ensembl VEP AVI plugin of the ensembl-vep 116.3 image adds
+  `AVI_PHRED` and `AVI_RAW` to the VEP table; gawk adapters write `candidates/avi/<cohort>.avi.tsv`
+  (one row per candidate variant with `avi_status`) and `<cohort>.avi.element_summary.tsv`. The
+  user-downloaded score file (`--alphagenome_avi`, datasheet key `alphagenome_avi`, checksums
+  pending the download) is checked with its `.tbi` before any task (`AVI_NEEDS_VEP`,
+  `AVI_FILE_MISSING`, `AVI_INDEX_MISSING`), and `AVI_TABLE` fails when the plugin did not load.
+  Annotation only; with the layer off the VEP command is unchanged.
 - Optional cohort-level signature QC (`--run_sigprofiler`; nf-core `sigprofiler`).
 - MultiQC 1.35 report with a per-cohort run summary (`RUNSUMMARYMQC`).
 - Pipeline-owned images `ghcr.io/khalofx/noncodingdrivers-{utils,activedriverwgs,mutenricher,combinepvalues,motifbreakr}`,
@@ -97,5 +105,6 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 | Ensembl VEP           | 116.3   |
 | motifbreakR           | 2.24.0  |
 | universalmotif        | 1.28.0  |
+| VEP AVI plugin        | 116     |
 | SigProfilerExtractor  | 1.2.2   |
 | MultiQC               | 1.35    |

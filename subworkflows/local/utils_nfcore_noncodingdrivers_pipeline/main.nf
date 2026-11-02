@@ -270,6 +270,7 @@ def resolveReferences() {
         low_mappability_bed : pickRef(sheet, 'low_mappability_bed', 'low_mappability_bed'),
         umap_bed            : pickRef(sheet, 'umap_bed', 'umap_bed'),
         gnomad_echtvar      : pickRef(sheet, 'gnomad_echtvar', 'gnomad_echtvar'),
+        alphagenome_avi     : pickRef(sheet, 'alphagenome_avi', 'alphagenome_avi'),
     ]
     // FASTA and its companions
     refs.fasta = pickRef(sheet, 'fasta', 'fasta')
@@ -365,6 +366,21 @@ def validateDriverParameters(refs) {
     }
     if (params.run_vep && !refs.vep_cache) {
         error("--run_vep needs --vep_cache (or --reference_base for the datasheet): an offline Ensembl VEP cache directory (homo_sapiens/${params.vep_cache_version}_GRCh38 inside it).")
+    }
+    // VEP exits 0 when the AVI plugin cannot load (no plugin folder, no .tbi): check here, before any task
+    if (params.run_alphagenome_avi) {
+        if (!params.run_vep) {
+            error("AVI_NEEDS_VEP: --run_alphagenome_avi reads the AlphaGenome AVI scores through the Ensembl VEP AVI plugin: set --run_vep true as well.")
+        }
+        if (!refs.alphagenome_avi) {
+            error("AVI_FILE_MISSING: --run_alphagenome_avi needs --alphagenome_avi (or --reference_base for the datasheet): the AlphaGenome AVI SNV score file \"AVI SNV scores\" (bgzip TSV, tabix-indexed), downloaded by the user (docs/usage.md).")
+        }
+        if (!file(refs.alphagenome_avi).exists()) {
+            error("AVI_FILE_MISSING: the AlphaGenome AVI score file ${refs.alphagenome_avi} does not exist.")
+        }
+        if (!file("${refs.alphagenome_avi}.tbi").exists()) {
+            error("AVI_INDEX_MISSING: ${refs.alphagenome_avi}.tbi not found. The VEP AVI plugin reads only a tabix .tbi index (not .csi) and VEP does not fail without it: index the file with tabix -s 1 -b 2 -e 2.")
+        }
     }
     validateConsensusCallers()
 }
@@ -484,6 +500,7 @@ def toolCitationText() {
             params.run_variant_flags ? "echtvar (Pedersen et al. 2023) with gnomAD v4.1 (Chen et al. 2024)," : "",
             params.run_vep ? "Ensembl VEP (McLaren et al. 2016)," : "",
             params.run_motifbreakr ? "motifbreakR (Coetzee et al. 2015) with JASPAR (Rauluseviciute et al. 2024)," : "",
+            params.run_alphagenome_avi ? "AlphaGenome Variant Impact scores (Avsec et al. 2026; Cheng et al. 2026) through the VEP AVI plugin," : "",
             "MultiQC (Ewels et al. 2016)",
             ".",
             callerRolesText()
@@ -511,7 +528,7 @@ def callerRolesText() {
 
 def toolBibliographyText() {
     // Bibliography of the tools of this run (MultiQC methods description)
-    def reference_text = [
+    def reference_text = ([
             "<li>Danecek, P., et al. (2021). Twelve years of SAMtools and BCFtools. GigaScience, 10(2). doi: <a href=\"https://doi.org/10.1093/gigascience/giab008\">10.1093/gigascience/giab008</a></li>",
             "<li>Quinlan, A. R., & Hall, I. M. (2010). BEDTools: a flexible suite of utilities for comparing genomic features. Bioinformatics, 26(6). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btq033\">10.1093/bioinformatics/btq033</a></li>",
             params.run_activedriverwgs ? "<li>Zhu, H., et al. (2020). Candidate cancer driver mutations in distal regulatory elements and long-range chromatin interaction networks. Molecular Cell, 77(6). doi: <a href=\"https://doi.org/10.1016/j.molcel.2019.12.027\">10.1016/j.molcel.2019.12.027</a></li>" : "",
@@ -527,8 +544,15 @@ def toolBibliographyText() {
             params.run_vep ? "<li>McLaren, W., et al. (2016). The Ensembl Variant Effect Predictor. Genome Biology, 17. doi: <a href=\"https://doi.org/10.1186/s13059-016-0974-4\">10.1186/s13059-016-0974-4</a></li>" : "",
             params.run_motifbreakr ? "<li>Coetzee, S. G., Coetzee, G. A., & Hazelett, D. J. (2015). motifbreakR: an R/Bioconductor package for predicting variant effects at transcription factor binding sites. Bioinformatics, 31(23). doi: <a href=\"https://doi.org/10.1093/bioinformatics/btv470\">10.1093/bioinformatics/btv470</a></li>" : "",
             params.run_motifbreakr ? "<li>Rauluseviciute, I., et al. (2024). JASPAR 2024: 20th anniversary of the open-access database of transcription factor binding profiles. Nucleic Acids Research, 52(D1). doi: <a href=\"https://doi.org/10.1093/nar/gkad1059\">10.1093/nar/gkad1059</a></li>" : "",
+        ] +
+        // Step 7A layers: listed only when on, so the text of a run without them is unchanged
+        (params.run_alphagenome_avi ? [
+            "<li>Avsec, Ž., et al. (2026). Advancing regulatory variant effect prediction with AlphaGenome. Nature, 649(8099), 1206–1218. doi: <a href=\"https://doi.org/10.1038/s41586-025-10014-0\">10.1038/s41586-025-10014-0</a></li>",
+            "<li>Cheng, J., et al. (2026). AlphaGenome Atlas: in silico mutagenesis of the entire human genome improves prioritization and interpretation of non-coding variants. medRxiv (preprint). doi: <a href=\"https://doi.org/10.64898/2026.09.16.26363192\">10.64898/2026.09.16.26363192</a></li>"
+        ] : []) +
+        [
             "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics, 32(19), 3047–3048. doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw354\">10.1093/bioinformatics/btw354</a></li>"
-        ].join(' ').trim()
+        ]).join(' ').trim()
 
     return reference_text
 }
