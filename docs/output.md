@@ -51,6 +51,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - `callers/oncodrivefml/`
   - `<cohort>.oncodrivefml.tsv`: the native OncodriveFML table (`GENE_ID` is the element id; `P_VALUE`, `Q_VALUE` and their `_NEG` counterparts, mutation and sample counts).
   - `<cohort>.oncodrivefml.status.txt`: the exit code of the OncodriveFML run.
+- `callers/oncodriveclustl/` (`--run_oncodriveclustl`)
+  - `<cohort>.oncodriveclustl.tsv`: the native OncodriveCLUSTL element table (`ENSID` is the element id; `TOTAL_MUT`, `CLUSTERED_MUT`, `CLUSTERS`, `SIM_CLUSTERS`, `SCORE`, `P_`/`Q_EMPIRICAL`, `P_`/`Q_ANALYTICAL`, `P_`/`Q_TOPCLUSTER`; `CGC` is `Non Available` on hg38). One row per element with at least `--oncodriveclustl_element_mutations` SNVs; p-values are empty for elements without an observed cluster (not tested). q-values are Benjamini–Hochberg over the tested elements of all shards. `P_ANALYTICAL`/`Q_ANALYTICAL` are harmonised as `p_oncodriveclustl`/`q_oncodriveclustl`.
+  - `<cohort>.oncodriveclustl.clusters.tsv`: one row per cluster (`RANK` of its element, coordinates, `MAX_COORD`, `WIDTH`, `N_MUT`, `N_SAMPLES`, `FRA_UNIQ_SAMPLES`, `SCORE`, `P`).
+  - `<cohort>.oncodriveclustl.log`: the OncodriveCLUSTL log of every shard.
 - `callers/mutenricher/` (`--run_mutenricher`): the native MutEnricher region table (SNVs only, sample-count statistic, local background). QC only: it never enters the combination.
 
 </details>
@@ -97,7 +101,7 @@ derived downstream from `driver_evidence.tsv`.
 - `postfilter/`
   - `<cohort>.postfilter.tsv`: one row per element of the consensus table with a value, a threshold and `pass`, `fail` or `not_applied` for minimum support (`--postfilter_min_mutations`, `--postfilter_min_patients`), mappability (share of the element's mutations outside GIAB low mappability above `--postfilter_min_mappable_fraction`) and maximum sample fraction (`--postfilter_max_sample_fraction`), and `postfilter_status`. With `--postfilter_mode pcawg`, `q_postfilter`: Benjamini-Hochberg after failing elements are set to p = 1; `consensus_q` is never changed.
 - `evidence/`
-  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values (combined callers and callers reported alongside), the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`). When a caller is reported alongside, one cohort-level row per caller records its role (`caller_role_<caller>`: value `1`, status `combined`, or value `0`, status `reported_alongside`); with every caller combined (the default) these rows are not written. `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
+  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values (combined callers and callers reported alongside; with `--run_oncodriveclustl` also `oncodriveclustl_n_clusters` and `oncodriveclustl_clustered_mutations` from its native table, `not_tested` for elements below its mutation cutoff), the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`). When a caller is reported alongside, one cohort-level row per caller records its role (`caller_role_<caller>`: value `1`, status `combined`, or value `0`, status `reported_alongside`); with every caller combined (the default) these rows are not written. `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
 
 </details>
 
@@ -110,7 +114,11 @@ positive under the null. A method is `excluded_for_inflation` when a null replic
 above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
 `conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
 that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
-`docs/validation.md`).
+`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is calibrated like the other
+callers, but it tests only elements with an observed cluster, so its `lambda` over those elements
+is inflated by construction in the observed and the null runs alike and its band status is not a
+calibration verdict; `docs/validation.md` records the statistic used for OncodriveCLUSTL instead
+(the null false-positive rate over the elements it analysed).
 
 <details markdown="1">
 <summary>Output files</summary>

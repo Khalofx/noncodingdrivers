@@ -12,6 +12,7 @@
 
 - ActiveDriverWGS — Zhu H, et al. Mol Cell 2020. doi:10.1016/j.molcel.2019.12.027
 - OncodriveFML — Mularoni L, et al. Genome Biol 2016. doi:10.1186/s13059-016-0994-0
+- OncodriveCLUSTL — Arnedo-Pac C, et al. Bioinformatics 2019;35(22):4788-4790. doi:10.1093/bioinformatics/btz501; erratum Bioinformatics 2019;35(24):5396. doi:10.1093/bioinformatics/btz588
 - CADD v1.7 (functional-impact scores for OncodriveFML; non-commercial terms, supplied by the user) — Schubach M, et al. Nucleic Acids Res 2024. doi:10.1093/nar/gkad989
 - MutEnricher — Soltis AR, et al. BMC Bioinformatics 2020. doi:10.1186/s12859-020-03695-z
 - Empirical Brown's method — Poole W, et al. Bioinformatics 2016. doi:10.1093/bioinformatics/btw438; Brown MB. Biometrics 1975. doi:10.2307/2529826

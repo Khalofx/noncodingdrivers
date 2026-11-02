@@ -30,6 +30,14 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 - P-value combination (`COMBINEPVALUES`): the empirical Brown's method (default) or ACAT sets
   `consensus_q` (Benjamini–Hochberg, `--fdr_threshold`); ACAT, robust rank aggregation and caller
   votes are published as sensitivity columns; `--skip_acat` where the ACAT package is unavailable.
+- OncodriveCLUSTL 1.2.0 (`--run_oncodriveclustl`, off by default; local `ONCODRIVECLUSTL`, public
+  image `ghcr.io/khalofx/noncodingdrivers-oncodriveclustl:1.2.0` from `containers/oncodriveclustl`
+  with the bundled COSMIC CGC list reduced to its header), reported alongside the consensus:
+  `p_oncodriveclustl`/`q_oncodriveclustl` (`P_`/`Q_ANALYTICAL`) carried in the consensus table,
+  cluster counts in the evidence table. The regions are prefiltered to the ids with at least
+  `--oncodriveclustl_element_mutations` SNVs (nf-core `bedtools/intersect` and `gawk`; exact) and
+  run in shards of `--oncodriveclustl_shard_size` ids with one cohort signature and q-values over
+  all shards (`bin/merge_oncodriveclustl_shards.py`). It reads the OncodriveFML bgdata genome.
 - `--consensus_callers` (default `activedriverwgs,oncodrivefml`): the callers whose p-values are
   combined (`combine_pvalues.R --callers`). Every other enabled caller is reported alongside: its
   `p_`/`q_` columns are carried in the consensus and evidence tables, not combined. Validation
