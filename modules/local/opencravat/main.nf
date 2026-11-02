@@ -49,11 +49,11 @@ process OPENCRAVAT {
         error("OPENCRAVAT runs in its image only (containers/opencravat: the OpenCRAVAT modules are installed when the image is built); conda is not supported.")
     }
     """
-    # 1. Task-local OpenCRAVAT configuration: the image's, with the metrics folder in this task.
+    # 1. Task-local OpenCRAVAT configuration: the image's, with the metrics and work folders in this task.
     #    Every remote address in it must be the closed local port.
     conf_image=\${OPENCRAVAT_IMAGE_CONF:?OPENCRAVAT needs the noncodingdrivers OpenCRAVAT image (containers/opencravat)}
-    mkdir -p oc_metrics
-    sed "s|^metrics_dir:.*|metrics_dir: \$PWD/oc_metrics|" "\$conf_image" > cravat-system.yml
+    mkdir -p oc_metrics oc_work
+    sed -e "s|^metrics_dir:.*|metrics_dir: \$PWD/oc_metrics|" -e "s|^work_dir:.*|work_dir: \$PWD/oc_work|" "\$conf_image" > cravat-system.yml
     if grep -E '^[a-z_]+_url:' cravat-system.yml | grep -v -F ': ${closed}'; then
         echo "OPENCRAVAT_TELEMETRY: an address in the OpenCRAVAT configuration is not the closed local port ${closed}" >&2
         exit 1
@@ -93,7 +93,7 @@ process OPENCRAVAT {
 
     # 4. The metrics copy OpenCRAVAT saves after the failed POST leaves no output: count it, delete it
     n_metrics=\$(find oc_metrics -name 'ocmetric_*.json' | wc -l)
-    rm -rf oc_metrics netaudit.raw
+    rm -rf oc_metrics oc_work netaudit.raw
     {
         printf 'item\\tvalue\\n'
         grep -E '^(metrics|store|publish)_url:' cravat-system.yml | sed 's/: /\\t/'
