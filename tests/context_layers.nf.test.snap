@@ -1,0 +1,195 @@
+{
+    "-profile test - all context layers on": {
+        "content": [
+            {
+                "ACTIVEDRIVERWGS": {
+                    "activedriverwgs": "1.2.1",
+                    "r-base": "4.5.3"
+                },
+                "ANCHOR_BASES": {
+                    "bedtools": "2.31.1"
+                },
+                "ANCHOR_JOIN": {
+                    "csvtk": "0.37.0"
+                },
+                "CALLABLE_TERRITORY": {
+                    "bedtools": "2.31.1"
+                },
+                "CANCERGENECONTEXT": {
+                    "python": "3.11.14"
+                },
+                "CANDIDATES": {
+                    "bedtools": "2.31.1"
+                },
+                "CANDIDATE_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "CCRE_CELLTYPE_OVERLAP": {
+                    "bedtools": "2.31.1"
+                },
+                "CCRE_CELLTYPE_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "CCRE_OVERLAP": {
+                    "bedtools": "2.31.1"
+                },
+                "CCRE_SUMMARY": {
+                    "gawk": "5.3.1"
+                },
+                "CCRE_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "COHORT_CONCAT": {
+                    "csvtk": "0.37.0"
+                },
+                "COHORT_DEDUP": {
+                    "gawk": "5.3.1"
+                },
+                "COMBINEPVALUES": {
+                    "acat": 0.91,
+                    "empiricalbrownsmethod": "1.34.0",
+                    "r-base": "4.4.3",
+                    "robustrankaggreg": "1.2.1"
+                },
+                "COSMICCONTEXT": {
+                    "python": "3.11.14"
+                },
+                "ELEMENT_CALLABLE": {
+                    "bedtools": "2.31.1"
+                },
+                "ELEMENT_COORDS": {
+                    "gawk": "5.3.1"
+                },
+                "ELEMENT_FLAGS_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "ELEMENT_HITS": {
+                    "bedtools": "2.31.1"
+                },
+                "FLAGS_BED": {
+                    "gawk": "5.3.1"
+                },
+                "GERMLINE_QUERY": {
+                    "bcftools": 1.25
+                },
+                "GNOMAD_ANNO": {
+                    "echtvar": "0.2.4"
+                },
+                "HARMONIZECALLS": {
+                    "csvtk": "0.37.0"
+                },
+                "INDEL_ANCHORS": {
+                    "gawk": "5.3.1"
+                },
+                "MASK_BLACKLIST": {
+                    "bedtools": "2.31.1"
+                },
+                "MASK_LOW_MAPPABILITY": {
+                    "bedtools": "2.31.1"
+                },
+                "MASK_SEGDUP": {
+                    "bedtools": "2.31.1"
+                },
+                "MASK_UMAP": {
+                    "bedtools": "2.31.1"
+                },
+                "MIDPOINT_BED": {
+                    "gawk": "5.3.1"
+                },
+                "MUTATION_BED": {
+                    "gawk": "5.3.1"
+                },
+                "NEAREST_PC_TSS": {
+                    "bedtools": "2.31.1"
+                },
+                "NEAREST_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "NEAREST_TSS": {
+                    "bedtools": "2.31.1"
+                },
+                "ONCODRIVEFML": {
+                    "oncodrivefml": "2.5.0"
+                },
+                "PC_TSS": {
+                    "gawk": "5.3.1"
+                },
+                "POSTFILTERFLAGS": {
+                    "python": "3.11.14"
+                },
+                "RE2G_LINKS": {
+                    "gawk": "5.3.1"
+                },
+                "RE2G_OVERLAP": {
+                    "bedtools": "2.31.1"
+                },
+                "RE2G_SUMMARY": {
+                    "gawk": "5.3.1"
+                },
+                "REGCTX_OVERLAP": {
+                    "bedtools": "2.31.1"
+                },
+                "REGCTX_SIGNAL": {
+                    "bedtools": "2.31.1"
+                },
+                "REGCTX_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "RUNSUMMARYMQC": {
+                    "python": "3.11.14"
+                },
+                "SIGNIFICANT_BED": {
+                    "gawk": "5.3.1"
+                },
+                "SITES_VCF": {
+                    "gawk": "5.3.1"
+                },
+                "SORT_MIDPOINTS": {
+                    "bedtools": "2.31.1"
+                },
+                "SORT_PEAKS": {
+                    "bedtools": "2.31.1"
+                },
+                "SORT_SIGNIFICANT": {
+                    "bedtools": "2.31.1"
+                },
+                "SORT_SITES_VCF": {
+                    "bcftools": 1.25
+                },
+                "UNTAR_ONCODRIVEFML_GENOME": {
+                    "untar": 1.34
+                },
+                "VARIANT_FLAGS_TABLE": {
+                    "gawk": "5.3.1"
+                },
+                "VARIANT_SITES": {
+                    "gawk": "5.3.1"
+                },
+                "WRITEDRIVEREVIDENCE": {
+                    "python": "3.11.14"
+                },
+                "Workflow": {
+                    "khalofx/noncodingdrivers": "v1.0.0dev"
+                }
+            },
+            [
+                "SYNTH-TERT.cosmic.mutation_summary.tsv:md5,7d5191b3489f6e980c18b112cc2b999c",
+                "SYNTH-TERT.cosmic.element_summary.tsv:md5,6cad8393b66e21c96e899f510e781f09",
+                "SYNTH-TERT.cosmic.provenance.json:md5,632c9440e8f72eb6f7881b910f2875ed",
+                "SYNTH-TERT.cosmic.exact_matches.tsv:md5,a672ebe54234149d16205b10a0dbcbbc",
+                "NOTICE.txt:md5,e3590514552a9d022d6f43b31731129e",
+                "SYNTH-TERT.cancer_gene_context.tsv:md5,fdfa921a20c5961d0a0dfa2392572391",
+                "SYNTH-TERT.enhancer_gene_links.tsv:md5,2ac460fd84dcd1dd462f6fb51ca0809e",
+                "SYNTH-TERT.enhancer_gene_summary.tsv:md5,1e8c14e461078b2d26bb153df66afaf0",
+                "SYNTH-TERT.ccre_v4.tsv:md5,8e453c9472b8c98655ddd224f9293371",
+                "SYNTH-TERT.ccre_v4_summary.tsv:md5,262918ab8f8052255bf57b733838c727",
+                "SYNTH-TERT.ccre_v4_celltype.tsv:md5,acd3e9654626fde88f53a8ced035ba34"
+            ]
+        ],
+        "timestamp": "2026-11-02T16:23:49.547321704",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}
