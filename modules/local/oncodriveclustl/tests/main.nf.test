@@ -35,8 +35,9 @@ nextflow_process {
         }
     }
 
-    // Real run on every fixture row (below-cutoff, empty and unplaced elements included). Seeded
-    // (--seed 1): the tables are deterministic, so their md5 is snapshotted.
+    // Real run on every fixture row (below-cutoff, empty and unplaced elements included); the task keeps
+    // the rows of the ids with >= -emut SNVs. Seeded (--seed 1): the tables are deterministic, so their
+    // md5 is snapshotted.
     test("synthetic TERT cohort - all catalogue rows") {
 
         when {
@@ -72,14 +73,16 @@ nextflow_process {
                 { assert !rows.any { r -> r[h.indexOf('ENSID')] == 'elem_unplaced' } },
                 { assert rows.find { r -> r[h.indexOf('ENSID')] == 'elem_split' }[h.indexOf('TOTAL_MUT')] == '2' },
                 { assert analysed_md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
+                // only the analysed ids reach OncodriveCLUSTL (prefilter in the task)
+                { assert path(process.out.results[0][1]).md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
                 { assert path(process.out.clusters[0][1]).md5 == '28ee9fc36afc5124eb24d1edd7cfec2b' },
                 { assert snapshot(process.out.results, process.out.clusters, process.out.versions_oncodriveclustl).match() }
             )
         }
     }
 
-    // Prefilter exactness: on the rows of the analysed ids only (what CLUSTL_REGIONS keeps), the
-    // analysed elements' rows and the clusters are the same as with every catalogue row (test above).
+    // Prefilter idempotence: the rows of the analysed ids only (what bin/oncodriveclustl_prefilter.py
+    // keeps) give the same tables as every catalogue row (test above).
     test("synthetic TERT cohort - prefiltered rows") {
 
         when {

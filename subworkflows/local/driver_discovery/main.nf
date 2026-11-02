@@ -8,9 +8,6 @@
 include { ACTIVEDRIVERWGS           } from '../../../modules/local/activedriverwgs'
 include { ONCODRIVEFML              } from '../../../modules/local/oncodrivefml'
 include { MUTENRICHER               } from '../../../modules/local/mutenricher'
-include { GAWK as CLUSTL_SNV_BED    } from '../../../modules/nf-core/gawk/main'
-include { BEDTOOLS_INTERSECT as CLUSTL_ELEMENT_COUNTS } from '../../../modules/nf-core/bedtools/intersect/main'
-include { GAWK as CLUSTL_REGIONS    } from '../../../modules/nf-core/gawk/main'
 include { ONCODRIVECLUSTL           } from '../../../modules/local/oncodriveclustl'
 include { HARMONIZECALLS            } from '../../../modules/local/harmonizecalls'
 include { GAWK as ELEMENT_COORDS    } from '../../../modules/nf-core/gawk/main'
@@ -45,19 +42,10 @@ workflow DRIVER_DISCOVERY {
         ch_raw = ch_raw.mix(ONCODRIVEFML.out.results.map { meta, tsv -> [ meta, 'oncodrivefml', tsv ] })
     }
     if ('oncodriveclustl' in callers) {
-        // Prefilter (layout only; exact): OncodriveCLUSTL analyses the ids with >= -emut SNVs, and its
-        // run time grows with the size of the regions file, so only those ids' rows are passed. SNVs of
-        // the canonical table as BED points, counted per catalogue row (bedtools intersect -c), summed
-        // per id (gawk). The signature is computed from all SNVs, so the analysed elements' results do
-        // not change (docs/validation.md).
-        CLUSTL_SNV_BED(ch_mutations.map { meta, tsv -> [ meta, tsv, 'bed' ] }, [], false)
-        CLUSTL_ELEMENT_COUNTS(
-            CLUSTL_SNV_BED.out.output.combine(ch_elements).map { meta, snvs, _meta2, bed -> [ meta, bed, snvs ] },
-            [ [:], [] ],
-            'bed'
-        )
-        CLUSTL_REGIONS(CLUSTL_ELEMENT_COUNTS.out.intersect.map { meta, counts -> [ meta, counts, 'bed' ] }, [], false)
-        ONCODRIVECLUSTL(ch_mutations.join(CLUSTL_REGIONS.out.output), bgdata_genome)
+        // The module itself keeps the catalogue rows of the ids with >= -emut SNVs (exact; layout only)
+        // and emits its version with env(): enabling OncodriveCLUSTL adds no eval() output, which would
+        // rename the later eval-using tasks and re-run them on -resume (docs/validation.md)
+        ONCODRIVECLUSTL(ch_mutations.combine(ch_elements).map { meta, tsv, _meta2, bed -> [ meta, tsv, bed ] }, bgdata_genome)
         ch_raw = ch_raw.mix(ONCODRIVECLUSTL.out.results.map { meta, tsv -> [ meta, 'oncodriveclustl', tsv ] })
     }
     // QC-only: published unmodified, not harmonised, not anchored, not combined

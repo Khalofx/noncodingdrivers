@@ -4,7 +4,7 @@
   `elem_split` (two fragments with one SNV each of `tests/data/activedriverwgs/mutations.tsv`, so two
   SNVs as one element) and `elem_empty` (no SNV).
 - `elements.prefiltered.bed`: the rows of the ids with at least 2 SNVs (`elem_B`, `TERT_promoter_fixture`,
-  `elem_D`, `elem_split`), in catalogue order: what `CLUSTL_ELEMENT_COUNTS` + `CLUSTL_REGIONS` keep.
+  `elem_D`, `elem_split`), in catalogue order: what `bin/oncodriveclustl_prefilter.py` keeps.
   `elem_A`, `elem_C` and `elem_E` hold one SNV, `elem_empty` none, `elem_unplaced` is off the primary
   chromosomes.
 - `expected.*`, `shard*.*` (unit test of `bin/merge_oncodriveclustl_shards.py`): the 36 tested elements and

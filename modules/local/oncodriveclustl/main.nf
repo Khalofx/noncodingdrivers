@@ -12,14 +12,16 @@ process ONCODRIVECLUSTL {
     container 'ghcr.io/khalofx/noncodingdrivers-oncodriveclustl@sha256:8925475d0045b13dac79e4ac7ee1852db1b123843c9c31c9cfed2141f5aa5c7f'
 
     input:
-    tuple val(meta), path(mutations), path(elements) // canonical cohort table (sample chrom pos ref alt vtype); element rows (headerless BED >= 4 columns), usually the ids with >= -emut SNVs
+    tuple val(meta), path(mutations), path(elements) // canonical cohort table (sample chrom pos ref alt vtype); element catalogue rows (headerless BED >= 4 columns)
     path bgdata_genome                               // offline bgdata hg38 genome directory, or [] for bgdata's own cache
 
     output:
     tuple val(meta), path("${prefix}.oncodriveclustl.tsv"),          emit: results
     tuple val(meta), path("${prefix}.oncodriveclustl.clusters.tsv"), emit: clusters
     tuple val(meta), path("${prefix}.oncodriveclustl.log"),          emit: log
-    tuple val("${task.process}"), val('oncodriveclustl'), eval('cat oncodriveclustl.version.txt'), topic: versions, emit: versions_oncodriveclustl
+    // env(), not eval(): Nextflow names eval outputs by a pipeline-wide counter that enters the task
+    // hash, so a new eval output would rename (and re-run on -resume) every later eval-using task
+    tuple val("${task.process}"), val('oncodriveclustl'), env('ONCODRIVECLUSTL_VERSION'), topic: versions, emit: versions_oncodriveclustl
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,6 +30,8 @@ process ONCODRIVECLUSTL {
     def args       = task.ext.args ?: ''             // OncodriveCLUSTL options, with --seed (conf/modules.config)
     def shard_size = task.ext.shard_size ?: 5000     // element ids per OncodriveCLUSTL run
     prefix         = task.ext.prefix ?: "${meta.id}"
+    def emut_arg   = args =~ /(?:^|\s)(?:-emut|--element-mutations)\s+(\d+)/
+    def emut       = emut_arg.find() ? emut_arg.group(1) : '2'  // OncodriveCLUSTL's default
     if (!(args =~ /(^|\s)--seed\s+\d+/)) {
         error("ONCODRIVECLUSTL needs --seed <n> in ext.args: without it the simulations are not reproducible.")
     }
@@ -49,7 +53,13 @@ process ONCODRIVECLUSTL {
     export MPLCONFIGDIR="\$PWD/.matplotlib"
     mkdir -p "\$XDG_CONFIG_HOME" "\$MPLCONFIGDIR"
     ${genome_cache}
-    python -c 'import importlib.metadata as m; print(m.version("oncodriveclustl"))' > oncodriveclustl.version.txt
+    ONCODRIVECLUSTL_VERSION=\$(python -c 'import importlib.metadata as m; print(m.version("oncodriveclustl"))')
+
+    # Prefilter (layout only; exact): the catalogue rows of the ids with >= -emut (${emut}) SNVs in
+    # total, in catalogue order. OncodriveCLUSTL analyses only those ids, and its run time grows with
+    # the size of the regions file; the signature is computed from all SNVs, so the analysed
+    # elements' results do not change (docs/validation.md).
+    oncodriveclustl_prefilter.py --mutations ${mutations} --elements ${elements} --min-snvs ${emut} --out elements.analysed.bed
 
     # Canonical table -> OncodriveCLUSTL input (CHROMOSOME, POSITION, REF, ALT, SAMPLE): SNVs on the
     # 24 primary chromosomes (the contigs of the regions; the signature is computed from these SNVs),
@@ -72,7 +82,7 @@ process ONCODRIVECLUSTL {
            f = sprintf("regions.%05d.tsv", shard[\$4]);
            if(!(f in seen)){ print "CHROMOSOME","START","END","ELEMENT","SYMBOL" > f; seen[f] = 1 }
            print ch, \$2 + 1, \$3, \$4, \$4 > f
-         }' ${elements}
+         }' elements.analysed.bed
 
     # One OncodriveCLUSTL run per shard. The first run computes the mutational signature from all
     # SNVs of the cohort (OncodriveCLUSTL's frequencies method); every later shard reads that
@@ -133,6 +143,6 @@ process ONCODRIVECLUSTL {
     printf 'SYMBOL\\tENSID\\tCGC\\tCHROMOSOME\\tSTRAND\\tLENGTH\\tTOTAL_MUT\\tCLUSTERED_MUT\\tCLUSTERS\\tSIM_CLUSTERS\\tSCORE\\tP_EMPIRICAL\\tQ_EMPIRICAL\\tP_ANALYTICAL\\tQ_ANALYTICAL\\tP_TOPCLUSTER\\tQ_TOPCLUSTER\\n' > ${prefix}.oncodriveclustl.tsv
     printf 'RANK\\tSYMBOL\\tENSID\\tCGC\\tCHROMOSOME\\tSTRAND\\tCOORDINATES\\tMAX_COORD\\tWIDTH\\tN_MUT\\tN_SAMPLES\\tFRA_UNIQ_SAMPLES\\tSCORE\\tP\\n' > ${prefix}.oncodriveclustl.clusters.tsv
     touch ${prefix}.oncodriveclustl.log
-    echo "1.2.0" > oncodriveclustl.version.txt
+    ONCODRIVECLUSTL_VERSION=1.2.0
     """
 }

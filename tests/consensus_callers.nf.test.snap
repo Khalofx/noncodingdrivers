@@ -21,15 +21,6 @@
                 "CANDIDATE_TABLE": {
                     "gawk": "5.3.1"
                 },
-                "CLUSTL_ELEMENT_COUNTS": {
-                    "bedtools": "2.31.1"
-                },
-                "CLUSTL_REGIONS": {
-                    "gawk": "5.3.1"
-                },
-                "CLUSTL_SNV_BED": {
-                    "gawk": "5.3.1"
-                },
                 "COHORT_CONCAT": {
                     "csvtk": "0.37.0"
                 },

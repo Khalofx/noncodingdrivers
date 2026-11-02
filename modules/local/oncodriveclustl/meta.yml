@@ -30,9 +30,9 @@ input:
     - elements:
         type: file
         description: |
-          Element catalogue rows, headerless BED (chrom, start, end, element id, ...). In the pipeline these are
-          the ids with at least `-emut` SNVs (CLUSTL_REGIONS); the analysed elements and their results are the
-          same with the full catalogue, which only costs run time.
+          Element catalogue rows, headerless BED (chrom, start, end, element id, ...). The task keeps the rows
+          of the ids with at least `-emut` SNVs in total (`bin/oncodriveclustl_prefilter.py`; exact: the other
+          ids are not analysed by OncodriveCLUSTL, and the signature is computed from all SNVs).
         pattern: "*.bed"
         ontologies: []
   - bgdata_genome:
@@ -77,9 +77,9 @@ output:
       - "oncodriveclustl":
           type: string
           description: The name of the tool
-      - "cat oncodriveclustl.version.txt":
-          type: eval
-          description: The expression to obtain the version of the tool
+      - "ONCODRIVECLUSTL_VERSION":
+          type: string
+          description: The version of the tool (env output; set from the installed package metadata)
 
 topics:
   versions:
@@ -89,9 +89,9 @@ topics:
       - "oncodriveclustl":
           type: string
           description: The name of the tool
-      - "cat oncodriveclustl.version.txt":
-          type: eval
-          description: The expression to obtain the version of the tool
+      - "ONCODRIVECLUSTL_VERSION":
+          type: string
+          description: The version of the tool (env output; set from the installed package metadata)
 authors:
   - "@Khalofx"
 maintainers:

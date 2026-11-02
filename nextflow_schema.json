@@ -385,7 +385,7 @@
                     "minimum": 1,
                     "fa_icon": "fas fa-sort-numeric-up",
                     "description": "OncodriveCLUSTL element mutation cutoff (-emut): elements with fewer SNVs are neither analysed nor passed to OncodriveCLUSTL.",
-                    "help_text": "The same value sets the prefilter of the regions (CLUSTL_REGIONS) and -emut of ONCODRIVECLUSTL, so the prefilter never removes an element OncodriveCLUSTL would analyse."
+                    "help_text": "The same value sets -emut of ONCODRIVECLUSTL and its prefilter of the regions, so the prefilter never removes an element OncodriveCLUSTL would analyse."
                 },
                 "oncodriveclustl_shard_size": {
                     "type": "integer",
