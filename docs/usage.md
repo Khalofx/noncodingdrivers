@@ -112,6 +112,26 @@ one sets `consensus_q` and `is_consensus` (Benjamini–Hochberg, `--fdr_threshol
 aggregation and the caller votes are sensitivity columns. `--skip_acat true` leaves out ACAT where
 the package is unavailable.
 
+### Combined and alongside callers
+
+`--consensus_callers` (default `activedriverwgs,oncodrivefml`) names the callers whose p-values are
+combined. A default caller that does not run is simply left out (OncodriveFML is off by default).
+Every other enabled caller is **reported alongside**: it is harmonised and joined on `element_id`,
+its `p_<caller>` and `q_<caller>` columns are carried in the consensus table and the evidence
+table, and it runs on the null replicates, but it does not enter EBM, ACAT, RRA, `vote_count`,
+`n_tested_callers` or `consensus_q`. The rows of the consensus table are the elements tested by at
+least one combined caller, so turning on a caller reported alongside adds its two columns and
+changes nothing else.
+
+A caller outside the default set may be named in `--consensus_callers` only after it has passed
+the opt-in gate for the element catalogue in use: null calibration within band with no null element
+at q < `--fdr_threshold` over at least three replicates, and recovery of the planted SYNTH-NC
+elements at least as good as the default consensus, on SYNTH-NC and Liver-HCC-public, recorded in
+`docs/validation.md`. The pipeline warns when such a caller is combined. A non-default caller named
+in `--consensus_callers` must also be enabled with its `--run_` flag; unknown names, duplicates and
+MutEnricher (QC-only) stop the run before any task. Combining another caller changes the EBM
+covariance set (elements tested by every combined caller) and therefore every consensus q-value.
+
 ### Software licences
 
 | Software                                              | Licence                                                     |

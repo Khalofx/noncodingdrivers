@@ -30,6 +30,13 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 - P-value combination (`COMBINEPVALUES`): the empirical Brown's method (default) or ACAT sets
   `consensus_q` (Benjamini–Hochberg, `--fdr_threshold`); ACAT, robust rank aggregation and caller
   votes are published as sensitivity columns; `--skip_acat` where the ACAT package is unavailable.
+- `--consensus_callers` (default `activedriverwgs,oncodrivefml`): the callers whose p-values are
+  combined (`combine_pvalues.R --callers`). Every other enabled caller is reported alongside: its
+  `p_`/`q_` columns are carried in the consensus and evidence tables, not combined. Validation
+  stops unknown names, MutEnricher, duplicates, a named non-default caller that is not run and an
+  empty combined set; combining a non-default caller prints the opt-in warning. Caller roles in
+  `driver_evidence.tsv` (`caller_role_<caller>`), the MultiQC run summary and the methods text,
+  written only when a caller is reported alongside, so the default outputs are unchanged.
 - Variant flags (`VARIANT_FLAGS`, on by default; flag, never filter): ENCODE Blacklist v2, GIAB v3.6
   segmental duplications and low mappability, Umap k100 uniqueness (nf-core `bedtools/intersect`,
   `bedtools/coverage`, `bedtools/subtract`) and gnomAD v4.1 genomes germline flags (nf-core
