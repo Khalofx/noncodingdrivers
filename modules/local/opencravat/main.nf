@@ -26,11 +26,14 @@ process OPENCRAVAT {
     tuple val(meta), path("${prefix}.opencravat.log"),           emit: log
     tuple val(meta), path("${prefix}.opencravat.network.tsv"),   emit: network
     tuple val(meta), path("${prefix}.opencravat.telemetry.tsv"), emit: telemetry
-    tuple val("${task.process}"), val('opencravat'), eval("grep '^open-cravat' opencravat.versions.tsv | cut -f2"), topic: versions, emit: versions_opencravat
-    tuple val("${task.process}"), val('opencravat-hg38'), eval("grep '^hg38' opencravat.versions.tsv | cut -f2"), topic: versions, emit: versions_hg38
-    tuple val("${task.process}"), val('opencravat-ccre_screen'), eval("grep '^ccre_screen' opencravat.versions.tsv | cut -f2"), topic: versions, emit: versions_ccre_screen
-    tuple val("${task.process}"), val('opencravat-repeat'), eval("grep '^repeat' opencravat.versions.tsv | cut -f2"), topic: versions, emit: versions_repeat
-    tuple val("${task.process}"), val('opencravat-clinvar'), eval("grep '^clinvar' opencravat.versions.tsv | cut -f2"), topic: versions, emit: versions_clinvar
+    // versions as named env outputs, not eval(): Nextflow numbers eval outputs with one counter in
+    // include order, so new eval outputs here would rename those of every module included after
+    // EXPLAIN and change their task hashes (no -resume across versions)
+    tuple val("${task.process}"), val('opencravat'), env('OC_VERSION'),                     topic: versions, emit: versions_opencravat
+    tuple val("${task.process}"), val('opencravat-hg38'), env('OC_HG38_VERSION'),           topic: versions, emit: versions_hg38
+    tuple val("${task.process}"), val('opencravat-ccre_screen'), env('OC_CCRE_SCREEN_VERSION'), topic: versions, emit: versions_ccre_screen
+    tuple val("${task.process}"), val('opencravat-repeat'), env('OC_REPEAT_VERSION'),       topic: versions, emit: versions_repeat
+    tuple val("${task.process}"), val('opencravat-clinvar'), env('OC_CLINVAR_VERSION'),     topic: versions, emit: versions_clinvar
 
     when:
     task.ext.when == null || task.ext.when
@@ -112,6 +115,9 @@ process OPENCRAVAT {
         if version:
             print(f"{name}\\t{version}")
     PY
+    v() { awk -F '\\t' -v k="\$1" '\$1 == k { print \$2 }' opencravat.versions.tsv; }
+    OC_VERSION=\$(v open-cravat); OC_HG38_VERSION=\$(v hg38); OC_CCRE_SCREEN_VERSION=\$(v ccre_screen)
+    OC_REPEAT_VERSION=\$(v repeat); OC_CLINVAR_VERSION=\$(v clinvar)
     """
 
     stub:
@@ -121,6 +127,6 @@ process OPENCRAVAT {
     touch ${prefix}.opencravat.sqlite ${prefix}.opencravat.log
     printf 'call\\thost\\tport\\tn_calls\\tis_local\\n' > ${prefix}.opencravat.network.tsv
     printf 'item\\tvalue\\nmetrics_url\\thttp://127.0.0.1:9\\n' > ${prefix}.opencravat.telemetry.tsv
-    printf 'open-cravat\\t3.2.4\\nhg38\\t1.47.2\\nccre_screen\\t1.0.2\\nclinvar\\t2026.10.01\\nrepeat\\t2020.10.16\\n' > opencravat.versions.tsv
+    OC_VERSION=3.2.4; OC_HG38_VERSION=1.47.2; OC_CCRE_SCREEN_VERSION=1.0.2; OC_REPEAT_VERSION=2020.10.16; OC_CLINVAR_VERSION=2026.10.01
     """
 }

@@ -80,9 +80,9 @@ output:
       - "opencravat":
           type: string
           description: The name of the tool
-      - "grep '^open-cravat' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the tool
+      - "OC_VERSION":
+          type: string
+          description: Environment variable holding the version (an env output, not eval, so the eval-output numbering of the pipeline is unchanged)
   versions_hg38:
     - - "${task.process}":
           type: string
@@ -90,9 +90,9 @@ output:
       - "opencravat-hg38":
           type: string
           description: The OpenCRAVAT hg38 gene mapper module
-      - "grep '^hg38' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the module
+      - "OC_HG38_VERSION":
+          type: string
+          description: Environment variable holding the module version (from the run's info table)
   versions_ccre_screen:
     - - "${task.process}":
           type: string
@@ -100,9 +100,9 @@ output:
       - "opencravat-ccre_screen":
           type: string
           description: The OpenCRAVAT ccre_screen annotator
-      - "grep '^ccre_screen' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the module
+      - "OC_CCRE_SCREEN_VERSION":
+          type: string
+          description: Environment variable holding the module version (from the run's info table)
   versions_repeat:
     - - "${task.process}":
           type: string
@@ -110,9 +110,9 @@ output:
       - "opencravat-repeat":
           type: string
           description: The OpenCRAVAT repeat annotator
-      - "grep '^repeat' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the module
+      - "OC_REPEAT_VERSION":
+          type: string
+          description: Environment variable holding the module version (from the run's info table)
   versions_clinvar:
     - - "${task.process}":
           type: string
@@ -120,9 +120,9 @@ output:
       - "opencravat-clinvar":
           type: string
           description: The OpenCRAVAT clinvar annotator
-      - "grep '^clinvar' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the module
+      - "OC_CLINVAR_VERSION":
+          type: string
+          description: Environment variable holding the module version (from the run's info table)
 
 topics:
   versions:
@@ -132,9 +132,9 @@ topics:
       - opencravat:
           type: string
           description: The tool name
-      - "grep '^open-cravat' opencravat.versions.tsv | cut -f2":
-          type: eval
-          description: The expression to obtain the version of the tool
+      - "OC_VERSION":
+          type: string
+          description: Environment variable holding the version (an env output, not eval, so the eval-output numbering of the pipeline is unchanged)
 
 authors:
   - "@Khalofx"
