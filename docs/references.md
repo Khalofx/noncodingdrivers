@@ -29,7 +29,7 @@ for non-commercial use only and is never bundled or downloaded by the pipeline.
 | `element_catalogue`                                  | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids)  | `39f838e6c81fdb0b152504f2d51939b5`                                     | all callers                            |
 | `gtf`                                                | `gencode/gencode.v50.basic.annotation.gtf.gz`                                 | `11e77cf1d4b78b43f57d608e3f7f2202`                                     | nearest-gene table                     |
 | `vep_cache`                                          | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`)                | archive `6e10959391069a9eebb8d8d165fd29be`                             | `--run_vep`                            |
-| `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                  | official bgdata dataset                                                | OncodriveFML                           |
+| `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                  | manifest `afe063fb3a742af2c16083e9a7e05d8a` (below)                    | OncodriveFML, OncodriveCLUSTL          |
 | `regulatory_peaks_dir`                               | `encode` (49 peak files, 12 tissues; per-file MD5 in `encode/PROVENANCE.tsv`) |                                                                        | `--run_regulatory_context`             |
 | `liftover_chain_from_hg19`                           | `liftover/hg19ToHg38.over.chain.gz`                                           | `35887f73fe5e2231656504d1f6430900`                                     | GRCh37/hg19 rows                       |
 | `liftover_source_fasta`, `liftover_source_fasta_fai` | `hg19/hg19.fa`, `hg19/hg19.fa.fai` (UCSC, 93 contigs)                         | `530d89d3ef07fdb2a9b3c701fb4ca486`, `e700bec606168273af0920bd1dd49eb9` | GRCh37/hg19 rows                       |
@@ -111,7 +111,17 @@ other rejects instead of stopping the run.
 
 The official bgdata dataset `datasets/genomereference/hg38-20161209`, staged once with its
 `.downloaded` marker and copied unchanged into `oncodrivefml_genome/`. The pipeline reads it
-offline.
+offline, for OncodriveFML and OncodriveCLUSTL. It is a directory of 27 files (4,427,776,705 bytes;
+`oncodrivefml_genome_bytes`), so the datasheet records a manifest checksum
+(`oncodrivefml_genome_manifest_md5`), the MD5 of the `md5sum` list of every file in C-locale order:
+
+```bash
+cd oncodrivefml_genome/datasets/genomereference/hg38-20161209
+find . -type f | LC_ALL=C sort | xargs md5sum | md5sum   # afe063fb3a742af2c16083e9a7e05d8a
+```
+
+`package.tar.xz` (1,339,490,304 bytes) is the unextracted archive and is not read; it is part of
+the manifest because it is part of the official dataset.
 
 ### Ensembl VEP cache
 

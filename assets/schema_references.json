@@ -180,6 +180,16 @@
                 "type": "string",
                 "meta": ["oncodrivefml_genome_note"]
             },
+            "oncodrivefml_genome_manifest_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["oncodrivefml_genome_manifest_md5"]
+            },
+            "oncodrivefml_genome_bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "meta": ["oncodrivefml_genome_bytes"]
+            },
             "regulatory_peaks_dir": {
                 "type": "string",
                 "meta": ["regulatory_peaks_dir"]
