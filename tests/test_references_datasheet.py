@@ -5,6 +5,8 @@ assets that ship with the pipeline must match their datasheet checksums. With
 NONCODINGDRIVERS_REFERENCE_BASE set (the Karakoram data/refs folder), the staged files are
 checked as well.
 """
+import csv
+import gzip
 import hashlib
 import json
 import os
@@ -22,6 +24,7 @@ PLACEHOLDER = "${reference_base}"
 # Checksums of a user-downloaded asset that has not been inspected yet (AlphaGenome AVI, to-do S7A.15)
 PENDING = "pending-user-download"
 PENDING_ALLOWED = {"alphagenome_avi_md5", "alphagenome_avi_tbi_md5", "alphagenome_avi_archive_md5"}
+MANIFEST = os.path.join(ROOT, "assets", "references", "encode_re2g.GRCh38.tsv")
 
 
 def _entry():
@@ -54,7 +57,8 @@ def test_every_property_is_a_meta_key():
 def test_paths_are_relative_to_reference_base_or_the_pipeline():
     path_keys = ["fasta", "fasta_fai", "fasta_dict", "element_catalogue", "gtf", "vep_cache", "oncodrivefml_genome",
                  "regulatory_peaks_dir", "liftover_chain_from_hg19", "liftover_source_fasta", "liftover_source_fasta_fai",
-                 "blacklist_bed", "segdup_bed", "low_mappability_bed", "umap_bed", "gnomad_echtvar", "alphagenome_avi"]
+                 "blacklist_bed", "segdup_bed", "low_mappability_bed", "umap_bed", "gnomad_echtvar", "alphagenome_avi",
+                 "enhancer_gene_dir", "ccre_v4_bed", "ccre_celltype_dir"]
     e = _entry()
     for k in path_keys:
         assert e[k].startswith(PLACEHOLDER + "/"), k
@@ -101,7 +105,7 @@ def test_staged_references_match_the_datasheet():
              "element_catalogue": "element_catalogue_md5", "gtf": "gtf_md5", "liftover_chain_from_hg19": "liftover_chain_md5",
              "liftover_source_fasta": "liftover_source_fasta_md5", "liftover_source_fasta_fai": "liftover_source_fasta_fai_md5",
              "blacklist_bed": "blacklist_md5", "segdup_bed": "segdup_md5", "low_mappability_bed": "low_mappability_md5",
-             "umap_bed": "umap_md5", "gnomad_echtvar": "gnomad_echtvar_md5"}
+             "umap_bed": "umap_md5", "gnomad_echtvar": "gnomad_echtvar_md5", "ccre_v4_bed": "ccre_v4_md5"}
     # the AVI file once its checksums are recorded (placeholders until the user's download, S7A.15)
     for path_key, md5_key in (("alphagenome_avi", "alphagenome_avi_md5"),):
         if e[md5_key] != PENDING:
@@ -115,3 +119,35 @@ def test_staged_references_match_the_datasheet():
     rows = sum(1 for _ in open(e["element_catalogue"].replace(PLACEHOLDER, base)))
     assert rows == e["element_catalogue_rows"]
     assert sum(1 for _ in open(e["fasta_fai"].replace(PLACEHOLDER, base))) == e["contig_count"]
+    with gzip.open(e["ccre_v4_bed"].replace(PLACEHOLDER, base), "rt") as fh:
+        assert sum(1 for _ in fh) == e["ccre_v4_rows"]
+    # every staged ENCODE-rE2G and SCREEN V4 file matches its PROVENANCE.tsv row and the manifest
+    manifest = {r["accession"]: r for r in csv.DictReader(open(MANIFEST), delimiter="\t")}
+    for folder in ("encode_re2g", "screen_v4"):
+        for row in csv.DictReader(open(os.path.join(base, folder, "PROVENANCE.tsv")), delimiter="\t"):
+            if row["layer"] == "re2g":
+                path = os.path.join(base, folder, row["tissue"], manifest[row["accession"]]["file_name"])
+                assert manifest[row["accession"]]["md5"] == row["md5"]
+            elif row["layer"] == "ccre_v4":
+                path = e["ccre_v4_bed"].replace(PLACEHOLDER, base)
+            else:
+                path = [os.path.join(base, folder, "celltype", row["tissue"], f) for f in os.listdir(os.path.join(base, folder, "celltype", row["tissue"]))
+                        if row["accession"] in f][0]
+            assert _md5(path) == row["md5"], path
+
+
+def test_encode_re2g_manifest():
+    """Coverage table of ENCODE-rE2G per tissue folder: DNaseOnly thresholded links, unique accessions,
+    liver = the 11-file D-E1 set, every other tissue its normal tissue samples."""
+    rows = list(csv.DictReader(open(MANIFEST), delimiter="\t"))
+    real = [r for r in rows if re.match(r"^ENCFF\w+$", r["accession"])]
+    assert len({r["accession"] for r in real}) == len(real)
+    assert all(re.match(r"^[0-9a-f]{32}$", r["md5"]) and int(r["bytes"]) > 0 for r in real)
+    assert all(r["file_name"] == f"{r['file_name'].split('.')[0]}.{r['accession']}.bed.gz" for r in real)
+    assert {r["model"] for r in real} == {"DNaseOnly"}
+    selected = [r for r in real if r["selected"] == "yes"]
+    liver = {r["accession"] for r in selected if r["tissue"] == "liver"}
+    assert liver == {"ENCFF960GTR", "ENCFF775WBY", "ENCFF239HUO", "ENCFF167GAJ", "ENCFF184TKS", "ENCFF441ZFG",
+                     "ENCFF284LMY", "ENCFF955UNH", "ENCFF043RAT", "ENCFF429OPN", "ENCFF603ILE"}
+    assert all(r["biosample_classification"] == "tissue" for r in selected if r["tissue"] != "liver")
+    assert len(selected) == 407

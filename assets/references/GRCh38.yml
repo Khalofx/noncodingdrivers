@@ -81,6 +81,15 @@
   alphagenome_avi_archive_md5: pending-user-download
   alphagenome_avi_source: "AlphaGenome Atlas downloads: 'AVI SNV scores - AVI scores and Phred-scaled scores in Tabix format' (avi_scores_snvs_tabix.zip, 88.5 GB), https://deepmind.google.com/science/alphagenome/downloads; download date pending"
   alphagenome_avi_licence: "AlphaGenome permissive-use download (commercial and non-commercial); user-downloaded, never bundled"
+  enhancer_gene_dir: ${reference_base}/encode_re2g
+  enhancer_gene_note: "ENCODE-rE2G thresholded element-gene links (DNaseOnly model, released 2024-06-06), <tissue>/<biosample>.<accession>.bed.gz; 407 files for 12 tissues (liver: the 11-file D-E1 set; other tissues: their normal tissue samples) as selected in assets/references/encode_re2g.GRCh38.tsv; per-file checksums in encode_re2g/PROVENANCE.tsv"
+  ccre_v4_bed: ${reference_base}/screen_v4/GRCh38-cCREs.V4.ENCFF420VPZ.bed.gz
+  ccre_v4_md5: ea1820bd71581ba01c94fc600fbf794d
+  ccre_v4_rows: 2348854
+  ccre_v4_source: "ENCODE Registry V4 agnostic cCREs, ENCSR800VNX / ENCFF420VPZ (GRCh38-cCREs.DCC.bed.gz, 32,795,453 bytes)"
+  ccre_celltype_dir: ${reference_base}/screen_v4/celltype
+  encode_licence: "ENCODE data (ENCODE-rE2G predictions, SCREEN cCREs): unrestricted use under the ENCODE data use policy; cite the ENCODE Consortium and the producing labs"
+  cosmic_licence: "COSMIC: registration (academic) or a QIAGEN licence (commercial); user-supplied at run time (--cosmic_ncv), never bundled or pinned here; current release only"
   cadd_snv_version: "v1.7"
   cadd_snv_licence: "Restricted: free for non-commercial use; user-supplied via --oncodrivefml_score, never bundled"
-  licence_summary: "open, except CADD (user-supplied, non-commercial)"
+  licence_summary: "open, except CADD (user-supplied, non-commercial) and COSMIC (user-supplied, licensed)"

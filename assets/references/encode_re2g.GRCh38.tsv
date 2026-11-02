@@ -1,0 +1,552 @@
+tissue	biosample	biosample_classification	accession	dataset	model	md5	bytes	date_created	file_name	selected	selection
+brain	Ammon's horn	tissue	ENCFF625WVS	ENCSR206VGK	DNaseOnly	19d692ffc07548f1c88bfd0b1b849b9e	3438104	2024-06-06	Ammon_s_horn.ENCFF625WVS.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF106VVJ	ENCSR591FCB	DNaseOnly	ed584515f2e0a239b20ad5d178beabe4	2811871	2024-06-06	brain.ENCFF106VVJ.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF253KVS	ENCSR568BFZ	DNaseOnly	af99569230ab814f33422a0e888ada9f	2760179	2024-06-06	brain.ENCFF253KVS.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF275AXF	ENCSR879LIM	DNaseOnly	038470eadcfbf2fdbba434021047f9f1	2825061	2024-06-06	brain.ENCFF275AXF.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF299OUH	ENCSR627QKP	DNaseOnly	ddcb97e84da4e0e083a773bbd67311f1	2847482	2024-06-06	brain.ENCFF299OUH.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF307BFL	ENCSR027MZW	DNaseOnly	4ffb394bcf0820957120a6c95dd1195a	2871818	2024-06-06	brain.ENCFF307BFL.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF363WGB	ENCSR243AWA	DNaseOnly	74dfbcbc56c27a3aaa14dc65797244f7	3027454	2024-06-06	brain.ENCFF363WGB.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF431FNQ	ENCSR219OBJ	DNaseOnly	a8f2afc6f7267a64b65fb1c83341505a	2930984	2024-06-06	brain.ENCFF431FNQ.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF434EPZ	ENCSR754SAJ	DNaseOnly	3fe85d4f21da98f9e14f197ad559e45a	3027500	2024-06-06	brain.ENCFF434EPZ.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF453RTV	ENCSR255THW	DNaseOnly	ce16f11082f230f245928181a311b347	2864568	2024-06-06	brain.ENCFF453RTV.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF498ZVL	ENCSR789MNP	DNaseOnly	2a9a5d8feb42af3269cca98bb6610ce7	2798005	2024-06-06	brain.ENCFF498ZVL.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF679SQC	ENCSR031NQT	DNaseOnly	cf90c896bc00b591d89ad85cfd131718	3078716	2024-06-06	brain.ENCFF679SQC.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF749AQG	ENCSR449JHG	DNaseOnly	0e2c62c46bfae39490270d1e3e6d1591	3077221	2024-06-06	brain.ENCFF749AQG.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF772BZE	ENCSR836CGF	DNaseOnly	0994be9f314ced29bf3c57b1e1a307ba	2737009	2024-06-06	brain.ENCFF772BZE.bed.gz	yes	normal tissue sample of the organ
+brain	brain	tissue	ENCFF916TBB	ENCSR371PSZ	DNaseOnly	13b51d4c5076f5ffd517e87da3d633db	2852320	2024-06-06	brain.ENCFF916TBB.bed.gz	yes	normal tissue sample of the organ
+brain	caudate nucleus	tissue	ENCFF389ROG	ENCSR094UDW	DNaseOnly	cedd7fd4eaebfc293fe7393238555294	3220165	2024-06-06	caudate_nucleus.ENCFF389ROG.bed.gz	yes	normal tissue sample of the organ
+brain	cerebellar cortex	tissue	ENCFF985RAY	ENCSR613RHA	DNaseOnly	d8cb816b3821cf5fa7259324fbf8f60d	3587042	2024-06-06	cerebellar_cortex.ENCFF985RAY.bed.gz	yes	normal tissue sample of the organ
+brain	cerebellum	tissue	ENCFF558LVN	ENCSR902CGQ	DNaseOnly	2692c07a107e04b9a53806f3fcc2b380	3578962	2024-06-06	cerebellum.ENCFF558LVN.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF044MAB	ENCSR908ADG	DNaseOnly	257386e9194eda80327142320e6e3a6d	3693829	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF044MAB.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF045NOC	ENCSR317UNA	DNaseOnly	30293ee5f633c86dd2b04f0004a13459	3528027	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF045NOC.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF048JPD	ENCSR151YGP	DNaseOnly	e329bc6e68e0b84cfcf42a3f906bf499	3577730	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF048JPD.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF055WCN	ENCSR229PSO	DNaseOnly	b4a431a53957d1ae32c9bc5b2b8c6f83	3537300	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF055WCN.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF058TJB	ENCSR076USE	DNaseOnly	925fa61ddde0c1d527f0dc6b0704dddf	3859818	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF058TJB.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF095WAM	ENCSR065SFT	DNaseOnly	b8bc4656b20a9f63143155d1c8032f17	3591134	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF095WAM.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF106QTN	ENCSR438FRG	DNaseOnly	6e0bbd131dc09bff37efb23b8ce2e5f5	3726045	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF106QTN.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF126JIS	ENCSR180FIU	DNaseOnly	f7a68962ca49493363e0e5ca217cc0c9	3649178	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF126JIS.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF135GVR	ENCSR258DMJ	DNaseOnly	ad97eacd8994993ff240243bf12059d5	3726219	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF135GVR.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF155UCU	ENCSR197RFH	DNaseOnly	9a31afc34e1cbcf9577f83be3c871bbf	3655005	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF155UCU.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF173EUD	ENCSR007SKZ	DNaseOnly	66b3dbb046ff577c9ba8a3f843e220e3	3768480	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF173EUD.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF186TQG	ENCSR739GUY	DNaseOnly	e1ee78faa699f54217ae8f09e7d44257	3616114	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF186TQG.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF199QZT	ENCSR004ZDG	DNaseOnly	77519bba675c8047bc4b7b7a473a74e9	3715284	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF199QZT.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF218UDX	ENCSR352OBK	DNaseOnly	dc690a0ef3539bba29d14d7d8c3098e8	3571912	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF218UDX.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF293HTB	ENCSR156YIR	DNaseOnly	100b3c8855ad37cec6133a3f5db421d1	3766164	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF293HTB.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF293UNU	ENCSR581UQX	DNaseOnly	b8b9196dee17701c1951442a499771b4	3595554	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF293UNU.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF302LCW	ENCSR569RJV	DNaseOnly	be291871ad6a81a81cf1b800b9534902	3861987	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF302LCW.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF325FID	ENCSR177FIU	DNaseOnly	1b51b7b81925eeade0bf54cd739d21ad	3703328	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF325FID.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF346MFT	ENCSR966YYP	DNaseOnly	232dd3353b303eb544a697490cc50325	3728894	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF346MFT.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF354HHW	ENCSR348JSL	DNaseOnly	67bc3226672044cf7b26931df4f0569d	3689826	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF354HHW.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF371VKL	ENCSR804MMB	DNaseOnly	ea1d0f79bf7ae48199c6ba5e88e24f88	3641822	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF371VKL.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF380EOK	ENCSR464HMB	DNaseOnly	ebd518d8dc6d38f7a51bb17e9541fa48	3819261	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF380EOK.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF418ESB	ENCSR569LDL	DNaseOnly	1e15a3947dcee7d802719dd991a681b6	3918357	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF418ESB.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF420LVY	ENCSR292ZID	DNaseOnly	3c8152e6863e9dfbe770aa35eb588b4c	3622521	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF420LVY.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF456GUJ	ENCSR330MYQ	DNaseOnly	d1877be36d20b05537d5dcff0fd4a8f4	3771148	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF456GUJ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF474IPE	ENCSR785DHY	DNaseOnly	a9ad9f09765a668d2253d1bc9392f7c7	3849174	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF474IPE.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF485IMQ	ENCSR294KZV	DNaseOnly	57c2a1c773fb15d50a8e9a567584fe35	3728870	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF485IMQ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF493HPK	ENCSR767LIM	DNaseOnly	899b3dc418852cd1795e5a94faa30593	3721922	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF493HPK.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF498WWH	ENCSR697TXI	DNaseOnly	d16028b4fad9ba644347ae67fb163f04	3849118	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF498WWH.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF503DHE	ENCSR249HAP	DNaseOnly	e2c446de01d31778732a5bd5807f3be4	3743773	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF503DHE.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF522FGN	ENCSR786PKE	DNaseOnly	1d321f376f0a50949b1afc1ba8616575	3624457	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF522FGN.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF585JEV	ENCSR280CYQ	DNaseOnly	a67ee088cefdc9dc1e1147b276abf39d	3736521	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF585JEV.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF617MBI	ENCSR145GZS	DNaseOnly	c48187145b606cdbf776f7e3d2cf8db7	3617092	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF617MBI.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF626LNF	ENCSR509UJZ	DNaseOnly	837cf6fa658d783df0c6948425d30d8b	3577473	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF626LNF.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF650OXL	ENCSR230QSC	DNaseOnly	962c97f6026714d122ae5cbcb41118f5	3602347	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF650OXL.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF744AXL	ENCSR178BPP	DNaseOnly	cbc5c554e5d020e6c6ddcbe05aa66eca	3579913	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF744AXL.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF755LAE	ENCSR309WTP	DNaseOnly	bd1d1c8daf8f4a31135ef12ef8cb2420	3566070	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF755LAE.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF776YZL	ENCSR174HZO	DNaseOnly	d49fd6c3762fca06b0096d015cf33648	3579888	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF776YZL.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF778ZWH	ENCSR155RBZ	DNaseOnly	83150c6b56ac97d265b6b4c136548dc3	3621531	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF778ZWH.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF781YPO	ENCSR693TXK	DNaseOnly	6770a1c49d279b2eebcc080705d12376	3726521	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF781YPO.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF789DXZ	ENCSR944SAJ	DNaseOnly	756c7fe34be5cc1f76100633598f4af6	3551169	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF789DXZ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF802DLT	ENCSR137MPX	DNaseOnly	5dc94537d48eaf56a265e90e86f28cb2	3535000	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF802DLT.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF809SOM	ENCSR444ZMD	DNaseOnly	c892685adcde8f2e1f4f6e59344a55b8	3644700	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF809SOM.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF821XZQ	ENCSR285HAJ	DNaseOnly	74397780220a9808ac4cc4da7be618d7	3449151	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF821XZQ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF854FZS	ENCSR179GOU	DNaseOnly	b5c88a02f4e56b9d1ca83e5c689c0885	3655736	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF854FZS.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF854UAA	ENCSR746FIO	DNaseOnly	ebe4a40f9b355e2b64085ea211e56d90	3670596	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF854UAA.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF865SIJ	ENCSR128FYS	DNaseOnly	d1ff267f28591860fb1330ffcf850f23	3664496	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF865SIJ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF876ISX	ENCSR584ZKT	DNaseOnly	a714ddfb52453f096fbeee9d0e8fd91e	3750512	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF876ISX.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF891CAR	ENCSR078VKM	DNaseOnly	3ca507f6f00a939316de657266d925ca	3765310	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF891CAR.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF900XIE	ENCSR362XPS	DNaseOnly	c6f14ebb7d35450ed970e566a0096f82	3882426	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF900XIE.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF907BIS	ENCSR982QDF	DNaseOnly	6af73e26c35349ef687f7f531b16a94d	3607043	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF907BIS.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF918NXA	ENCSR603QHQ	DNaseOnly	ffd3ed3d9cfd48d5ed22c5b74abeabf1	3629159	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF918NXA.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF924MLZ	ENCSR488UPD	DNaseOnly	0c79ba6487bcf1945b7176124172db3e	3617657	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF924MLZ.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF927LUG	ENCSR793NFG	DNaseOnly	b8b7912edc9d54a871ae8163a0995f37	3648234	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF927LUG.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF933VEX	ENCSR940ZRB	DNaseOnly	7253715ba851acfb6cdf3d6fa0a043ed	3706611	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF933VEX.bed.gz	yes	normal tissue sample of the organ
+brain	dorsolateral prefrontal cortex	tissue	ENCFF937EMZ	ENCSR149VUN	DNaseOnly	5f04d7818e24becbff09e8ecbd32f24f	3700632	2024-06-06	dorsolateral_prefrontal_cortex.ENCFF937EMZ.bed.gz	yes	normal tissue sample of the organ
+brain	frontal cortex	tissue	ENCFF341GPP	ENCSR052OIR	DNaseOnly	e01766b01b88749759644e45a39649bb	3568560	2024-06-06	frontal_cortex.ENCFF341GPP.bed.gz	yes	normal tissue sample of the organ
+brain	frontal cortex	tissue	ENCFF566EEG	ENCSR110KGA	DNaseOnly	ecf278dd0a771be353a88728c90bed83	3613103	2024-06-06	frontal_cortex.ENCFF566EEG.bed.gz	yes	normal tissue sample of the organ
+brain	globus pallidus	tissue	ENCFF523WSZ	ENCSR138SKU	DNaseOnly	e6a084229c28adafd688e6a9376d413c	3471347	2024-06-06	globus_pallidus.ENCFF523WSZ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF003BKC	ENCSR297HTV	DNaseOnly	ac288e598310e54b889191f9f7930d6a	3540043	2024-06-06	head_of_caudate_nucleus.ENCFF003BKC.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF051ZEK	ENCSR557GWO	DNaseOnly	ece75b04a51855813a6a547facb1ae0b	3671357	2024-06-06	head_of_caudate_nucleus.ENCFF051ZEK.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF076EUJ	ENCSR234UCO	DNaseOnly	b5c34bc5290e3761200071f36041986a	3617897	2024-06-06	head_of_caudate_nucleus.ENCFF076EUJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF081AZL	ENCSR965IRW	DNaseOnly	06476578a901138184989f85fb9ae6b5	3613397	2024-06-06	head_of_caudate_nucleus.ENCFF081AZL.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF084YWN	ENCSR431HOV	DNaseOnly	67847912e3682bdff38f347edb320573	3632936	2024-06-06	head_of_caudate_nucleus.ENCFF084YWN.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF090CLG	ENCSR865HXL	DNaseOnly	9417ed3231d61d7f15011b99a057ed92	3488269	2024-06-06	head_of_caudate_nucleus.ENCFF090CLG.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF094VLE	ENCSR078FYW	DNaseOnly	ceb1712f2a87e9254b41adc9da9a399c	3542358	2024-06-06	head_of_caudate_nucleus.ENCFF094VLE.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF095LNJ	ENCSR114ETK	DNaseOnly	d99a75d89c6e4b24fce0d1989bb3b1e3	3584692	2024-06-06	head_of_caudate_nucleus.ENCFF095LNJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF110JYA	ENCSR232NMT	DNaseOnly	f813b7a9851f6aa072117c5fb28d3568	3592795	2024-06-06	head_of_caudate_nucleus.ENCFF110JYA.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF114LHQ	ENCSR896BUX	DNaseOnly	2f9bec6beb54d8be06b693d05c8f082f	3564020	2024-06-06	head_of_caudate_nucleus.ENCFF114LHQ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF118YII	ENCSR490NCH	DNaseOnly	5e4ddecfd98293dffaf57dcaad0bf774	3642860	2024-06-06	head_of_caudate_nucleus.ENCFF118YII.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF121SEG	ENCSR313CDD	DNaseOnly	20a120c6a86ecfd0258b46d6d72d7da9	3628643	2024-06-06	head_of_caudate_nucleus.ENCFF121SEG.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF124KBW	ENCSR885UEE	DNaseOnly	898793c65cfaecfa89099cdd692c7ccf	3546208	2024-06-06	head_of_caudate_nucleus.ENCFF124KBW.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF135TJO	ENCSR030NKL	DNaseOnly	637008b2921c01faded8813d8b24d6f7	3511481	2024-06-06	head_of_caudate_nucleus.ENCFF135TJO.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF142BNS	ENCSR248YWS	DNaseOnly	ef9194b122cb09f21d62f52ba7a39915	3513132	2024-06-06	head_of_caudate_nucleus.ENCFF142BNS.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF171KIF	ENCSR907JQW	DNaseOnly	fcb0be36098f85323753889bcf355cd1	3535952	2024-06-06	head_of_caudate_nucleus.ENCFF171KIF.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF183AYX	ENCSR737GBJ	DNaseOnly	6ccaaaf2e59acf69023de88cec71819a	3485512	2024-06-06	head_of_caudate_nucleus.ENCFF183AYX.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF196CMX	ENCSR489WPU	DNaseOnly	605f72c24488e6dbdde96025e674657a	3482026	2024-06-06	head_of_caudate_nucleus.ENCFF196CMX.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF221YKJ	ENCSR862GYG	DNaseOnly	dca9a6a92bf655a70c7d3f67c8f5ff21	3522921	2024-06-06	head_of_caudate_nucleus.ENCFF221YKJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF223AWC	ENCSR498RUW	DNaseOnly	388fbd355be9c1d8b873a5c946528994	3671935	2024-06-06	head_of_caudate_nucleus.ENCFF223AWC.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF239YGD	ENCSR270ORJ	DNaseOnly	c0d61c560bee08db498750d4ae8909a9	3380012	2024-06-06	head_of_caudate_nucleus.ENCFF239YGD.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF245RHB	ENCSR718MTO	DNaseOnly	1f68686a46bba7468d6fa099631fe494	3523127	2024-06-06	head_of_caudate_nucleus.ENCFF245RHB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF251IYS	ENCSR955RML	DNaseOnly	ef87f3d7df5d887d6a4e6ccae8df905b	3525775	2024-06-06	head_of_caudate_nucleus.ENCFF251IYS.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF261BDP	ENCSR083JGD	DNaseOnly	f67d29e1f7b3c2036e45270dcebcf239	3539252	2024-06-06	head_of_caudate_nucleus.ENCFF261BDP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF264XQN	ENCSR631IZW	DNaseOnly	0d646c80de5f860d0edc1faa60d24541	3617513	2024-06-06	head_of_caudate_nucleus.ENCFF264XQN.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF290PQX	ENCSR186LZW	DNaseOnly	06a627406cf05d1e3c20cdafdfe2ce1a	3660166	2024-06-06	head_of_caudate_nucleus.ENCFF290PQX.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF299QZJ	ENCSR419ETH	DNaseOnly	b6e7c6ab216d743b518318b71fa7a0d0	3520824	2024-06-06	head_of_caudate_nucleus.ENCFF299QZJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF304SER	ENCSR695DAU	DNaseOnly	4fe682ab874d58237ccb224771113af0	3543081	2024-06-06	head_of_caudate_nucleus.ENCFF304SER.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF314JTT	ENCSR525VMC	DNaseOnly	5dc2baa7389adebd0793756dca5f42b5	3572088	2024-06-06	head_of_caudate_nucleus.ENCFF314JTT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF316FRV	ENCSR673ZUI	DNaseOnly	33344f58fd08cf99aeb6cd6c1f4bcd52	3489958	2024-06-06	head_of_caudate_nucleus.ENCFF316FRV.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF322TMJ	ENCSR220PUL	DNaseOnly	869d643aafbe5d257ec2cdbc777a2fe1	3029712	2024-06-06	head_of_caudate_nucleus.ENCFF322TMJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF338VVB	ENCSR522TVW	DNaseOnly	72b7907a32f550f0fda18d1985af72ac	3671356	2024-06-06	head_of_caudate_nucleus.ENCFF338VVB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF340AHB	ENCSR002YWN	DNaseOnly	d625cf2f082ab84535ceaada9cc45925	3762622	2024-06-06	head_of_caudate_nucleus.ENCFF340AHB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF342LFO	ENCSR097UWX	DNaseOnly	c517379c79a5194cf73ef07b362dcd4b	3614369	2024-06-06	head_of_caudate_nucleus.ENCFF342LFO.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF351ERP	ENCSR573LJN	DNaseOnly	fc711832442eeb0e6ffbe6a7f7004810	3621063	2024-06-06	head_of_caudate_nucleus.ENCFF351ERP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF365MFP	ENCSR226LZZ	DNaseOnly	13185e6b651da3ab1d7479bc70ebf432	3625221	2024-06-06	head_of_caudate_nucleus.ENCFF365MFP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF371KPK	ENCSR348FJE	DNaseOnly	5341af8b94db8535f9deb346ecfac692	3660911	2024-06-06	head_of_caudate_nucleus.ENCFF371KPK.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF405QVU	ENCSR027MJC	DNaseOnly	38159a0c6c7c25626bdf1e2332db5293	3621723	2024-06-06	head_of_caudate_nucleus.ENCFF405QVU.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF409JVU	ENCSR211YED	DNaseOnly	dccf11f557553f1674c1c07f09e5d5bd	3444481	2024-06-06	head_of_caudate_nucleus.ENCFF409JVU.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF436JPD	ENCSR748QYZ	DNaseOnly	2022f1fc08d19924004b449e31254c76	3636302	2024-06-06	head_of_caudate_nucleus.ENCFF436JPD.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF443RHB	ENCSR882UOP	DNaseOnly	00995d4a8c32acc0b1193bb2683c5ad5	3562064	2024-06-06	head_of_caudate_nucleus.ENCFF443RHB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF463DIT	ENCSR800WSR	DNaseOnly	2764ea5c51c45c2f07faf0ee44249c75	3583709	2024-06-06	head_of_caudate_nucleus.ENCFF463DIT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF488FIX	ENCSR862UYG	DNaseOnly	42637f1e0e34ed6a99a5b07337b2ce11	3593233	2024-06-06	head_of_caudate_nucleus.ENCFF488FIX.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF494AYS	ENCSR124XXZ	DNaseOnly	48422dede1d4b912a74329d1965066a4	3644171	2024-06-06	head_of_caudate_nucleus.ENCFF494AYS.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF494FKR	ENCSR251VNJ	DNaseOnly	e027816aba16604fb4193e713ca315fd	3502611	2024-06-06	head_of_caudate_nucleus.ENCFF494FKR.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF504UNT	ENCSR725UJD	DNaseOnly	fea11c489d2ca9a7aaabe31c0767e3c8	3530644	2024-06-06	head_of_caudate_nucleus.ENCFF504UNT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF505BXZ	ENCSR184IHO	DNaseOnly	f25f82affe7349755773817f9551c304	3487047	2024-06-06	head_of_caudate_nucleus.ENCFF505BXZ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF509TRK	ENCSR852IBE	DNaseOnly	751abe5857a5efa6f93c43b62b9e16f9	3583257	2024-06-06	head_of_caudate_nucleus.ENCFF509TRK.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF540JMF	ENCSR844EDS	DNaseOnly	49db645e45ebda48c4117fc06e175f8f	3764032	2024-06-06	head_of_caudate_nucleus.ENCFF540JMF.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF547ENT	ENCSR756WAN	DNaseOnly	b6960dff7a3831358ada6432abf678b6	3534070	2024-06-06	head_of_caudate_nucleus.ENCFF547ENT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF550KTE	ENCSR260SPE	DNaseOnly	8cf402bf070b24b0269129b6a7f4cbbf	3505257	2024-06-06	head_of_caudate_nucleus.ENCFF550KTE.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF554AKU	ENCSR866VGC	DNaseOnly	49998d7c062e905e51f3d8612ade0467	3732232	2024-06-06	head_of_caudate_nucleus.ENCFF554AKU.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF557ODJ	ENCSR854BPQ	DNaseOnly	99472d851d65ee634530b8cd83ce9f4d	3682016	2024-06-06	head_of_caudate_nucleus.ENCFF557ODJ.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF572XDT	ENCSR010JRN	DNaseOnly	42064378ce5f4bda7ef3392649c4c02a	3562622	2024-06-06	head_of_caudate_nucleus.ENCFF572XDT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF573UOP	ENCSR852BNE	DNaseOnly	19fe8c562ade6ed30f07e7817006cb80	3519855	2024-06-06	head_of_caudate_nucleus.ENCFF573UOP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF573ZMM	ENCSR322YGO	DNaseOnly	374f9e8f7e730eb4cf08feea4dfcc52c	3476305	2024-06-06	head_of_caudate_nucleus.ENCFF573ZMM.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF587XCN	ENCSR274XLI	DNaseOnly	ab11f87a7c908d2582c68713b02df833	3681831	2024-06-06	head_of_caudate_nucleus.ENCFF587XCN.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF618TNH	ENCSR893UVQ	DNaseOnly	9aabc501e3576d598c41a66d40163585	3527060	2024-06-06	head_of_caudate_nucleus.ENCFF618TNH.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF620QSH	ENCSR232JNE	DNaseOnly	9b3e413519c0f68379431b3719575913	3451774	2024-06-06	head_of_caudate_nucleus.ENCFF620QSH.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF622SUT	ENCSR214EAH	DNaseOnly	018a22bfbabb18e70835f2b64ec7663a	3532029	2024-06-06	head_of_caudate_nucleus.ENCFF622SUT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF637FCU	ENCSR448FRN	DNaseOnly	56c45204b87ab81d776113897c3203e2	3694604	2024-06-06	head_of_caudate_nucleus.ENCFF637FCU.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF640GBS	ENCSR568FSF	DNaseOnly	782f264404c62d40f3aaca14663d8791	3508704	2024-06-06	head_of_caudate_nucleus.ENCFF640GBS.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF681AIS	ENCSR683JFU	DNaseOnly	1141e5ee3273f6de8a5fbd2e5860da6d	3630564	2024-06-06	head_of_caudate_nucleus.ENCFF681AIS.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF705FAW	ENCSR834QHG	DNaseOnly	8d0999706d59409d50153d9487dc941e	3537698	2024-06-06	head_of_caudate_nucleus.ENCFF705FAW.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF705XYT	ENCSR099GAB	DNaseOnly	96d5dd5853c32ef29edae3efde28dc46	3641146	2024-06-06	head_of_caudate_nucleus.ENCFF705XYT.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF709MAP	ENCSR899UXS	DNaseOnly	8adaa3f9bcccd4fe876ad5a9feb05a8b	3518435	2024-06-06	head_of_caudate_nucleus.ENCFF709MAP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF714PDG	ENCSR175MVB	DNaseOnly	64a173f69b3a77b0145b3a60cd0fbfaa	3571999	2024-06-06	head_of_caudate_nucleus.ENCFF714PDG.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF715OVH	ENCSR622HAC	DNaseOnly	f4403113431e82a4e50ee8cf92e14e0a	3560032	2024-06-06	head_of_caudate_nucleus.ENCFF715OVH.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF725XGA	ENCSR501HEM	DNaseOnly	e7bab555abb5d991dbd0e62730e3d41f	3579977	2024-06-06	head_of_caudate_nucleus.ENCFF725XGA.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF790MFI	ENCSR333YLN	DNaseOnly	278c8fa4d12d863a503b2b15950e5ae2	3602675	2024-06-06	head_of_caudate_nucleus.ENCFF790MFI.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF816XOH	ENCSR814OFS	DNaseOnly	30078d9fc89d476f616d1d79fce22c94	3658600	2024-06-06	head_of_caudate_nucleus.ENCFF816XOH.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF821KPO	ENCSR735IZI	DNaseOnly	b3e95c727701617b23b483df983c5ac7	3516199	2024-06-06	head_of_caudate_nucleus.ENCFF821KPO.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF824EVH	ENCSR560KUI	DNaseOnly	89e0d8661b43d848c95a8f307cf2b695	3618557	2024-06-06	head_of_caudate_nucleus.ENCFF824EVH.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF831BRF	ENCSR673FDN	DNaseOnly	9206c9e5fcb242912632d739a935aa66	3509784	2024-06-06	head_of_caudate_nucleus.ENCFF831BRF.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF835FRD	ENCSR234XRY	DNaseOnly	a8ee2b3556a10b9a090b0dbff0503c03	3652059	2024-06-06	head_of_caudate_nucleus.ENCFF835FRD.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF839BMB	ENCSR581KZV	DNaseOnly	b8c829184e86e237e1eb2938682c9ea0	3491934	2024-06-06	head_of_caudate_nucleus.ENCFF839BMB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF906KFK	ENCSR457WZG	DNaseOnly	254a17e0b8028a05b5adda739bbbfc69	3603598	2024-06-06	head_of_caudate_nucleus.ENCFF906KFK.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF923RVB	ENCSR899YZA	DNaseOnly	937091ff5b54fd9ae0acccf62c9d8115	3561816	2024-06-06	head_of_caudate_nucleus.ENCFF923RVB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF925KMV	ENCSR430MBO	DNaseOnly	0ffa2ed83c8713293bf16424da27e92c	3502095	2024-06-06	head_of_caudate_nucleus.ENCFF925KMV.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF927XMI	ENCSR982TTL	DNaseOnly	0b8575e130ab78703f1c1a679fc1013c	3578651	2024-06-06	head_of_caudate_nucleus.ENCFF927XMI.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF934WVA	ENCSR543YSD	DNaseOnly	573c7d78dee2e94c8e97be3f8fdf597d	3482681	2024-06-06	head_of_caudate_nucleus.ENCFF934WVA.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF935PQR	ENCSR356DGD	DNaseOnly	e5681cfe22c5e6d360d860628a131a4c	3594530	2024-06-06	head_of_caudate_nucleus.ENCFF935PQR.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF937QAV	ENCSR938KTW	DNaseOnly	096e3c30dd662bfbf5c559e2c0ff68e6	3591193	2024-06-06	head_of_caudate_nucleus.ENCFF937QAV.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF949CGB	ENCSR982SWE	DNaseOnly	cf01dc5da6729a5866c21516d8e0bceb	3696585	2024-06-06	head_of_caudate_nucleus.ENCFF949CGB.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF960LJP	ENCSR586JZB	DNaseOnly	7453b5bc0a802e023388498db48f4ba1	3625712	2024-06-06	head_of_caudate_nucleus.ENCFF960LJP.bed.gz	yes	normal tissue sample of the organ
+brain	head of caudate nucleus	tissue	ENCFF991QZP	ENCSR245MYV	DNaseOnly	a6681b7b30b97dd7d8802ea217baf814	3649984	2024-06-06	head_of_caudate_nucleus.ENCFF991QZP.bed.gz	yes	normal tissue sample of the organ
+brain	inferior parietal cortex	tissue	ENCFF400IBI	ENCSR133SBH	DNaseOnly	b3c5f79e5f753c55d3b0da2195b96758	3348678	2024-06-06	inferior_parietal_cortex.ENCFF400IBI.bed.gz	yes	normal tissue sample of the organ
+brain	medulla oblongata	tissue	ENCFF705JKU	ENCSR080GWY	DNaseOnly	5e2f90ad16be3af159c1b1e2be8dac79	3531698	2024-06-06	medulla_oblongata.ENCFF705JKU.bed.gz	yes	normal tissue sample of the organ
+brain	midbrain	tissue	ENCFF776IZV	ENCSR937IVA	DNaseOnly	488e2d9c50067b6cca846ee0e88bc85c	3416619	2024-06-06	midbrain.ENCFF776IZV.bed.gz	yes	normal tissue sample of the organ
+brain	middle frontal gyrus	tissue	ENCFF611QJV	ENCSR524AYL	DNaseOnly	2a605277da2c1160909ebdbe6a4a1bd9	3213172	2024-06-06	middle_frontal_gyrus.ENCFF611QJV.bed.gz	yes	normal tissue sample of the organ
+brain	occipital lobe	tissue	ENCFF741ORO	ENCSR500QVP	DNaseOnly	8477cc4bb7871172a973809e8c3da65d	3271110	2024-06-06	occipital_lobe.ENCFF741ORO.bed.gz	yes	normal tissue sample of the organ
+brain	pons	tissue	ENCFF910VNN	ENCSR752WRO	DNaseOnly	5ddcdeea185020de2f6bfbce246630ac	3464052	2024-06-06	pons.ENCFF910VNN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF010QCT	ENCSR583KIA	DNaseOnly	590ee56fa31b93a7fe7eccd00fff060c	3666769	2024-06-06	posterior_cingulate_gyrus.ENCFF010QCT.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF038DMX	ENCSR850JPM	DNaseOnly	e4bb93000c9c8794bd8352798a45e905	3897686	2024-06-06	posterior_cingulate_gyrus.ENCFF038DMX.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF042JWD	ENCSR328ZES	DNaseOnly	4c63d9a812e213f624b9ddb566f696ce	3792694	2024-06-06	posterior_cingulate_gyrus.ENCFF042JWD.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF094VTW	ENCSR026UHA	DNaseOnly	6b8adcbf34a660023d9a5bc675e0b7c3	3728630	2024-06-06	posterior_cingulate_gyrus.ENCFF094VTW.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF115DHW	ENCSR752ANI	DNaseOnly	41d6c10a6a96f80aaaf17a7cdc4d0363	3716135	2024-06-06	posterior_cingulate_gyrus.ENCFF115DHW.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF115PWN	ENCSR006VBD	DNaseOnly	fbe0025836bc88bb4db6ffd3060402c7	3619497	2024-06-06	posterior_cingulate_gyrus.ENCFF115PWN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF131FEU	ENCSR326WEF	DNaseOnly	1ce0c8436bc9f0053f79f87a3a9693b1	3659847	2024-06-06	posterior_cingulate_gyrus.ENCFF131FEU.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF134SUB	ENCSR196SOF	DNaseOnly	a22182595d639befe3c850721272b644	3680319	2024-06-06	posterior_cingulate_gyrus.ENCFF134SUB.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF140VWU	ENCSR714MYG	DNaseOnly	b9ec035547f0b3010d68a236711542ff	3494935	2024-06-06	posterior_cingulate_gyrus.ENCFF140VWU.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF179KYN	ENCSR940LMH	DNaseOnly	abbf65a08de222e787ed2b85091b29db	3661286	2024-06-06	posterior_cingulate_gyrus.ENCFF179KYN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF196YSE	ENCSR643DYF	DNaseOnly	c3d6cc37ce71b521b970302ad79b71c8	3753857	2024-06-06	posterior_cingulate_gyrus.ENCFF196YSE.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF237PYA	ENCSR731QZB	DNaseOnly	ae63ded85aa89492bfb2e9e5a25a3525	3649796	2024-06-06	posterior_cingulate_gyrus.ENCFF237PYA.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF272AHN	ENCSR783RXJ	DNaseOnly	7b7d55664a5d9dcee6cd25679539a4fc	3697202	2024-06-06	posterior_cingulate_gyrus.ENCFF272AHN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF274ZVA	ENCSR826FTX	DNaseOnly	c835e1feb44f73750aa8a543585900a0	3657449	2024-06-06	posterior_cingulate_gyrus.ENCFF274ZVA.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF350WSQ	ENCSR106NBD	DNaseOnly	7514ea73be057d66a6031eb1c4934a33	3768566	2024-06-06	posterior_cingulate_gyrus.ENCFF350WSQ.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF351IFC	ENCSR374TCY	DNaseOnly	61fc69bb946145cec61a26a28fcab864	3660456	2024-06-06	posterior_cingulate_gyrus.ENCFF351IFC.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF377MDP	ENCSR336YYB	DNaseOnly	27cfce585a701c45d427190cfe443450	3582395	2024-06-06	posterior_cingulate_gyrus.ENCFF377MDP.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF383LWI	ENCSR702UZO	DNaseOnly	a4660a5084b6b25b969bc487a6bd5891	3605461	2024-06-06	posterior_cingulate_gyrus.ENCFF383LWI.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF383SHZ	ENCSR199UNC	DNaseOnly	87d75e570753d1bd6fd9a56c94c85060	3517674	2024-06-06	posterior_cingulate_gyrus.ENCFF383SHZ.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF400TSM	ENCSR982EZK	DNaseOnly	bcd03723e79f2ecfd91d7109db332c52	3440845	2024-06-06	posterior_cingulate_gyrus.ENCFF400TSM.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF404ACN	ENCSR365PGQ	DNaseOnly	f939c030296b767d5df11bdcf1d29a61	3700152	2024-06-06	posterior_cingulate_gyrus.ENCFF404ACN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF412LFU	ENCSR518BYD	DNaseOnly	15128248e0bd0feadee7c9a3d1fded77	3574710	2024-06-06	posterior_cingulate_gyrus.ENCFF412LFU.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF419OSD	ENCSR881UIQ	DNaseOnly	248dbfcc9d6932773270a03049a74a8d	3685666	2024-06-06	posterior_cingulate_gyrus.ENCFF419OSD.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF445QXP	ENCSR913WNG	DNaseOnly	c4a3c062d6fb9ad03135dfc0946ea4a6	3580884	2024-06-06	posterior_cingulate_gyrus.ENCFF445QXP.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF449CRP	ENCSR746UEY	DNaseOnly	9b6c94f4289a92de8547cc99d6651ad9	3696869	2024-06-06	posterior_cingulate_gyrus.ENCFF449CRP.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF486MSA	ENCSR556APZ	DNaseOnly	233e33e06fa8907a6eae38167f00d84e	3617759	2024-06-06	posterior_cingulate_gyrus.ENCFF486MSA.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF498CDH	ENCSR297ZRG	DNaseOnly	fd642e663aac6e4006d70c4e59fc411d	3720634	2024-06-06	posterior_cingulate_gyrus.ENCFF498CDH.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF528GUB	ENCSR537DDI	DNaseOnly	6e17f4a65d95a1c4ff95cf1d5dc92435	3885183	2024-06-06	posterior_cingulate_gyrus.ENCFF528GUB.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF533ZDK	ENCSR520WFC	DNaseOnly	eaf2a80f961ecbfdc4f24e80b9b96556	3522009	2024-06-06	posterior_cingulate_gyrus.ENCFF533ZDK.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF544XHP	ENCSR924FCG	DNaseOnly	dedcbeee11b0c68fdc72a0783f55983d	3487948	2024-06-06	posterior_cingulate_gyrus.ENCFF544XHP.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF583TDF	ENCSR604CQU	DNaseOnly	f1c32e39fb52fccf77eff8dbc195c638	3873404	2024-06-06	posterior_cingulate_gyrus.ENCFF583TDF.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF658JNG	ENCSR332HRZ	DNaseOnly	4afe89a11c58d99421dbb3153b7a1f7f	3738043	2024-06-06	posterior_cingulate_gyrus.ENCFF658JNG.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF662HGN	ENCSR467FCA	DNaseOnly	b13ee0038ebc9bba21cd2a6b7aaa224d	3732213	2024-06-06	posterior_cingulate_gyrus.ENCFF662HGN.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF662RVX	ENCSR774BOY	DNaseOnly	fd7c2b5b9e4aa17e205c390d279755ca	3623462	2024-06-06	posterior_cingulate_gyrus.ENCFF662RVX.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF673CRY	ENCSR689QMJ	DNaseOnly	3397384b6cde211e5d0bea61894bf900	3734139	2024-06-06	posterior_cingulate_gyrus.ENCFF673CRY.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF674VTT	ENCSR386QUK	DNaseOnly	0d0e056eb96e62c70299df3f023ea241	3760683	2024-06-06	posterior_cingulate_gyrus.ENCFF674VTT.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF678PER	ENCSR817AQF	DNaseOnly	35277c85f8763258e4f70113ef3586ce	3619182	2024-06-06	posterior_cingulate_gyrus.ENCFF678PER.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF702PON	ENCSR408RPS	DNaseOnly	f863e32421d0b84eb18bd89a0428f134	3688755	2024-06-06	posterior_cingulate_gyrus.ENCFF702PON.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF754QPS	ENCSR485AJM	DNaseOnly	26d318f7b904afdfbe0bd883681b1483	3576271	2024-06-06	posterior_cingulate_gyrus.ENCFF754QPS.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF757QYH	ENCSR983PAA	DNaseOnly	f193d82c955510df9f6f0f1375d8201a	3504517	2024-06-06	posterior_cingulate_gyrus.ENCFF757QYH.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF766RWB	ENCSR031KRW	DNaseOnly	2799a2205d98450010108577dee57bca	3968428	2024-06-06	posterior_cingulate_gyrus.ENCFF766RWB.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF799CJT	ENCSR706ZYQ	DNaseOnly	6d9de04071715bed8a40e29fcf2404cc	3615718	2024-06-06	posterior_cingulate_gyrus.ENCFF799CJT.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF819VGZ	ENCSR034TGA	DNaseOnly	4a2b4be453e5f5ba0cca06556639ba34	3731361	2024-06-06	posterior_cingulate_gyrus.ENCFF819VGZ.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF822HAZ	ENCSR702MMO	DNaseOnly	943a8fbb03d64b99ba0e2280aad29aca	3782613	2024-06-06	posterior_cingulate_gyrus.ENCFF822HAZ.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF835SEA	ENCSR855LWK	DNaseOnly	4d7522425145b3f3fb7c10e8c55557d9	3540674	2024-06-06	posterior_cingulate_gyrus.ENCFF835SEA.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF874DII	ENCSR428XIB	DNaseOnly	39bbf957e1480daeec8476012a4d3e39	3884491	2024-06-06	posterior_cingulate_gyrus.ENCFF874DII.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF896DPL	ENCSR409KGF	DNaseOnly	be43491a888c7ea14d98ee1dbf9e7d4d	3882152	2024-06-06	posterior_cingulate_gyrus.ENCFF896DPL.bed.gz	yes	normal tissue sample of the organ
+brain	posterior cingulate gyrus	tissue	ENCFF923RKX	ENCSR531BGV	DNaseOnly	ae1075371afcd61a2dc6975adfd420fe	3791383	2024-06-06	posterior_cingulate_gyrus.ENCFF923RKX.bed.gz	yes	normal tissue sample of the organ
+brain	putamen	tissue	ENCFF084UIL	ENCSR639WRL	DNaseOnly	54bc9eb3517dfa9ea0ceaea8dafcf1ab	3381843	2024-06-06	putamen.ENCFF084UIL.bed.gz	yes	normal tissue sample of the organ
+brain	superior temporal gyrus	tissue	ENCFF516SOR	ENCSR411DDW	DNaseOnly	e5d7fc5ccdb5cfbbf6aa4ffbb2d9626e	3347379	2024-06-06	superior_temporal_gyrus.ENCFF516SOR.bed.gz	yes	normal tissue sample of the organ
+brain	A172	cell line	ENCFF206PZP	ENCSR356OTG	DNaseOnly	df9e8243550cab0812d2b396e2c79706	3309992	2024-06-06	A172.ENCFF206PZP.bed.gz	no	not staged: cell line
+brain	BE2C	cell line	ENCFF392VME	ENCSR225USG	DNaseOnly	30f2acf85581ecb122577442f121d9b9	3750259	2024-06-06	BE2C.ENCFF392VME.bed.gz	no	not staged: cell line
+brain	BE2C	cell line	ENCFF919XTB	ENCSR526HSH	DNaseOnly	db30c3c2bccc0e71ce373a123f1113f5	3160616	2024-06-06	BE2C.ENCFF919XTB.bed.gz	no	not staged: cell line
+brain	D341Med	cell line	ENCFF403ZFY	ENCSR158OTN	DNaseOnly	c9a597f9f9f72e50bd0ae1877afcb898	3261445	2024-06-06	D341Med.ENCFF403ZFY.bed.gz	no	not staged: cell line
+brain	D721Med	cell line	ENCFF692KBA	ENCSR888PNM	DNaseOnly	f832977289aba9592c682a6c5be67a91	3475836	2024-06-06	D721Med.ENCFF692KBA.bed.gz	no	not staged: cell line
+brain	Daoy	cell line	ENCFF620WPB	ENCSR579WIF	DNaseOnly	0fe3f5fa71e4e08c3c74c8582038b73a	3329491	2024-06-06	Daoy.ENCFF620WPB.bed.gz	no	not staged: cell line
+brain	H4	cell line	ENCFF546KXG	ENCSR834CMH	DNaseOnly	1c25e104aa0ad5aab8edca22cd8909e3	3154962	2024-06-06	H4.ENCFF546KXG.bed.gz	no	not staged: cell line
+brain	H54	cell line	ENCFF323GUQ	ENCSR142SVM	DNaseOnly	bb56bc8fc805367ac1a3d60eef9b4426	3476152	2024-06-06	H54.ENCFF323GUQ.bed.gz	no	not staged: cell line
+brain	M059J	cell line	ENCFF564CQU	ENCSR265LDS	DNaseOnly	5cd6542d71cf6f6f2d39726f9a6f14da	3318481	2024-06-06	M059J.ENCFF564CQU.bed.gz	no	not staged: cell line
+brain	SK-N-DZ	cell line	ENCFF029QEL	ENCSR768FRX	DNaseOnly	5f2f7c4f6b823478d574105e48d2d42b	3240057	2024-06-06	SK_N_DZ.ENCFF029QEL.bed.gz	no	not staged: cell line
+brain	SK-N-DZ	cell line	ENCFF720FLZ	ENCSR549ACS	DNaseOnly	f7de6231bc217329efd1f838cd619f58	3134246	2024-06-06	SK_N_DZ.ENCFF720FLZ.bed.gz	no	not staged: cell line
+brain	SK-N-MC	cell line	ENCFF814LRL	ENCSR121YCJ	DNaseOnly	17f8e8ef68a7056dd8d8a812e2eeeeda	2896328	2024-06-06	SK_N_MC.ENCFF814LRL.bed.gz	no	not staged: cell line
+brain	SK-N-SH	cell line	ENCFF564BWI	ENCSR881LMQ	DNaseOnly	2c1315f73b10052a731d952bcf1cdf30	3169227	2024-06-06	SK_N_SH.ENCFF564BWI.bed.gz	no	not staged: cell line
+brain	SK-N-SH	cell line	ENCFF797UZT	ENCSR365QKC	DNaseOnly	50c5cca1fec415d599b48001041dc8b0	3273872	2024-06-06	SK_N_SH.ENCFF797UZT.bed.gz	no	not staged: cell line
+brain	astrocyte	primary cell	ENCFF614IKJ	ENCSR777RNP	DNaseOnly	36c136b1458e196cba829c327fd66d5e	3120587	2024-06-06	astrocyte.ENCFF614IKJ.bed.gz	no	not staged: primary cell
+brain	astrocyte	in vitro differentiated cells	ENCFF858MAK	ENCSR414CMA	DNaseOnly	c94f80ecfcdd05adeff4c2b4698825e3	3786126	2024-06-06	astrocyte.ENCFF858MAK.bed.gz	no	not staged: in vitro differentiated cells
+brain	astrocyte of the cerebellum	primary cell	ENCFF367EIR	ENCSR484JHD	DNaseOnly	4335e029497e6aabb730760013885d9b	3087354	2024-06-06	astrocyte_of_the_cerebellum.ENCFF367EIR.bed.gz	no	not staged: primary cell
+brain	astrocyte of the hippocampus	primary cell	ENCFF505JVD	ENCSR381NTL	DNaseOnly	1e012962c378f9c5e63510f1734106f4	3307241	2024-06-06	astrocyte_of_the_hippocampus.ENCFF505JVD.bed.gz	no	not staged: primary cell
+brain	bipolar neuron	in vitro differentiated cells	ENCFF581SMG	ENCSR847HUI	DNaseOnly	6a38c0afe1dfe109fe778ed95cc6457c	3228170	2024-06-06	bipolar_neuron.ENCFF581SMG.bed.gz	no	not staged: in vitro differentiated cells
+brain	brain	organoid	ENCFF613WLT	ENCSR866BSU	DNaseOnly	08709981ae1e342cd5eac377df6c53a1	3194661	2024-06-06	brain.ENCFF613WLT.bed.gz	no	not staged: organoid
+brain	brain	organoid	ENCFF617OHH	ENCSR041KGF	DNaseOnly	aa12ace7c16a550fffdf9294bc7f6c10	3283104	2024-06-06	brain.ENCFF617OHH.bed.gz	no	not staged: organoid
+brain	brain microvascular endothelial cell	primary cell	ENCFF106CSK	ENCSR712HIP	DNaseOnly	030e4452bb661b3e1f44c9c5234dc818	3382173	2024-06-06	brain_microvascular_endothelial_cell.ENCFF106CSK.bed.gz	no	not staged: primary cell
+brain	brain microvascular endothelial cell	primary cell	ENCFF915CRL	ENCSR557ZED	DNaseOnly	d37fea3774cb3ae43ab361ec7e663f18	3204640	2024-06-06	brain_microvascular_endothelial_cell.ENCFF915CRL.bed.gz	no	not staged: primary cell
+brain	brain pericyte	primary cell	ENCFF493FVO	ENCSR243OLS	DNaseOnly	f4c2c3160a857f8263cfa9c2d7ef9723	3141837	2024-06-06	brain_pericyte.ENCFF493FVO.bed.gz	no	not staged: primary cell
+brain	choroid plexus epithelial cell	primary cell	ENCFF336VVC	ENCSR652HJF	DNaseOnly	4d18ec3969ed646445db5e8d144755e5	3297671	2024-06-06	choroid_plexus_epithelial_cell.ENCFF336VVC.bed.gz	no	not staged: primary cell
+brain	smooth muscle cell of the brain vasculature	primary cell	ENCFF141RKM	ENCSR643RBO	DNaseOnly	a066fc022d761e0fe9b414cac586e7f2	3271795	2024-06-06	smooth_muscle_cell_of_the_brain_vasculature.ENCFF141RKM.bed.gz	no	not staged: primary cell
+esophagus	esophagus muscularis mucosa	tissue	ENCFF069AZO	ENCSR820OQX	DNaseOnly	654f05f19ffd2ec1027c79e6f47c96f3	3126066	2024-06-06	esophagus_muscularis_mucosa.ENCFF069AZO.bed.gz	yes	normal tissue sample of the organ
+esophagus	esophagus squamous epithelium	tissue	ENCFF044ZAN	ENCSR702CWE	DNaseOnly	4d63ed5615ff6d98d59b5ed8c0305966	3295619	2024-06-06	esophagus_squamous_epithelium.ENCFF044ZAN.bed.gz	yes	normal tissue sample of the organ
+esophagus	epithelial cell of esophagus	primary cell	ENCFF528XKP	ENCSR538LRI	DNaseOnly	3f8a69416918e6e6e91d2e2f17894d38	3272779	2024-06-06	epithelial_cell_of_esophagus.ENCFF528XKP.bed.gz	no	not staged: primary cell
+kidney	kidney	tissue	ENCFF124DGT	ENCSR122SNI	DNaseOnly	c77580f1516480518c15a7e7503da722	3540281	2024-06-06	kidney.ENCFF124DGT.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF178SIN	ENCSR893SPO	DNaseOnly	dbeb69763890ed1ae5f82281da06bfcf	3335757	2024-06-06	kidney.ENCFF178SIN.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF179DXS	ENCSR267CCM	DNaseOnly	d17e54f83806ebc61aa7e80d87570ba4	3915273	2024-06-06	kidney.ENCFF179DXS.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF190DHL	ENCSR827UXW	DNaseOnly	32260f338421054c8a07553852919dcb	3204337	2024-06-06	kidney.ENCFF190DHL.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF296LUB	ENCSR270YRH	DNaseOnly	9e8530272552ee4eefe61ee40fb8737b	3280063	2024-06-06	kidney.ENCFF296LUB.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF317WGY	ENCSR934YNP	DNaseOnly	9fcb7539227fcb45ed918535b68bc31e	3193065	2024-06-06	kidney.ENCFF317WGY.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF374ZFD	ENCSR115PBS	DNaseOnly	5fc7802c4777293e8fcf46dbbecb1904	3133075	2024-06-06	kidney.ENCFF374ZFD.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF423AUG	ENCSR449PQD	DNaseOnly	2cebe407a48c23bd9b166db480d57e5b	3040445	2024-06-06	kidney.ENCFF423AUG.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF448PFC	ENCSR716KOD	DNaseOnly	bf9bbd9a336f9d803ae5ddf0c62700f4	3680271	2024-06-06	kidney.ENCFF448PFC.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF517HGF	ENCSR137SNV	DNaseOnly	87a978d60912c729d771b3258eeb9828	3004953	2024-06-06	kidney.ENCFF517HGF.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF792IYD	ENCSR439PQS	DNaseOnly	0f67a86740d6c6649ed5133b6440d65b	3089049	2024-06-06	kidney.ENCFF792IYD.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF948ARX	ENCSR990BBN	DNaseOnly	aa73f05fb7e612b1674dc16dce191772	3212013	2024-06-06	kidney.ENCFF948ARX.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF953SWV	ENCSR278BKS	DNaseOnly	2a72e5c0e92a02fba2e5b7a23a576e13	3195956	2024-06-06	kidney.ENCFF953SWV.bed.gz	yes	normal tissue sample of the organ
+kidney	kidney	tissue	ENCFF969SFV	ENCSR694NWA	DNaseOnly	bf8d2af64a04e7c14b49abe980a939dd	3158865	2024-06-06	kidney.ENCFF969SFV.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF194JYC	ENCSR564HXQ	DNaseOnly	e63c8118231473e0bca460a471c208ec	3189902	2024-06-06	left_kidney.ENCFF194JYC.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF367DQW	ENCSR757SHG	DNaseOnly	94599bc5f2cab4cb22815de9ac141776	3052663	2024-06-06	left_kidney.ENCFF367DQW.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF368JNG	ENCSR339UZA	DNaseOnly	3a1c238bfe30c01124a63d1f539f5722	3047773	2024-06-06	left_kidney.ENCFF368JNG.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF468NEJ	ENCSR513WUS	DNaseOnly	a617d2d7de4924ea73523aa8edf9f553	3251814	2024-06-06	left_kidney.ENCFF468NEJ.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF496RNG	ENCSR646LCR	DNaseOnly	1eeae471b7da6e81e44f897a038ee1a1	3348275	2024-06-06	left_kidney.ENCFF496RNG.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF852QFK	ENCSR389VDH	DNaseOnly	86df571b9975f1e41da2806c4b7a321e	2984879	2024-06-06	left_kidney.ENCFF852QFK.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF886RCV	ENCSR044FFX	DNaseOnly	38838fd8b7a637cb8637535b100e83b7	3177292	2024-06-06	left_kidney.ENCFF886RCV.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF899XZX	ENCSR111NMH	DNaseOnly	ceca638b0e716863842e012780dd8d51	3101765	2024-06-06	left_kidney.ENCFF899XZX.bed.gz	yes	normal tissue sample of the organ
+kidney	left kidney	tissue	ENCFF976KNF	ENCSR289QGO	DNaseOnly	1bb2e4590655ccfe117c009691f865b8	3206862	2024-06-06	left_kidney.ENCFF976KNF.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal cortex interstitium	tissue	ENCFF150MMP	ENCSR236RXA	DNaseOnly	27d1b796e7fe85a209e7e3ea13027d61	2916424	2024-06-06	left_renal_cortex_interstitium.ENCFF150MMP.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal cortex interstitium	tissue	ENCFF241JYS	ENCSR386YOO	DNaseOnly	1c4a118b2bc784f930a61188da6d9e58	3134283	2024-06-06	left_renal_cortex_interstitium.ENCFF241JYS.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal cortex interstitium	tissue	ENCFF321BWK	ENCSR931VTT	DNaseOnly	46397e7601de53941baa1efdd87ba70f	3216473	2024-06-06	left_renal_cortex_interstitium.ENCFF321BWK.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal cortex interstitium	tissue	ENCFF712ZGB	ENCSR541OXX	DNaseOnly	9d7a384c83ec7c52e3b9061eb2fbc4ae	3149394	2024-06-06	left_renal_cortex_interstitium.ENCFF712ZGB.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal pelvis	tissue	ENCFF074IGB	ENCSR177NKS	DNaseOnly	0cecefeb6b8337ff5868bfdb8b87bb52	3183297	2024-06-06	left_renal_pelvis.ENCFF074IGB.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal pelvis	tissue	ENCFF100FKP	ENCSR085PAX	DNaseOnly	ffd08d3f6da6d90a51c3c7f1eb0e977c	3189599	2024-06-06	left_renal_pelvis.ENCFF100FKP.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal pelvis	tissue	ENCFF622IDY	ENCSR864LOX	DNaseOnly	d3c7d1b7b9199b67044598e40b227567	3136026	2024-06-06	left_renal_pelvis.ENCFF622IDY.bed.gz	yes	normal tissue sample of the organ
+kidney	left renal pelvis	tissue	ENCFF941JVV	ENCSR503MEB	DNaseOnly	bc352e8b5876f942fcac0e7a2f917004	3147035	2024-06-06	left_renal_pelvis.ENCFF941JVV.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF066BNZ	ENCSR517URS	DNaseOnly	f87f3abbd537225be750bb9e67090beb	3242593	2024-06-06	renal_cortex_interstitium.ENCFF066BNZ.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF101ISC	ENCSR913MBX	DNaseOnly	d2a5fe5cf5eefd328c3eb37bd9d6b2a6	3217340	2024-06-06	renal_cortex_interstitium.ENCFF101ISC.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF118XZC	ENCSR285AMD	DNaseOnly	bf5fd2446693638cee4d286166b721c8	3270647	2024-06-06	renal_cortex_interstitium.ENCFF118XZC.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF195KGU	ENCSR575IPS	DNaseOnly	4d0c5e4daf874d93cad47720d63078fc	3258677	2024-06-06	renal_cortex_interstitium.ENCFF195KGU.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF221DTW	ENCSR462ZSD	DNaseOnly	d1e68bfcc8b922c20c36ddef65c34e59	3189098	2024-06-06	renal_cortex_interstitium.ENCFF221DTW.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF321NWH	ENCSR458LPO	DNaseOnly	df28d5ebe40294f4094021992dac29a2	3187974	2024-06-06	renal_cortex_interstitium.ENCFF321NWH.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF351YBR	ENCSR588WNM	DNaseOnly	4fd5dbc3f43b9e42326c34ec1a806163	3214590	2024-06-06	renal_cortex_interstitium.ENCFF351YBR.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF455KHS	ENCSR537JGP	DNaseOnly	03d44e2ab74424b191c75c150650dd22	3235335	2024-06-06	renal_cortex_interstitium.ENCFF455KHS.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF522WSR	ENCSR100EUL	DNaseOnly	9f2c3295da1b7167fd4059409f853205	3323582	2024-06-06	renal_cortex_interstitium.ENCFF522WSR.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF799YNR	ENCSR095HLE	DNaseOnly	9df11850287bdd82e5ca67a133a37871	3113729	2024-06-06	renal_cortex_interstitium.ENCFF799YNR.bed.gz	yes	normal tissue sample of the organ
+kidney	renal cortex interstitium	tissue	ENCFF956NWR	ENCSR280VQO	DNaseOnly	b40c26b717a036d3fe56766c0ab20d1c	3128711	2024-06-06	renal_cortex_interstitium.ENCFF956NWR.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF083JAI	ENCSR868EBW	DNaseOnly	8e143c73a5068a9db00986df9f8184be	3306176	2024-06-06	renal_pelvis.ENCFF083JAI.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF156SZM	ENCSR862QXB	DNaseOnly	7f33c823e1477ce63d11d3acd55c4696	3286337	2024-06-06	renal_pelvis.ENCFF156SZM.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF177ORJ	ENCSR076VYG	DNaseOnly	35c40c8dea32a59e8b390b330c05b102	3236540	2024-06-06	renal_pelvis.ENCFF177ORJ.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF256OLN	ENCSR392IWG	DNaseOnly	1444ed570d6d4a58883931fdadf447fa	3228222	2024-06-06	renal_pelvis.ENCFF256OLN.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF332LDG	ENCSR419RQY	DNaseOnly	bb8649e05ba5273236b6cdf2511c5d97	3171584	2024-06-06	renal_pelvis.ENCFF332LDG.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF433JOJ	ENCSR442MAQ	DNaseOnly	574117999d43cb081c8bbb6a00d81da4	3114574	2024-06-06	renal_pelvis.ENCFF433JOJ.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF563NBA	ENCSR478WXB	DNaseOnly	6a5364741936d025b695cbf4f8cd2454	3209934	2024-06-06	renal_pelvis.ENCFF563NBA.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF607XXM	ENCSR983CLV	DNaseOnly	3d871b5d182080964750029002173f2c	3173747	2024-06-06	renal_pelvis.ENCFF607XXM.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF680ICR	ENCSR805SPG	DNaseOnly	18575e795cf4862a7fee58af616a1d1f	3144256	2024-06-06	renal_pelvis.ENCFF680ICR.bed.gz	yes	normal tissue sample of the organ
+kidney	renal pelvis	tissue	ENCFF822CIF	ENCSR927TUT	DNaseOnly	d86d42e2717bd618a154c7cd365b21b5	3237226	2024-06-06	renal_pelvis.ENCFF822CIF.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF050KZD	ENCSR095SOW	DNaseOnly	aa89230ccd8916f34007c413e83c4e44	3147969	2024-06-06	right_kidney.ENCFF050KZD.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF169UMM	ENCSR176ONU	DNaseOnly	469ac45085492d0a1bf3a4df9835fa80	3171819	2024-06-06	right_kidney.ENCFF169UMM.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF229GDZ	ENCSR913QEP	DNaseOnly	f356f34d2723bf7b1bb9af4980b3142d	3097828	2024-06-06	right_kidney.ENCFF229GDZ.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF427ECZ	ENCSR401XBQ	DNaseOnly	6138ecceb9de097efa491556e9d9bb44	3165751	2024-06-06	right_kidney.ENCFF427ECZ.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF623LPO	ENCSR788VPF	DNaseOnly	dc2d5fd799c61ca1b01c45d90e71b78d	3029316	2024-06-06	right_kidney.ENCFF623LPO.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF688YGS	ENCSR906ZPR	DNaseOnly	41e5e7d847306ee473c744aa560435bb	3213071	2024-06-06	right_kidney.ENCFF688YGS.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF755APH	ENCSR725IQG	DNaseOnly	99bfd37092df0b605056efa76a700e31	3227482	2024-06-06	right_kidney.ENCFF755APH.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF756RGR	ENCSR962XJQ	DNaseOnly	9577bedb960669b8375df4a7751cc421	3207988	2024-06-06	right_kidney.ENCFF756RGR.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF902EDT	ENCSR800AUJ	DNaseOnly	b52301fa9dd728569d6725ef03c6e984	3083412	2024-06-06	right_kidney.ENCFF902EDT.bed.gz	yes	normal tissue sample of the organ
+kidney	right kidney	tissue	ENCFF947VVS	ENCSR416SGQ	DNaseOnly	87fb91f817277567cc69e614db794d5b	3197133	2024-06-06	right_kidney.ENCFF947VVS.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal cortex interstitium	tissue	ENCFF886ZEN	ENCSR263ZDA	DNaseOnly	0b5766db3d6a029fc3bdac00f6117834	3148634	2024-06-06	right_renal_cortex_interstitium.ENCFF886ZEN.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal cortex interstitium	tissue	ENCFF914UQJ	ENCSR448KEL	DNaseOnly	a195a50f9207ebcd3751020079221c16	3104508	2024-06-06	right_renal_cortex_interstitium.ENCFF914UQJ.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal cortex interstitium	tissue	ENCFF962JGS	ENCSR073XXR	DNaseOnly	263b9b4a2e20ac683a8a3ab2c70fae8f	3168150	2024-06-06	right_renal_cortex_interstitium.ENCFF962JGS.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal pelvis	tissue	ENCFF398WTN	ENCSR637JFZ	DNaseOnly	b1133a4e569c8872bb28b69d4daa9f58	3158272	2024-06-06	right_renal_pelvis.ENCFF398WTN.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal pelvis	tissue	ENCFF459CHA	ENCSR843GRX	DNaseOnly	78912ab41b017da1f792bde4e99addc9	3207146	2024-06-06	right_renal_pelvis.ENCFF459CHA.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal pelvis	tissue	ENCFF818NTO	ENCSR503SHG	DNaseOnly	4e23a36f4728ec58c2d48e6e5e42c6c9	3209166	2024-06-06	right_renal_pelvis.ENCFF818NTO.bed.gz	yes	normal tissue sample of the organ
+kidney	right renal pelvis	tissue	ENCFF962RBO	ENCSR393PMZ	DNaseOnly	3e5a42bdd9c6ed4646b1ac9e05d31d4d	3129584	2024-06-06	right_renal_pelvis.ENCFF962RBO.bed.gz	yes	normal tissue sample of the organ
+kidney	ureter	tissue	ENCFF071JMZ	ENCSR569UEJ	DNaseOnly	59dcb7d1c7e1b19c546ca35f63b49491	3692033	2024-06-06	ureter.ENCFF071JMZ.bed.gz	yes	normal tissue sample of the organ
+kidney	ACHN	cell line	ENCFF772TPW	ENCSR493YUS	DNaseOnly	bef1760cb27169e7d3dae3f02aa1014d	3294958	2024-06-06	ACHN.ENCFF772TPW.bed.gz	no	not staged: cell line
+kidney	Caki2	cell line	ENCFF685PBH	ENCSR679UZK	DNaseOnly	c1bfbd1de6208281fb17c083507a7258	2944356	2024-06-06	Caki2.ENCFF685PBH.bed.gz	no	not staged: cell line
+kidney	G401	cell line	ENCFF144HNU	ENCSR998GYO	DNaseOnly	579e6650fc12d9ba932596b4d157a4f8	3786498	2024-06-06	G401.ENCFF144HNU.bed.gz	no	not staged: cell line
+kidney	HEK293T	cell line	ENCFF080QNU	ENCSR747FFM	DNaseOnly	5437632ed2771105e36de405d2265bf1	3141408	2024-06-06	HEK293T.ENCFF080QNU.bed.gz	no	not staged: cell line
+kidney	HK-2	cell line	ENCFF443OQS	ENCSR167SMG	DNaseOnly	59a55866318e746102ca834eac328b2c	3368613	2024-06-06	HK_2.ENCFF443OQS.bed.gz	no	not staged: cell line
+kidney	RCC	cell line	ENCFF097RYX	ENCSR180PFS	DNaseOnly	378282680d3845b33f00cc9a9af65b6d	3226710	2024-06-06	RCC.ENCFF097RYX.bed.gz	no	not staged: cell line
+kidney	RCC 7860	cell line	ENCFF026HBX	ENCSR664KAQ	DNaseOnly	1c968248d03feb4e82521e77954f1eba	3225351	2024-06-06	RCC_7860.ENCFF026HBX.bed.gz	no	not staged: cell line
+kidney	epithelial cell of proximal tubule	primary cell	ENCFF050WCK	ENCSR334SBV	DNaseOnly	d5373fb0e72bbb7ad1e99afd2cb4ccca	3288697	2024-06-06	epithelial_cell_of_proximal_tubule.ENCFF050WCK.bed.gz	no	not staged: primary cell
+kidney	glomerular endothelial cell	primary cell	ENCFF573BWV	ENCSR564ZLE	DNaseOnly	8eb43014cb918688d6e821a4ff40404b	3443716	2024-06-06	glomerular_endothelial_cell.ENCFF573BWV.bed.gz	no	not staged: primary cell
+kidney	glomerular visceral epithelial cell	primary cell	ENCFF838LFG	ENCSR665THS	DNaseOnly	16c5f9f077bd4a6944f024872585a02d	3330518	2024-06-06	glomerular_visceral_epithelial_cell.ENCFF838LFG.bed.gz	no	not staged: primary cell
+kidney	kidney capillary endothelial cell	primary cell	ENCFF083XAN	ENCSR424MBB	DNaseOnly	b3d23cf21b7517a399b0c9302fa49a92	3399104	2024-06-06	kidney_capillary_endothelial_cell.ENCFF083XAN.bed.gz	no	not staged: primary cell
+kidney	kidney epithelial cell	primary cell	ENCFF881JOC	ENCSR093IGI	DNaseOnly	378b808ff6b4a6a01d1f517ea124c5a7	3259098	2024-06-06	kidney_epithelial_cell.ENCFF881JOC.bed.gz	no	not staged: primary cell
+kidney	kidney glomerular epithelial cell	primary cell	ENCFF929DQM	ENCSR907TBJ	DNaseOnly	b0369b3f72720109fc82fb392d960fa3	3290214	2024-06-06	kidney_glomerular_epithelial_cell.ENCFF929DQM.bed.gz	no	not staged: primary cell
+kidney	kidney tubule cell	primary cell	ENCFF913DBW	ENCSR206JHT	DNaseOnly	a6148f117f858b594a1794ca1638ad80	3356221	2024-06-06	kidney_tubule_cell.ENCFF913DBW.bed.gz	no	not staged: primary cell
+kidney	kidney tubule cell	primary cell	ENCFF955XUL	ENCSR681BEB	DNaseOnly	48b7366132c89aeb08238706ff927ed6	3168878	2024-06-06	kidney_tubule_cell.ENCFF955XUL.bed.gz	no	not staged: primary cell
+kidney	nephron progenitor cell	in vitro differentiated cells	ENCFF232USB	ENCSR584AAP	DNaseOnly	afa4cd61315773426d4fbd0db53b396a	3563603	2024-06-06	nephron_progenitor_cell.ENCFF232USB.bed.gz	no	not staged: in vitro differentiated cells
+kidney	renal cortical epithelial cell	primary cell	ENCFF829IVH	ENCSR670TXW	DNaseOnly	76dea7894bef3f4b716ad1cbff9e1a0d	3305812	2024-06-06	renal_cortical_epithelial_cell.ENCFF829IVH.bed.gz	no	not staged: primary cell
+liver	HepG2	cell line	ENCFF775WBY	ENCSR932TWZ	DNaseOnly	b688190ada64cb49b9ba50d0eab992e9	3442487	2024-06-06	HepG2.ENCFF775WBY.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	HepG2	cell line	ENCFF960GTR	ENCSR411RGL	DNaseOnly	754bb6689c1fc909182359d8975e2177	3638852	2024-06-06	HepG2.ENCFF960GTR.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	hepatocyte	in vitro differentiated cells	ENCFF429OPN	ENCSR819OXZ	DNaseOnly	455d199f4609f0964f5b92ef145a0fb5	3347319	2024-06-06	hepatocyte.ENCFF429OPN.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	hepatocyte	primary cell	ENCFF603ILE	ENCSR540LPL	DNaseOnly	f65e6512d4ada98c960229090f9e4fa8	3599248	2024-06-06	hepatocyte.ENCFF603ILE.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	liver	tissue	ENCFF167GAJ	ENCSR731BRS	DNaseOnly	ca99db1cd1666cd615bc42d487e38528	3608016	2024-06-06	liver.ENCFF167GAJ.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	liver	tissue	ENCFF239HUO	ENCSR257HLT	DNaseOnly	31dac22d601e4a00edf2c9f06f05888d	3415644	2024-06-06	liver.ENCFF239HUO.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	right lobe of liver	tissue	ENCFF043RAT	ENCSR588DXH	DNaseOnly	9ac1a98dff9af2a8315177fc8ac350b3	3850794	2024-06-06	right_lobe_of_liver.ENCFF043RAT.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	right lobe of liver	tissue	ENCFF184TKS	ENCSR183YXK	DNaseOnly	f801cbd6c34323fa272c614359b03dee	3730603	2024-06-06	right_lobe_of_liver.ENCFF184TKS.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	right lobe of liver	tissue	ENCFF284LMY	ENCSR301IGZ	DNaseOnly	4dc92d8fc11c00edaa6166833bffe27f	3730895	2024-06-06	right_lobe_of_liver.ENCFF284LMY.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	right lobe of liver	tissue	ENCFF441ZFG	ENCSR845CMR	DNaseOnly	6423d052b518967168a976fb7bd5989b	3773180	2024-06-06	right_lobe_of_liver.ENCFF441ZFG.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	right lobe of liver	tissue	ENCFF955UNH	ENCSR045MDC	DNaseOnly	fbbaa67abbd34d9fd31ce56189cb3f79	3944074	2024-06-06	right_lobe_of_liver.ENCFF955UNH.bed.gz	yes	D-E1 liver set (HepG2, liver, right lobe of liver, hepatocyte)
+liver	HuH-7	cell line	ENCFF227BFF	ENCSR449XTZ	DNaseOnly	00dc1827362e28bb21cb96aa79ff38ed	3484850	2024-06-06	HuH_7.ENCFF227BFF.bed.gz	no	not in the D-E1 liver set
+liver	HuH-7.5	cell line	ENCFF792CML	ENCSR746LWC	DNaseOnly	29cae6cf4e8591a59430b9ebe32fef32	3501556	2024-06-06	HuH_7_5.ENCFF792CML.bed.gz	no	not in the D-E1 liver set
+liver	hepatic stellate cell	primary cell	ENCFF865FME	ENCSR612QRK	DNaseOnly	3e7d34f5eeec39ebfe0f0448e42f23ca	3541242	2024-06-06	hepatic_stellate_cell.ENCFF865FME.bed.gz	no	not in the D-E1 liver set
+liver	left lobe of liver	tissue	ENCFF901QLO	ENCSR456DWH	DNaseOnly	6646cf4db01394eb4ca40d77001dff13	3808051	2024-06-06	left_lobe_of_liver.ENCFF901QLO.bed.gz	no	not in the D-E1 liver set
+lung	left lung	tissue	ENCFF024PMN	ENCSR619IHY	DNaseOnly	04af2fd124ce8b9bfdc68841bc9d8afc	3114064	2024-06-06	left_lung.ENCFF024PMN.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF220APY	ENCSR457PMF	DNaseOnly	1503fcef4b58683d154f382b33e90950	3027953	2024-06-06	left_lung.ENCFF220APY.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF352DUS	ENCSR152ELC	DNaseOnly	7096e27f04191e2eaa25973ec9f00180	3163517	2024-06-06	left_lung.ENCFF352DUS.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF353YXW	ENCSR016PXO	DNaseOnly	fedb3fe5d7fca1b768fbfa235786e9c7	3105014	2024-06-06	left_lung.ENCFF353YXW.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF395RZO	ENCSR145OHU	DNaseOnly	879aa1b6fcff8dd059e6f01aed1de6c6	3152262	2024-06-06	left_lung.ENCFF395RZO.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF406ZIS	ENCSR519DDQ	DNaseOnly	bd6cb83c3c089b6429d83f81052c33ca	3029217	2024-06-06	left_lung.ENCFF406ZIS.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF424ULX	ENCSR013EFQ	DNaseOnly	9345a02e32a1c274812c4a4b7d639fd2	3210596	2024-06-06	left_lung.ENCFF424ULX.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF564IWB	ENCSR364FSK	DNaseOnly	eefd7435b3e2bdd26179466bcafce3ee	3307256	2024-06-06	left_lung.ENCFF564IWB.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF662NVO	ENCSR415YZQ	DNaseOnly	49ffdc2dc005ee317a7c0ede8cf4bb4c	3049284	2024-06-06	left_lung.ENCFF662NVO.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF731KKV	ENCSR170KGO	DNaseOnly	3975b85d95ffbdb3ccab09019e6a4d0e	3005614	2024-06-06	left_lung.ENCFF731KKV.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF784ZFA	ENCSR262DQF	DNaseOnly	f3d3f869c5f5f2fd043a7c15704a05a2	3808240	2024-06-06	left_lung.ENCFF784ZFA.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF852ZMN	ENCSR925BQN	DNaseOnly	4ab5792c1a3c82ac9240ea2cd8cac260	3173544	2024-06-06	left_lung.ENCFF852ZMN.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF885QXE	ENCSR134YKE	DNaseOnly	1c5eec3024729548ee52b90605ee2942	4076016	2024-06-06	left_lung.ENCFF885QXE.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF912QDC	ENCSR051YXR	DNaseOnly	7f0d1dcd315e4a57afd10e95cff790c4	3113084	2024-06-06	left_lung.ENCFF912QDC.bed.gz	yes	normal tissue sample of the organ
+lung	left lung	tissue	ENCFF939OFR	ENCSR878JTV	DNaseOnly	db3eeac516792b48a5a23b75bc687e2d	3036008	2024-06-06	left_lung.ENCFF939OFR.bed.gz	yes	normal tissue sample of the organ
+lung	lower lobe of left lung	tissue	ENCFF565XBM	ENCSR970INU	DNaseOnly	732181f9e9b8447efe676d5155535071	3874908	2024-06-06	lower_lobe_of_left_lung.ENCFF565XBM.bed.gz	yes	normal tissue sample of the organ
+lung	lower lobe of left lung	tissue	ENCFF590WGL	ENCSR548BBI	DNaseOnly	d6930ac767815401469c937171bea24f	3834122	2024-06-06	lower_lobe_of_left_lung.ENCFF590WGL.bed.gz	yes	normal tissue sample of the organ
+lung	lower lobe of left lung	tissue	ENCFF967LDV	ENCSR370ETB	DNaseOnly	917e6681cbae5bfa0e17379cc4db6033	3733665	2024-06-06	lower_lobe_of_left_lung.ENCFF967LDV.bed.gz	yes	normal tissue sample of the organ
+lung	lower lobe of right lung	tissue	ENCFF960ZTJ	ENCSR764OJN	DNaseOnly	a48d3d2c48251cdb46aeee2d66e0a595	3970159	2024-06-06	lower_lobe_of_right_lung.ENCFF960ZTJ.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF147YXG	ENCSR659BFI	DNaseOnly	13f56f6eac766dd2144ae743c6b322ba	2980626	2024-06-06	lung.ENCFF147YXG.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF167OSZ	ENCSR084EOB	DNaseOnly	8cca6f37f772a1263e5618d9ac34f59f	3314183	2024-06-06	lung.ENCFF167OSZ.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF182JOK	ENCSR194KNE	DNaseOnly	fbfce23a34c2a1e2c5abe6db3d18fc4e	3110110	2024-06-06	lung.ENCFF182JOK.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF189FRT	ENCSR853ZVZ	DNaseOnly	c75d791b1f5744dfcc0ed3de60a5fc65	3168752	2024-06-06	lung.ENCFF189FRT.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF272HRW	ENCSR844XAT	DNaseOnly	026b1ce894c9a528373e5de63c9b492f	3117808	2024-06-06	lung.ENCFF272HRW.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF273CXK	ENCSR747OZG	DNaseOnly	93bd78c654dd15d9ee66ea91688e402c	3078674	2024-06-06	lung.ENCFF273CXK.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF324XYW	ENCSR528UQX	DNaseOnly	913e96fe878fd9006b1de225dd2c817d	3501618	2024-06-06	lung.ENCFF324XYW.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF379QBY	ENCSR316TSE	DNaseOnly	5a24feed6352ac1b0946f1938cad6b23	3166846	2024-06-06	lung.ENCFF379QBY.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF393LEM	ENCSR286OLZ	DNaseOnly	8beb566644e4b5d9e3a7b0675d1a2c24	3153814	2024-06-06	lung.ENCFF393LEM.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF464TCQ	ENCSR400MNO	DNaseOnly	2d530e651d112a22fb0b1f79d3cef8b3	3174607	2024-06-06	lung.ENCFF464TCQ.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF499CAJ	ENCSR134CMY	DNaseOnly	413ce43171c3873277b8722f67ebbd38	3118244	2024-06-06	lung.ENCFF499CAJ.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF584QKC	ENCSR208OKU	DNaseOnly	b99c1a6c81d11d00b677d15a9157332c	3166579	2024-06-06	lung.ENCFF584QKC.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF936VIY	ENCSR151YBS	DNaseOnly	fe0fdb96ce45e0a8558986fb59e7f6ae	3033313	2024-06-06	lung.ENCFF936VIY.bed.gz	yes	normal tissue sample of the organ
+lung	lung	tissue	ENCFF954JVO	ENCSR294PCC	DNaseOnly	5fe20a8e4ac953a7dcdb706b5dba7d42	3198463	2024-06-06	lung.ENCFF954JVO.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF004PFU	ENCSR359DFW	DNaseOnly	03c56654737ac89c2f7a422609d17b25	3116264	2024-06-06	right_lung.ENCFF004PFU.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF027RHP	ENCSR814UZN	DNaseOnly	b6e16849b47ee2ec2f39d9c38757f2d4	3082915	2024-06-06	right_lung.ENCFF027RHP.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF139OLA	ENCSR481BBB	DNaseOnly	818794f80f48cabf10e28d7b3df3042a	3060499	2024-06-06	right_lung.ENCFF139OLA.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF242SRW	ENCSR373JRG	DNaseOnly	97e6795a979cc1879b57609b312045f7	3111044	2024-06-06	right_lung.ENCFF242SRW.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF458LUT	ENCSR928UQP	DNaseOnly	42a3244b8e61e1dbfaf04ba86032bfba	3097326	2024-06-06	right_lung.ENCFF458LUT.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF550ISA	ENCSR810XCU	DNaseOnly	ab7c7f0e131a0ec249dff02cb0fab03b	3029853	2024-06-06	right_lung.ENCFF550ISA.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF680TJP	ENCSR195XPU	DNaseOnly	9b31335c2be217429864c1ef0f042c46	3043334	2024-06-06	right_lung.ENCFF680TJP.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF718XVJ	ENCSR126NWL	DNaseOnly	6337a1160f5844332b653d0b78e5d91a	3190690	2024-06-06	right_lung.ENCFF718XVJ.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF832UYA	ENCSR573MAK	DNaseOnly	27ad80a23037526c4254515577cb4d9e	3260377	2024-06-06	right_lung.ENCFF832UYA.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF895IZT	ENCSR910TKY	DNaseOnly	ba62ea52e4fafcc24d00dd9cf0014838	2914901	2024-06-06	right_lung.ENCFF895IZT.bed.gz	yes	normal tissue sample of the organ
+lung	right lung	tissue	ENCFF954HAB	ENCSR235FVW	DNaseOnly	ceb9e0d9e5154345d53ecb61395a984c	3139734	2024-06-06	right_lung.ENCFF954HAB.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF199GKE	ENCSR457UNS	DNaseOnly	9236ebb5686feb0cc650f8f2097e0dea	3711362	2024-06-06	upper_lobe_of_left_lung.ENCFF199GKE.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF482HID	ENCSR519KIQ	DNaseOnly	484f071d0e35944f15116f34cc7ae088	3974792	2024-06-06	upper_lobe_of_left_lung.ENCFF482HID.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF543FLH	ENCSR545HRY	DNaseOnly	c3f3fbda13deca2b18181edde289db20	3645036	2024-06-06	upper_lobe_of_left_lung.ENCFF543FLH.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF688ZOX	ENCSR910JVL	DNaseOnly	fd167348e87a65f90e80b0f3e0374b8f	3768956	2024-06-06	upper_lobe_of_left_lung.ENCFF688ZOX.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF715SUB	ENCSR398PAI	DNaseOnly	0cf148a1e98a0834dc18c676756f62bc	3739844	2024-06-06	upper_lobe_of_left_lung.ENCFF715SUB.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF801KLR	ENCSR527PXI	DNaseOnly	b9dec626c23c87109d09fb243df5b84d	3622881	2024-06-06	upper_lobe_of_left_lung.ENCFF801KLR.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of left lung	tissue	ENCFF867SWX	ENCSR420RMG	DNaseOnly	52e54d2a42726aee5ab2fadf8c8caf98	3559840	2024-06-06	upper_lobe_of_left_lung.ENCFF867SWX.bed.gz	yes	normal tissue sample of the organ
+lung	upper lobe of right lung	tissue	ENCFF159CGA	ENCSR223TKR	DNaseOnly	60ea952378c530959b8050d0916b37e9	3892955	2024-06-06	upper_lobe_of_right_lung.ENCFF159CGA.bed.gz	yes	normal tissue sample of the organ
+lung	A549	cell line	ENCFF126UEL	ENCSR478GKR	DNaseOnly	0cd323d15c2122580afdb63d5146093d	3150218	2024-06-06	A549.ENCFF126UEL.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF152EQU	ENCSR763OLM	DNaseOnly	0d42f852073ab889caf772f6bbac51ee	3132657	2024-06-06	A549.ENCFF152EQU.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF220QNX	ENCSR629UOB	DNaseOnly	20d3f4644cf015b0cbbb2340eec90607	3105533	2024-06-06	A549.ENCFF220QNX.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF454PSH	ENCSR054MMM	DNaseOnly	2ff65ebc2d1e1759d2e742bfa34d371b	3105820	2024-06-06	A549.ENCFF454PSH.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF539BQT	ENCSR349ZBW	DNaseOnly	a7b960c9afb64d5480b8920cab58939b	3122607	2024-06-06	A549.ENCFF539BQT.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF583XWG	ENCSR424GRN	DNaseOnly	9a25c1790a103dcf1425d5adfbd25edf	3150568	2024-06-06	A549.ENCFF583XWG.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF652IHL	ENCSR586QGX	DNaseOnly	d39971f3f8ecb67188821f8342b77790	3086104	2024-06-06	A549.ENCFF652IHL.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF659EUU	ENCSR964DGT	DNaseOnly	f916b796f31c5518b57116a1dd0242d5	3102354	2024-06-06	A549.ENCFF659EUU.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF711LDE	ENCSR190YDU	DNaseOnly	636272fe11b201266b89c7faceb20f37	3185775	2024-06-06	A549.ENCFF711LDE.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF712KXU	ENCSR490KUB	DNaseOnly	54b1dc5ea54109742d84fbaa3282aaaa	3458773	2024-06-06	A549.ENCFF712KXU.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF743RTN	ENCSR601XON	DNaseOnly	4f73f2ccdce5b08e9739e6b25cd66567	3185449	2024-06-06	A549.ENCFF743RTN.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF756FCE	ENCSR090HJT	DNaseOnly	cc208cbce8c1efbceb6565b41d520f79	3308635	2024-06-06	A549.ENCFF756FCE.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF826YGP	ENCSR165ODW	DNaseOnly	87d893ad87a9c486b902830836ab0e0a	3098813	2024-06-06	A549.ENCFF826YGP.bed.gz	no	not staged: cell line
+lung	A549	cell line	ENCFF912WDX	ENCSR021KGI	DNaseOnly	90dc97ebf39a566ad2e41395377f2db1	3143522	2024-06-06	A549.ENCFF912WDX.bed.gz	no	not staged: cell line
+lung	AG04450	cell line	ENCFF913XCY	ENCSR971BWQ	DNaseOnly	9fd056ec4a90664caef9622cb32e854e	3249030	2024-06-06	AG04450.ENCFF913XCY.bed.gz	no	not staged: cell line
+lung	AG08396	cell line	ENCFF800MGD	ENCSR551DPI	DNaseOnly	d7c17d5d5cb967e43d5ee74c988dceb8	3339968	2024-06-06	AG08396.ENCFF800MGD.bed.gz	no	not staged: cell line
+lung	IMR-90	cell line	ENCFF685OHY	ENCSR376SFG	DNaseOnly	7ee1b3ff4368282db80c3a359a55ffe7	3443763	2024-06-06	IMR_90.ENCFF685OHY.bed.gz	no	not staged: cell line
+lung	IMR-90	cell line	ENCFF801JXJ	ENCSR103IHZ	DNaseOnly	851be647986e238daf8a33a6fb0c22b1	3267160	2024-06-06	IMR_90.ENCFF801JXJ.bed.gz	no	not staged: cell line
+lung	NCI-H226	cell line	ENCFF789BXH	ENCSR994TMJ	DNaseOnly	a7b95728ab9d09eb625f0fc871b464eb	3148619	2024-06-06	NCI_H226.ENCFF789BXH.bed.gz	no	not staged: cell line
+lung	NCI-H460	cell line	ENCFF819RJP	ENCSR861RPY	DNaseOnly	5e22453a27dd1c243dd1e0ac51607370	3123949	2024-06-06	NCI_H460.ENCFF819RJP.bed.gz	no	not staged: cell line
+lung	PC-9	cell line	ENCFF388UWG	ENCSR265PWT	DNaseOnly	ddfa37d558260d6f8b81e50e64215898	3671022	2024-06-06	PC_9.ENCFF388UWG.bed.gz	no	not staged: cell line
+lung	PC-9	cell line	ENCFF884RZY	ENCSR034FEW	DNaseOnly	49b8e97635dfc1d967c7f024550c0e9a	3470691	2024-06-06	PC_9.ENCFF884RZY.bed.gz	no	not staged: cell line
+lung	WI38	cell line	ENCFF698FQM	ENCSR545RFV	DNaseOnly	ec76401f634a4568aa9b121fa2b77c98	3506690	2024-06-06	WI38.ENCFF698FQM.bed.gz	no	not staged: cell line
+lung	WI38	cell line	ENCFF979HIW	ENCSR605MTG	DNaseOnly	dfb0f34d2873f820337a006dc61b2d7a	3373836	2024-06-06	WI38.ENCFF979HIW.bed.gz	no	not staged: cell line
+lung	bronchial epithelial cell	primary cell	ENCFF276WUK	ENCSR262GGN	DNaseOnly	17533dc3c2b8246a0f8731ce0c97a2d1	3416749	2024-06-06	bronchial_epithelial_cell.ENCFF276WUK.bed.gz	no	not staged: primary cell
+lung	bronchial epithelial cell	primary cell	ENCFF966SJP	ENCSR100UQM	DNaseOnly	651edacfeb63e799cdf597580f76a5a5	3278544	2024-06-06	bronchial_epithelial_cell.ENCFF966SJP.bed.gz	no	not staged: primary cell
+lung	fibroblast of lung	primary cell	ENCFF285DYD	ENCSR555HVT	DNaseOnly	5118745e7d82d68e54f6743d13b2173e	3190027	2024-06-06	fibroblast_of_lung.ENCFF285DYD.bed.gz	no	not staged: primary cell
+lung	fibroblast of lung	primary cell	ENCFF390UYN	ENCSR954OGD	DNaseOnly	8c13025542b6390643b0db5c001b988a	3228706	2024-06-06	fibroblast_of_lung.ENCFF390UYN.bed.gz	no	not staged: primary cell
+lung	lung microvascular endothelial cell	primary cell	ENCFF125QTA	ENCSR078TXJ	DNaseOnly	28160a078250eed36b0f642d67c7f139	3439616	2024-06-06	lung_microvascular_endothelial_cell.ENCFF125QTA.bed.gz	no	not staged: primary cell
+lung	lung microvascular endothelial cell	primary cell	ENCFF444ZHO	ENCSR596LGE	DNaseOnly	b447090ef45311890cd14f380630286d	3338458	2024-06-06	lung_microvascular_endothelial_cell.ENCFF444ZHO.bed.gz	no	not staged: primary cell
+ovary	ovary	tissue	ENCFF014BDJ	ENCSR050CMT	DNaseOnly	550cf5598b85c9f2575efd4a48cf08bc	3934012	2024-06-06	ovary.ENCFF014BDJ.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF100VOK	ENCSR019URU	DNaseOnly	82271d440e8a85f7ce352e81bf202ab2	3972417	2024-06-06	ovary.ENCFF100VOK.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF164ZBX	ENCSR496SHX	DNaseOnly	725c59ce35e5c8ad4c94c08179642606	3362467	2024-06-06	ovary.ENCFF164ZBX.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF284BFH	ENCSR079YSS	DNaseOnly	4513174e8ec2363c5dd115acfb5b3f3d	3680884	2024-06-06	ovary.ENCFF284BFH.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF420ZCG	ENCSR648ATV	DNaseOnly	805264fa711d66e5341d5461bbda9727	3710040	2024-06-06	ovary.ENCFF420ZCG.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF764OKL	ENCSR257XOE	DNaseOnly	850b296ed29963e98859efc42a5bb843	3819489	2024-06-06	ovary.ENCFF764OKL.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF833JNT	ENCSR554HIP	DNaseOnly	e95120bb687629c1f8f7d7d935af67b6	3778529	2024-06-06	ovary.ENCFF833JNT.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF918QUS	ENCSR476YHE	DNaseOnly	1c42093fbadf9245bd9637b31d864629	3107032	2024-06-06	ovary.ENCFF918QUS.bed.gz	yes	normal tissue sample of the organ
+ovary	ovary	tissue	ENCFF987UIA	ENCSR154RKX	DNaseOnly	d7956d1bcf61326240f6b64a3d521021	3717301	2024-06-06	ovary.ENCFF987UIA.bed.gz	yes	normal tissue sample of the organ
+pancreas	body of pancreas	tissue	ENCFF076OZR	ENCSR490POX	DNaseOnly	5b65c5eec924069c96be7f27c97fe0a5	3605580	2024-06-06	body_of_pancreas.ENCFF076OZR.bed.gz	yes	normal tissue sample of the organ
+pancreas	body of pancreas	tissue	ENCFF223DMR	ENCSR773TJN	DNaseOnly	1bbcb020ce49aaa699c94c57e2b83d4b	3544124	2024-06-06	body_of_pancreas.ENCFF223DMR.bed.gz	yes	normal tissue sample of the organ
+pancreas	body of pancreas	tissue	ENCFF710LRO	ENCSR794LUD	DNaseOnly	58c2b4dc8b3f7f684d02f75119b4bd15	3624759	2024-06-06	body_of_pancreas.ENCFF710LRO.bed.gz	yes	normal tissue sample of the organ
+pancreas	body of pancreas	tissue	ENCFF970EVX	ENCSR467MNV	DNaseOnly	38837c864f2c767f5c1e2053970e12c1	3476469	2024-06-06	body_of_pancreas.ENCFF970EVX.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF308XRI	ENCSR748WVY	DNaseOnly	4162080902579a9c21faa3fc9c6c9703	3848392	2024-06-06	pancreas.ENCFF308XRI.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF479FYI	ENCSR480FCZ	DNaseOnly	2e0db5ea373757f181229d78a9e4c7f0	3453434	2024-06-06	pancreas.ENCFF479FYI.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF569HCL	ENCSR547BLV	DNaseOnly	d8810eeba21b36e8860b3be6930e1987	3608531	2024-06-06	pancreas.ENCFF569HCL.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF629JOY	ENCSR204ACI	DNaseOnly	1c64827d62ccbcb81e2011c7007f5882	3361405	2024-06-06	pancreas.ENCFF629JOY.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF676KZA	ENCSR685YUN	DNaseOnly	2f175d2d78b9020b1463a6b5ef60b26e	3690253	2024-06-06	pancreas.ENCFF676KZA.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF807PLR	ENCSR855BCT	DNaseOnly	5c2ed1f8ad0f215e2fc2d84f60c7cb28	3585794	2024-06-06	pancreas.ENCFF807PLR.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF808DHV	ENCSR864DIM	DNaseOnly	2ccfe3ffec8a1e1bde3c25da1456a8d0	3676645	2024-06-06	pancreas.ENCFF808DHV.bed.gz	yes	normal tissue sample of the organ
+pancreas	pancreas	tissue	ENCFF978IKH	ENCSR890BYS	DNaseOnly	2097e02f2b06b41adeeff72b22f6a673	3957461	2024-06-06	pancreas.ENCFF978IKH.bed.gz	yes	normal tissue sample of the organ
+pancreas	8988T	cell line	ENCFF320RXO	ENCSR825HVE	DNaseOnly	f78fed541919938b57a01d63490bfc61	3449141	2024-06-06	8988T.ENCFF320RXO.bed.gz	no	not staged: cell line
+pancreas	HPDE6-E6E7	cell line	ENCFF216WYF	ENCSR590KXM	DNaseOnly	71106fae38861c78a9d75e7abeaf580c	3193018	2024-06-06	HPDE6_E6E7.ENCFF216WYF.bed.gz	no	not staged: cell line
+pancreas	Panc1	cell line	ENCFF761VUH	ENCSR886RTH	DNaseOnly	633ba2a31f27e6a7d5da609e1c3d2590	3300376	2024-06-06	Panc1.ENCFF761VUH.bed.gz	no	not staged: cell line
+pancreas	islet precursor cell	in vitro differentiated cells	ENCFF458NTQ	ENCSR249VUG	DNaseOnly	f9bb2427020bda2927b8aa2e8cd0f15b	3418302	2024-06-06	islet_precursor_cell.ENCFF458NTQ.bed.gz	no	not staged: in vitro differentiated cells
+pancreas	progenitor cell of endocrine pancreas	in vitro differentiated cells	ENCFF864UTU	ENCSR574TBL	DNaseOnly	346cdfab4af665a0c06b81362110908e	3370196	2024-06-06	progenitor_cell_of_endocrine_pancreas.ENCFF864UTU.bed.gz	no	not staged: in vitro differentiated cells
+pancreas	type B pancreatic cell	in vitro differentiated cells	ENCFF763SGA	ENCSR960KWV	DNaseOnly	e1f3fd496be8efc1966881ae7f55e673	3564360	2024-06-06	type_B_pancreatic_cell.ENCFF763SGA.bed.gz	no	not staged: in vitro differentiated cells
+prostate_gland	prostate gland	tissue	ENCFF374VRU	ENCSR684OZL	DNaseOnly	b9034dff0c67fb1ffe5d70a444b2eec5	3472009	2024-06-06	prostate_gland.ENCFF374VRU.bed.gz	yes	normal tissue sample of the organ
+prostate_gland	LNCaP clone FGC	cell line	ENCFF592EMA	ENCSR357SDP	DNaseOnly	7ad0ae503ee045f7c3cd11a41f540bf2	3453030	2024-06-06	LNCaP_clone_FGC.ENCFF592EMA.bed.gz	no	not staged: cell line
+prostate_gland	LNCaP clone FGC	cell line	ENCFF822TFS	ENCSR101SLZ	DNaseOnly	8704ad611ac33cff39e89b20e0f5f8f2	2966906	2024-06-06	LNCaP_clone_FGC.ENCFF822TFS.bed.gz	no	not staged: cell line
+prostate_gland	LNCaP clone FGC	cell line	ENCFF901MAN	ENCSR864JGD	DNaseOnly	78c497532448050539146cc3a0c5b8d0	3480569	2024-06-06	LNCaP_clone_FGC.ENCFF901MAN.bed.gz	no	not staged: cell line
+prostate_gland	PC-3	cell line	ENCFF846NVT	ENCSR548KGZ	DNaseOnly	cb7338dec99cb85cc9fa80f78d2d33b1	3209662	2024-06-06	PC_3.ENCFF846NVT.bed.gz	no	not staged: cell line
+prostate_gland	RWPE1	cell line	ENCFF955TLW	ENCSR670CPW	DNaseOnly	62b29648d8893a9f0a64f6d3394b474d	3095042	2024-06-06	RWPE1.ENCFF955TLW.bed.gz	no	not staged: cell line
+prostate_gland	RWPE2	cell line	ENCFF381TRF	ENCSR516GJF	DNaseOnly	cf9393d9ea45de2b08c178df55bcda0e	3815749	2024-06-06	RWPE2.ENCFF381TRF.bed.gz	no	not staged: cell line
+prostate_gland	epithelial cell of prostate	primary cell	ENCFF215CYT	ENCSR958BWB	DNaseOnly	1907dd28b7be5c91a6bd84516dfbd1bf	3147859	2024-06-06	epithelial_cell_of_prostate.ENCFF215CYT.bed.gz	no	not staged: primary cell
+skin_of_body	lower leg skin	tissue	ENCFF338DSE	ENCSR847VIM	DNaseOnly	64f294bf396c05d6cf8f3cad5e290303	3803462	2024-06-06	lower_leg_skin.ENCFF338DSE.bed.gz	yes	normal tissue sample of the organ
+skin_of_body	lower leg skin	tissue	ENCFF973WSQ	ENCSR260ZMD	DNaseOnly	e76dbd93acfd6fa4eb5378108ae90eb3	3743959	2024-06-06	lower_leg_skin.ENCFF973WSQ.bed.gz	yes	normal tissue sample of the organ
+skin_of_body	skin of body	tissue	ENCFF576QDG	ENCSR821CNM	DNaseOnly	28c971b9bac1295b556a7b0a23312a67	3098743	2024-06-06	skin_of_body.ENCFF576QDG.bed.gz	yes	normal tissue sample of the organ
+skin_of_body	suprapubic skin	tissue	ENCFF861XMV	ENCSR439IHT	DNaseOnly	515f9e70087e0aa968a0a121ed174c9d	4001767	2024-06-06	suprapubic_skin.ENCFF861XMV.bed.gz	yes	normal tissue sample of the organ
+skin_of_body	suprapubic skin	tissue	ENCFF953AAS	ENCSR478AZK	DNaseOnly	660ab4e5eeaf29010df4c7150f3b5b60	3834049	2024-06-06	suprapubic_skin.ENCFF953AAS.bed.gz	yes	normal tissue sample of the organ
+skin_of_body	AG04449	cell line	ENCFF616JAO	ENCSR901LTZ	DNaseOnly	58edc3f0d9891bc52ed89431905c1592	3169468	2024-06-06	AG04449.ENCFF616JAO.bed.gz	no	not staged: cell line
+skin_of_body	AG08395	cell line	ENCFF653FUE	ENCSR155JXP	DNaseOnly	f336a0065591cbc01d1284e682387216	3233336	2024-06-06	AG08395.ENCFF653FUE.bed.gz	no	not staged: cell line
+skin_of_body	AG09309	cell line	ENCFF877WOZ	ENCSR428QIW	DNaseOnly	d28643b8da4573eb0a9dae8c7da61c8f	3180634	2024-06-06	AG09309.ENCFF877WOZ.bed.gz	no	not staged: cell line
+skin_of_body	AG10803	cell line	ENCFF143GHI	ENCSR905VRP	DNaseOnly	b67b915d30b181ee6fbca81799fdd9c9	3250539	2024-06-06	AG10803.ENCFF143GHI.bed.gz	no	not staged: cell line
+skin_of_body	AG20443	cell line	ENCFF647HXH	ENCSR978XYK	DNaseOnly	345252ee0ddd7eb59164f1aff00cc626	3163288	2024-06-06	AG20443.ENCFF647HXH.bed.gz	no	not staged: cell line
+skin_of_body	BJ	cell line	ENCFF167IQB	ENCSR348OAV	DNaseOnly	90e2a5e48bc8a992ded49efc1d13aab0	3264813	2024-06-06	BJ.ENCFF167IQB.bed.gz	no	not staged: cell line
+skin_of_body	COLO829	cell line	ENCFF645DDS	ENCSR027FZE	DNaseOnly	b2cfb565cdc9d6afee092180981caf29	3065458	2024-06-06	COLO829.ENCFF645DDS.bed.gz	no	not staged: cell line
+skin_of_body	GM03348	cell line	ENCFF250IFF	ENCSR279BKT	DNaseOnly	b3864c314b19544f7544c11a96c1d4f7	3121989	2024-06-06	GM03348.ENCFF250IFF.bed.gz	no	not staged: cell line
+skin_of_body	GM03348	cell line	ENCFF366UES	ENCSR558EKO	DNaseOnly	af3240494c309bbbd6191d74dd65e29f	3162354	2024-06-06	GM03348.ENCFF366UES.bed.gz	no	not staged: cell line
+skin_of_body	GM03348	cell line	ENCFF374RSX	ENCSR498EHM	DNaseOnly	9bf416e698914574d005c49998489823	3131607	2024-06-06	GM03348.ENCFF374RSX.bed.gz	no	not staged: cell line
+skin_of_body	GM04503	cell line	ENCFF206IQP	ENCSR464VYW	DNaseOnly	6a86fa37617100291feac5dd46d0c53f	3252068	2024-06-06	GM04503.ENCFF206IQP.bed.gz	no	not staged: cell line
+skin_of_body	GM04504	cell line	ENCFF105JLZ	ENCSR950MWY	DNaseOnly	85122a75e6d4dfc3410fc70c6411f24b	3227696	2024-06-06	GM04504.ENCFF105JLZ.bed.gz	no	not staged: cell line
+skin_of_body	GM23248	cell line	ENCFF553ZXL	ENCSR999YQC	DNaseOnly	51129361e7b283e3b5bbc6102ed26b63	3271948	2024-06-06	GM23248.ENCFF553ZXL.bed.gz	no	not staged: cell line
+skin_of_body	GM23338	cell line	ENCFF460CEY	ENCSR481MDA	DNaseOnly	b9a16c5492b5cfab12e5c524ca3b29f5	3552993	2024-06-06	GM23338.ENCFF460CEY.bed.gz	no	not staged: cell line
+skin_of_body	GM23338	cell line	ENCFF950EAO	ENCSR125GRF	DNaseOnly	fab4422cbacc647ccdb50f51c36d13f8	3219357	2024-06-06	GM23338.ENCFF950EAO.bed.gz	no	not staged: cell line
+skin_of_body	RPMI7951	cell line	ENCFF760OGT	ENCSR517RZQ	DNaseOnly	ed049829129e6ff6b9d3517e0cccdb9c	3357219	2024-06-06	RPMI7951.ENCFF760OGT.bed.gz	no	not staged: cell line
+skin_of_body	SK-MEL-5	cell line	ENCFF890MEM	ENCSR166UAA	DNaseOnly	ec6f98ad1100361445a90d77a4c7777a	3060904	2024-06-06	SK_MEL_5.ENCFF890MEM.bed.gz	no	not staged: cell line
+skin_of_body	WTC11	cell line	ENCFF279NIK	ENCSR464GSY	DNaseOnly	6c62ee1627da1556c24e0c7799547c4b	3392760	2024-06-06	WTC11.ENCFF279NIK.bed.gz	no	not staged: cell line
+skin_of_body	dermis blood vessel endothelial cell	primary cell	ENCFF396JGP	ENCSR843ZVX	DNaseOnly	65deefb5e2300a7dfe7ad54bd2eb9a4a	3419782	2024-06-06	dermis_blood_vessel_endothelial_cell.ENCFF396JGP.bed.gz	no	not staged: primary cell
+skin_of_body	dermis blood vessel endothelial cell	primary cell	ENCFF641UHT	ENCSR246SVY	DNaseOnly	3515152c0f5e8a956a5f201457d9064d	3481309	2024-06-06	dermis_blood_vessel_endothelial_cell.ENCFF641UHT.bed.gz	no	not staged: primary cell
+skin_of_body	dermis blood vessel endothelial cell	primary cell	ENCFF687YWV	ENCSR302CFA	DNaseOnly	0763f2b849bc1e0eac89fc4401c71ca6	3486289	2024-06-06	dermis_blood_vessel_endothelial_cell.ENCFF687YWV.bed.gz	no	not staged: primary cell
+skin_of_body	dermis blood vessel endothelial cell	primary cell	ENCFF961IZY	ENCSR271GAD	DNaseOnly	236e00e02bf307646d9ee0ac1c0935a8	3365983	2024-06-06	dermis_blood_vessel_endothelial_cell.ENCFF961IZY.bed.gz	no	not staged: primary cell
+skin_of_body	dermis microvascular lymphatic vessel endothelial cell	primary cell	ENCFF191CER	ENCSR589JEB	DNaseOnly	91082aa0dfc831cbc668fd0d5e047a03	3326558	2024-06-06	dermis_microvascular_lymphatic_vessel_endothelial_cell.ENCFF191CER.bed.gz	no	not staged: primary cell
+skin_of_body	dermis microvascular lymphatic vessel endothelial cell	primary cell	ENCFF735NMF	ENCSR735SJQ	DNaseOnly	393c46b10c5b22cc33910d2ca7e70633	3426770	2024-06-06	dermis_microvascular_lymphatic_vessel_endothelial_cell.ENCFF735NMF.bed.gz	no	not staged: primary cell
+skin_of_body	epidermal melanocyte	primary cell	ENCFF693RQO	ENCSR647KDV	DNaseOnly	986f0c0784658a2c8e965670677aaab8	3226383	2024-06-06	epidermal_melanocyte.ENCFF693RQO.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of dermis	primary cell	ENCFF475PJB	ENCSR210RBR	DNaseOnly	42f9471d66b6f29a0612fa11900dd758	3277028	2024-06-06	fibroblast_of_dermis.ENCFF475PJB.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of abdomen	primary cell	ENCFF626XIM	ENCSR979HSQ	DNaseOnly	4979c763563b6bf40e36250bd3568cc3	3109215	2024-06-06	fibroblast_of_skin_of_abdomen.ENCFF626XIM.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of abdomen	primary cell	ENCFF853ALR	ENCSR593ATV	DNaseOnly	0c9dbf07106832dccfc81f6f088dc05a	3007843	2024-06-06	fibroblast_of_skin_of_abdomen.ENCFF853ALR.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of back	primary cell	ENCFF629YDL	ENCSR886NXW	DNaseOnly	16180cbd2962b7b463caaff8b114051b	3168103	2024-06-06	fibroblast_of_skin_of_back.ENCFF629YDL.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of left biceps	primary cell	ENCFF207HUI	ENCSR662SVC	DNaseOnly	c4b04a694ae6575453fc178dacaea69a	3047238	2024-06-06	fibroblast_of_skin_of_left_biceps.ENCFF207HUI.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of left biceps	primary cell	ENCFF645EUQ	ENCSR034TYW	DNaseOnly	b94271131667fb1ea1fdc336bea3712f	3133043	2024-06-06	fibroblast_of_skin_of_left_biceps.ENCFF645EUQ.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of left quadriceps	primary cell	ENCFF316VLW	ENCSR034KPI	DNaseOnly	434a450d84809908b838ae3b010b510b	3072906	2024-06-06	fibroblast_of_skin_of_left_quadriceps.ENCFF316VLW.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of left quadriceps	primary cell	ENCFF375BFX	ENCSR565FRQ	DNaseOnly	63ccdc2e709ae9fcbf54e140d31af695	3105450	2024-06-06	fibroblast_of_skin_of_left_quadriceps.ENCFF375BFX.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of right biceps	primary cell	ENCFF918TQY	ENCSR446MVF	DNaseOnly	e508cf563f2adc459b160a54bb9ea5c5	3188524	2024-06-06	fibroblast_of_skin_of_right_biceps.ENCFF918TQY.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of right quadriceps	primary cell	ENCFF616KAR	ENCSR587YOY	DNaseOnly	a56bd62c6c0cb8319eee5b84d812fd8d	3160184	2024-06-06	fibroblast_of_skin_of_right_quadriceps.ENCFF616KAR.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of scalp	primary cell	ENCFF283PEV	ENCSR596BBP	DNaseOnly	1bab893374dce8236e95099ae64cb867	3172812	2024-06-06	fibroblast_of_skin_of_scalp.ENCFF283PEV.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of skin of scalp	primary cell	ENCFF860HBE	ENCSR360BQF	DNaseOnly	ff8d6dcdc4002c42f4156db5c87cb3b1	3097566	2024-06-06	fibroblast_of_skin_of_scalp.ENCFF860HBE.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of upper back skin	primary cell	ENCFF073HQO	ENCSR570AWB	DNaseOnly	db3e18ce6b9856de04b0a3970c3401ee	3138439	2024-06-06	fibroblast_of_upper_back_skin.ENCFF073HQO.bed.gz	no	not staged: primary cell
+skin_of_body	fibroblast of upper back skin	primary cell	ENCFF859YZI	ENCSR998QCO	DNaseOnly	c3237336350b166de056ca03bd8bdcb3	3157353	2024-06-06	fibroblast_of_upper_back_skin.ENCFF859YZI.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin fibroblast	primary cell	ENCFF388OWS	ENCSR991DRT	DNaseOnly	6e41cc33a3c1ba1fc21b8f5113d4fd9e	3298064	2024-06-06	foreskin_fibroblast.ENCFF388OWS.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin fibroblast	primary cell	ENCFF473OEL	ENCSR796YWJ	DNaseOnly	1218404641c2904d5a9519a7364d56c9	3204282	2024-06-06	foreskin_fibroblast.ENCFF473OEL.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin fibroblast	primary cell	ENCFF489QTT	ENCSR947RLQ	DNaseOnly	4016934d4a150cf39bd2b820d71ffb6f	3381840	2024-06-06	foreskin_fibroblast.ENCFF489QTT.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin fibroblast	primary cell	ENCFF708WQS	ENCSR027RGM	DNaseOnly	652d04a1e00200b0152f955dc6a4bb3b	3406653	2024-06-06	foreskin_fibroblast.ENCFF708WQS.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin keratinocyte	primary cell	ENCFF021PDX	ENCSR331KQB	DNaseOnly	c6dab69552902351d681ef05dcecf6d8	3084986	2024-06-06	foreskin_keratinocyte.ENCFF021PDX.bed.gz	no	not staged: primary cell
+skin_of_body	foreskin keratinocyte	primary cell	ENCFF324CBD	ENCSR941XYA	DNaseOnly	ee8925f92fa431368f92533a212bd656	3096824	2024-06-06	foreskin_keratinocyte.ENCFF324CBD.bed.gz	no	not staged: primary cell
+skin_of_body	iPS DF 19.11	cell line	ENCFF036QBQ	ENCSR772VHZ	DNaseOnly	d83025bc0bd2ba4130a84011afd30ece	3235900	2024-06-06	iPS_DF_19_11.ENCFF036QBQ.bed.gz	no	not staged: cell line
+skin_of_body	iPS DF 19.7	cell line	ENCFF628KFY	ENCSR416HDS	DNaseOnly	d724e17366c351886523fb5aad5b66f7	3126083	2024-06-06	iPS_DF_19_7.ENCFF628KFY.bed.gz	no	not staged: cell line
+skin_of_body	iPS DF 4.7	cell line	ENCFF500OPM	ENCSR920MHM	DNaseOnly	cc0e35419ebb485fe67ea7cf1f31a083	3045700	2024-06-06	iPS_DF_4_7.ENCFF500OPM.bed.gz	no	not staged: cell line
+skin_of_body	iPS DF 6.9	cell line	ENCFF947ZBB	ENCSR846KBH	DNaseOnly	d52b56d65d2a594db02a1b66fe5182ea	3152583	2024-06-06	iPS_DF_6_9.ENCFF947ZBB.bed.gz	no	not staged: cell line
+skin_of_body	iPS-NIHi11	cell line	ENCFF375BTH	ENCSR082HOQ	DNaseOnly	24a0ca18206689cc83f773f09d914e45	3119376	2024-06-06	iPS_NIHi11.ENCFF375BTH.bed.gz	no	not staged: cell line
+skin_of_body	iPS-NIHi7	cell line	ENCFF362GUY	ENCSR157DJQ	DNaseOnly	55e9ef35d7fc1e4686ba6052aa286173	3051376	2024-06-06	iPS_NIHi7.ENCFF362GUY.bed.gz	no	not staged: cell line
+skin_of_body	keratinocyte	primary cell	ENCFF614ZKA	ENCSR998FKR	DNaseOnly	46b485023a5892587e70b3593a4765e4	3270662	2024-06-06	keratinocyte.ENCFF614ZKA.bed.gz	no	not staged: primary cell
+skin_of_body	keratinocyte	primary cell	ENCFF656OFR	ENCSR366BKU	DNaseOnly	fe64a96fe901df98913310aa52a06e45	3544770	2024-06-06	keratinocyte.ENCFF656OFR.bed.gz	no	not staged: primary cell
+stomach	stomach	tissue	ENCFF018FTI	ENCSR440CSE	DNaseOnly	db79e668c9b08326df1f539fc8ad5ada	3282021	2024-06-06	stomach.ENCFF018FTI.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF026ECC	ENCSR516CNX	DNaseOnly	cdb9c4ec1285ea5e4d764a4c13b69fbd	3209269	2024-06-06	stomach.ENCFF026ECC.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF044DBE	ENCSR801RPE	DNaseOnly	31f5d0725259cff485014fe4a68bbb99	3538302	2024-06-06	stomach.ENCFF044DBE.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF079CAV	ENCSR588VNM	DNaseOnly	094049918d6b13a479efa7241364148b	3176703	2024-06-06	stomach.ENCFF079CAV.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF240SZS	ENCSR464EVX	DNaseOnly	d21373e3e836d1047914c330daba22ce	3230102	2024-06-06	stomach.ENCFF240SZS.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF286OIN	ENCSR045AMF	DNaseOnly	37714a1299e2a2a30aa04006313b07e4	3259033	2024-06-06	stomach.ENCFF286OIN.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF318TLK	ENCSR848DFI	DNaseOnly	7de7082b5ba3296784dabe67ce1da1b7	3220824	2024-06-06	stomach.ENCFF318TLK.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF512CQF	ENCSR342RWQ	DNaseOnly	891b2e5f5c99030ceaa1f713fe054858	3207092	2024-06-06	stomach.ENCFF512CQF.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF539JXJ	ENCSR406ZWT	DNaseOnly	dda8c71f51e4d906c258d653ed78bc1c	3329666	2024-06-06	stomach.ENCFF539JXJ.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF552WFD	ENCSR850SEU	DNaseOnly	b2577bb7720e099161c6fe0f281d7198	3579095	2024-06-06	stomach.ENCFF552WFD.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF568EKI	ENCSR266DOK	DNaseOnly	9d269486d9bbe0bb2d58715454c73c9f	3534024	2024-06-06	stomach.ENCFF568EKI.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF607CEO	ENCSR329ZVK	DNaseOnly	c77ff8cae65f2320a8d7b4771c598951	3308354	2024-06-06	stomach.ENCFF607CEO.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF644XKS	ENCSR677ZHE	DNaseOnly	259604660c425553e743d6856c9551e0	3331610	2024-06-06	stomach.ENCFF644XKS.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF703ZER	ENCSR094PBV	DNaseOnly	b1496b26f031e69b28395f72f7270dad	3422423	2024-06-06	stomach.ENCFF703ZER.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF706TEL	ENCSR189XXA	DNaseOnly	d4c59a2f56eb6fd5bef36b8ba4cc7c93	3330616	2024-06-06	stomach.ENCFF706TEL.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF741HHU	ENCSR737XPT	DNaseOnly	0dd789d024889e3ccc3d47b16d4450ca	3354679	2024-06-06	stomach.ENCFF741HHU.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF776NWH	ENCSR318PXA	DNaseOnly	eeef108a37ad0ff968c2f762e13644b3	3327248	2024-06-06	stomach.ENCFF776NWH.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF871QHX	ENCSR184WWA	DNaseOnly	12010e5e384b7ebffebff0ce0dc00829	3400424	2024-06-06	stomach.ENCFF871QHX.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF880EBI	ENCSR246LLE	DNaseOnly	83bbe71f65078d7066f25fcb95f3d872	3367495	2024-06-06	stomach.ENCFF880EBI.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF888VNM	ENCSR538FSP	DNaseOnly	4e10a59e13efb9e0d259bb5961734a78	3567607	2024-06-06	stomach.ENCFF888VNM.bed.gz	yes	normal tissue sample of the organ
+stomach	stomach	tissue	ENCFF922BTU	ENCSR046CKU	DNaseOnly	438b8bed21691f5d3d5c7e4529d9d95f	3273963	2024-06-06	stomach.ENCFF922BTU.bed.gz	yes	normal tissue sample of the organ
+thyroid_gland	thyroid gland	tissue	ENCFF258PFN	ENCSR608WBW	DNaseOnly	93ba62e69a021e8f14090f44bd0ce64c	3470357	2024-06-06	thyroid_gland.ENCFF258PFN.bed.gz	yes	normal tissue sample of the organ
+thyroid_gland	thyroid gland	tissue	ENCFF351UTH	ENCSR541LLX	DNaseOnly	55daa2f165fc0a4484cce72da35fdb11	3517022	2024-06-06	thyroid_gland.ENCFF351UTH.bed.gz	yes	normal tissue sample of the organ
+thyroid_gland	thyroid gland	tissue	ENCFF472ACF	ENCSR121UGD	DNaseOnly	92d253dc811b73b936dc9e2bdcbb95b7	3671884	2024-06-06	thyroid_gland.ENCFF472ACF.bed.gz	yes	normal tissue sample of the organ
+thyroid_gland	thyroid gland	tissue	ENCFF614XVZ	ENCSR468UXK	DNaseOnly	2d38b663bc7b6370e005da1b0e0aa5ef	3444464	2024-06-06	thyroid_gland.ENCFF614XVZ.bed.gz	yes	normal tissue sample of the organ
+urinary_bladder	urinary bladder	tissue	ENCFF757NAM	ENCSR091VPY	DNaseOnly	8ea7358fda5916d4138bca29eed1f2ec	3131663	2024-06-06	urinary_bladder.ENCFF757NAM.bed.gz	yes	normal tissue sample of the organ

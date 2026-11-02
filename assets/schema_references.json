@@ -269,6 +269,45 @@
                 "type": "string",
                 "meta": ["alphagenome_avi_licence"]
             },
+            "enhancer_gene_dir": {
+                "type": "string",
+                "meta": ["enhancer_gene_dir"]
+            },
+            "enhancer_gene_note": {
+                "type": "string",
+                "meta": ["enhancer_gene_note"]
+            },
+            "ccre_v4_bed": {
+                "type": "string",
+                "pattern": "^\\S+\\.bed(\\.gz)?$",
+                "meta": ["ccre_v4_bed"]
+            },
+            "ccre_v4_md5": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{32}$",
+                "meta": ["ccre_v4_md5"]
+            },
+            "ccre_v4_rows": {
+                "type": "integer",
+                "minimum": 1,
+                "meta": ["ccre_v4_rows"]
+            },
+            "ccre_v4_source": {
+                "type": "string",
+                "meta": ["ccre_v4_source"]
+            },
+            "ccre_celltype_dir": {
+                "type": "string",
+                "meta": ["ccre_celltype_dir"]
+            },
+            "encode_licence": {
+                "type": "string",
+                "meta": ["encode_licence"]
+            },
+            "cosmic_licence": {
+                "type": "string",
+                "meta": ["cosmic_licence"]
+            },
             "cadd_snv_version": {
                 "type": "string",
                 "meta": ["cadd_snv_version"]
