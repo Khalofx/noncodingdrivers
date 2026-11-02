@@ -155,7 +155,9 @@ nextflow_pipeline {
                 { assert roles == [ caller_role_activedriverwgs: 'combined', caller_role_oncodrivefml: 'combined', caller_role_oncodriveclustl: 'reported_alongside' ] },
                 { assert erows.any { r -> r.element_id == 'TERT_promoter_fixture' && r.evidence_item == 'oncodriveclustl_n_clusters' && r.status == 'observed' } },
                 { assert path("$outputDir/callers/oncodriveclustl/SYNTH-TERT.oncodriveclustl.clusters.tsv").exists() },
-                { assert mqc.any { name -> name.contains('caller_roles') } }
+                { assert mqc.any { name -> name.contains('caller_roles') } },
+                // pipeline versions.yml without the Nextflow version (tests run on several Nextflow versions)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
             )
         }
     }
