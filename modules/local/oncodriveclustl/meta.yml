@@ -1,0 +1,98 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "oncodriveclustl"
+description: Positional clustering of SNVs within each element against a local, trinucleotide-matched simulation (OncodriveCLUSTL), run in shards of element ids with one cohort signature and Benjamini-Hochberg over all shards
+keywords:
+  - cancer
+  - driver
+  - noncoding
+  - clustering
+tools:
+  - "oncodriveclustl":
+      description: "OncodriveCLUSTL: a sequence-based clustering method to identify cancer drivers"
+      homepage: "https://bbglab.irbbarcelona.org/oncodriveclustl"
+      documentation: "https://github.com/bbglab/oncodriveclustl"
+      tool_dev_url: "https://github.com/bbglab/oncodriveclustl"
+      doi: "10.1093/bioinformatics/btz501"
+      licence: ["AGPL-3.0-or-later"]
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Cohort meta map, e.g. `[ id:'SYNTH-NC', cohort:'SYNTH-NC', assembly:'GRCh38' ]`
+    - mutations:
+        type: file
+        description: Canonical cohort mutation table (sample, chrom, pos, ref, alt, vtype; GRCh38, chr-prefixed, 1-based); SNVs are used
+        pattern: "*.{tsv,tsv.gz}"
+        ontologies: []
+    - elements:
+        type: file
+        description: |
+          Element catalogue rows, headerless BED (chrom, start, end, element id, ...). In the pipeline these are
+          the ids with at least `-emut` SNVs (CLUSTL_REGIONS); the analysed elements and their results are the
+          same with the full catalogue, which only costs run time.
+        pattern: "*.bed"
+        ontologies: []
+  - bgdata_genome:
+      type: directory
+      description: Optional offline bgdata hg38 genome directory (chr*.txt), the one OncodriveFML reads; `[]` uses bgdata's own cache
+
+output:
+  results:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.oncodriveclustl.tsv":
+          type: file
+          description: |
+            Per-element OncodriveCLUSTL results (native `elements_results.txt` columns: SYMBOL, ENSID, CGC, CHROMOSOME,
+            STRAND, LENGTH, TOTAL_MUT, CLUSTERED_MUT, CLUSTERS, SIM_CLUSTERS, SCORE, P_/Q_EMPIRICAL, P_/Q_ANALYTICAL,
+            P_/Q_TOPCLUSTER); q-values over all shards. CGC is "Non Available" on hg38.
+          pattern: "*.oncodriveclustl.tsv"
+          ontologies: []
+  clusters:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.oncodriveclustl.clusters.tsv":
+          type: file
+          description: Per-cluster results (native `clusters_results.tsv`; RANK follows the merged element order)
+          pattern: "*.oncodriveclustl.clusters.tsv"
+          ontologies: []
+  log:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "${prefix}.oncodriveclustl.log":
+          type: file
+          description: OncodriveCLUSTL logs of every shard (options, counts, iterations)
+          pattern: "*.oncodriveclustl.log"
+          ontologies: []
+  versions_oncodriveclustl:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "oncodriveclustl":
+          type: string
+          description: The name of the tool
+      - "cat oncodriveclustl.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+
+topics:
+  versions:
+    - - "${task.process}":
+          type: string
+          description: The name of the process
+      - "oncodriveclustl":
+          type: string
+          description: The name of the tool
+      - "cat oncodriveclustl.version.txt":
+          type: eval
+          description: The expression to obtain the version of the tool
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

@@ -1,0 +1,147 @@
+nextflow_process {
+
+    name "Test Process ONCODRIVECLUSTL"
+    script "../main.nf"
+    process "ONCODRIVECLUSTL"
+    config "./nextflow.config"
+
+    tag "modules"
+    tag "modules_local"
+    tag "oncodriveclustl"
+
+    test("synthetic TERT cohort - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true),
+                    file("${projectDir}/tests/data/oncodriveclustl/elements.prefiltered.bed", checkIfExists: true)
+                ]
+                // bgdata reads chromosome files by offset: the first 1.4 Mb of hg38 chr5 covers every fixture element
+                input[1] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    // Real run on every fixture row (below-cutoff, empty and unplaced elements included). Seeded
+    // (--seed 1): the tables are deterministic, so their md5 is snapshotted.
+    test("synthetic TERT cohort - all catalogue rows") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true),
+                    file("${projectDir}/tests/data/oncodriveclustl/elements.bed", checkIfExists: true)
+                ]
+                // bgdata reads chromosome files by offset: the first 1.4 Mb of hg38 chr5 covers every fixture element
+                input[1] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            def lines  = path(process.out.results[0][1]).readLines()
+            def h      = lines[0].tokenize('\t')
+            def rows   = lines.drop(1).collect { l -> l.split('\t', -1) }
+            def tested = rows.findAll { r -> r[h.indexOf('P_ANALYTICAL')] }
+            def tert   = rows.find { r -> r[h.indexOf('ENSID')] == 'TERT_promoter_fixture' }
+            def analysed = rows.findAll { r -> (r[h.indexOf('TOTAL_MUT')] as int) >= 2 }.collect { r -> r[h.indexOf('ENSID')] }
+            // the analysed elements' rows, in table order, as the next test's whole table (md5 below)
+            def analysed_text = ([ lines[0] ] + lines.drop(1).findAll { l -> (l.split('\t', -1)[h.indexOf('TOTAL_MUT')] as int) >= 2 }).join('\n') + '\n'
+            def analysed_md5  = java.security.MessageDigest.getInstance('MD5').digest(analysed_text.getBytes('UTF-8')).encodeHex().toString()
+            assert process.success
+            assertAll(
+                { assert analysed.sort() == [ 'TERT_promoter_fixture', 'elem_B', 'elem_D', 'elem_split' ] },
+                { assert (tert[h.indexOf('CLUSTERS')] as int) >= 1 && (tert[h.indexOf('TOTAL_MUT')] as int) == 10 },
+                { assert tested.collect { r -> r[h.indexOf('P_ANALYTICAL')] as double }.min() == (tert[h.indexOf('P_ANALYTICAL')] as double) },
+                { assert rows[0][h.indexOf('ENSID')] == 'TERT_promoter_fixture' },
+                { assert !rows.any { r -> r[h.indexOf('ENSID')] == 'elem_unplaced' } },
+                { assert rows.find { r -> r[h.indexOf('ENSID')] == 'elem_split' }[h.indexOf('TOTAL_MUT')] == '2' },
+                { assert analysed_md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
+                { assert path(process.out.clusters[0][1]).md5 == '28ee9fc36afc5124eb24d1edd7cfec2b' },
+                { assert snapshot(process.out.results, process.out.clusters, process.out.versions_oncodriveclustl).match() }
+            )
+        }
+    }
+
+    // Prefilter exactness: on the rows of the analysed ids only (what CLUSTL_REGIONS keeps), the
+    // analysed elements' rows and the clusters are the same as with every catalogue row (test above).
+    test("synthetic TERT cohort - prefiltered rows") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true),
+                    file("${projectDir}/tests/data/oncodriveclustl/elements.prefiltered.bed", checkIfExists: true)
+                ]
+                // bgdata reads chromosome files by offset: the first 1.4 Mb of hg38 chr5 covers every fixture element
+                input[1] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.results[0][1]).readLines()
+            assert process.success
+            assertAll(
+                { assert lines.size() == 5 },
+                // prefilter exactness: the analysed rows and the clusters of the run on every catalogue row
+                { assert path(process.out.results[0][1]).md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
+                { assert path(process.out.clusters[0][1]).md5 == '28ee9fc36afc5124eb24d1edd7cfec2b' },
+                { assert snapshot(process.out.results, process.out.clusters).match() }
+            )
+        }
+    }
+
+    // Shards of two element ids: the signature of the first shard is reused (-sig), the q-values are
+    // recomputed over both shards and the observed cluster counts and scores do not depend on the layout.
+    test("synthetic TERT cohort - prefiltered rows, shards of two ids") {
+
+        when {
+            params {
+                clustl_shard_size = 2
+            }
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true),
+                    file("${projectDir}/tests/data/oncodriveclustl/elements.prefiltered.bed", checkIfExists: true)
+                ]
+                // bgdata reads chromosome files by offset: the first 1.4 Mb of hg38 chr5 covers every fixture element
+                input[1] = file("${projectDir}/tests/data/oncodrivefml/genome_hg38_chr5_head", checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.results[0][1]).readLines()
+            def h     = lines[0].tokenize('\t')
+            def rows  = lines.drop(1).collect { l -> l.split('\t', -1) }
+            def obs   = rows.collect { r -> [ 'ENSID', 'TOTAL_MUT', 'CLUSTERED_MUT', 'CLUSTERS', 'SCORE' ].collect { c -> r[h.indexOf(c)] }.join(',') }.sort()
+            def log   = path(process.out.log[0][1]).text
+            assert process.success
+            assertAll(
+                { assert rows.size() == 4 },
+                { assert log.contains('== out.00001') && log.contains('== out.00002') },
+                { assert snapshot(obs, process.out.results, process.out.clusters).match() }
+            )
+        }
+    }
+}
