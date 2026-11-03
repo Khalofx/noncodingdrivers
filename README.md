@@ -41,7 +41,10 @@ added files.
 7. Annotation of the significant elements: their mutations per patient and the nearest gene, plus
    the optional ENCODE regulatory context, Ensembl VEP and motifbreakR. SigProfiler signature QC
    is optional.
-8. A MultiQC run summary.
+8. Optional context layers, each with its own tables: exact matches in the user's own COSMIC
+   Non-Coding Variants file, cancer gene-list labels (e.g. the Cancer Gene Census), ENCODE-rE2G
+   enhancer-gene links for the chosen tissues and SCREEN Registry V4 cCRE classes.
+9. A MultiQC run summary.
 
 ## Usage
 
