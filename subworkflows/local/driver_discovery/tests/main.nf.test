@@ -133,9 +133,10 @@ nextflow_workflow {
     }
 
     // A caller reported alongside changes nothing combined: with ActiveDriverWGS the only combined
-    // caller, the consensus without the two OncodriveCLUSTL columns has the bytes of the
-    // ActiveDriverWGS-only run (next test). OncodriveCLUSTL gets the prefiltered rows: its table holds
-    // exactly the ids with >= 2 SNVs (elem_split counts its two fragments together).
+    // caller, the consensus without the two OncodriveCLUSTL columns has the columns, element ids and
+    // ranks of the ActiveDriverWGS-only run (next test), and every combined column is what
+    // ActiveDriverWGS alone implies (same checks in both tests). OncodriveCLUSTL prefilters its rows:
+    // its table holds exactly the ids with >= 2 SNVs (elem_split counts its two fragments together).
     test("synthetic TERT cohort - activedriverwgs + oncodriveclustl (alongside)") {
 
         when {
@@ -158,32 +159,60 @@ nextflow_workflow {
         }
 
         then {
+            // Platform-independent: the ActiveDriverWGS p-values differ in their last digits across platforms
+            // (see modules/local/activedriverwgs/tests), so the table is not compared by md5. Instead every
+            // combined column is checked against what ActiveDriverWGS alone implies, within this run.
             def lines  = path(workflow.out.consensus[0][1]).readLines()
             def cols   = lines[0].tokenize('\t')
             def rows   = lines.drop(1).collect { line -> line.split('\t', -1) }
+            def v      = { row, name -> row[cols.indexOf(name)] }
+            def n      = rows.size()
+            def p      = rows.collect { row -> v(row, 'p_activedriverwgs') as double }
+            def close  = { double x, double y, double rel -> Math.abs(x - y) <= rel * Math.max(Math.abs(y), Double.MIN_VALUE) }
+            // Benjamini-Hochberg as R p.adjust(method = "BH")
+            def bh     = new double[n]
+            def acc    = 1.0d
+            (0..<n).toList().sort { a, b -> p[b] <=> p[a] }.eachWithIndex { idx, k -> acc = Math.min(acc, n / (double) (n - k) * p[idx]); bh[idx] = acc }
+            // ActiveDriverWGS-only consensus: columns, and element ids in rank order with their p-values (3 significant digits)
+            def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
+                           'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
+                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
+            def adwgs  = [ TERT_promoter_fixture: 1.242e-6d, elem_split: 0.3306d, elem_E: 0.6320d, elem_D: 0.6602d,
+                           elem_C: 0.9011d, elem_B: 0.9726d, elem_A: 0.9798d, elem_empty: 1.0d ]
+            def same_as_adwgs_alone = [
+                { assert rows.collect { row -> v(row, 'element_id') } == adwgs.keySet() as List },
+                { assert rows.every { row -> close(v(row, 'p_activedriverwgs') as double, adwgs[v(row, 'element_id')], 1e-3) } },
+                // one combined caller: EBM and ACAT p are its p, n_tested_callers 1, q = BH of its p
+                { assert rows.every { row -> v(row, 'n_tested_callers') == '1' && v(row, 'ebm_p') == v(row, 'p_activedriverwgs') && v(row, 'acat_p') == v(row, 'p_activedriverwgs') } },
+                { assert (0..<n).every { i -> close(v(rows[i], 'ebm_q') as double, bh[i], 1e-9) && v(rows[i], 'acat_q') == v(rows[i], 'ebm_q') } },
+                { assert rows.every { row -> v(row, 'combination_method') == 'ebm' && v(row, 'consensus_q') == v(row, 'ebm_q') } },
+                // ranks follow the ActiveDriverWGS p-values; RRA of one ranking is the normalised rank
+                { assert p == p.sort(false) && rows.collect { row -> v(row, 'consensus_rank') as int } == (1..n).toList() },
+                { assert (0..<n).every { i -> close(v(rows[i], 'rra_score') as double, (i + 1) / (double) n, 1e-12) && close(v(rows[i], 'rra_q') as double, 1.0d, 1e-12) } },
+                { assert rows.every { row -> (v(row, 'vote_count') as int) == ((v(row, 'q_activedriverwgs') as double) <= 0.1 ? 1 : 0) } },
+                // the TERT promoter is rank 1 and the only consensus element
+                { assert rows.collect { row -> v(row, 'is_consensus') } == [ 'True' ] + [ 'False' ] * (n - 1) }
+            ]
             def clustl = workflow.out.raw.find { _meta, f -> file(f).name.endsWith('.oncodriveclustl.tsv') }
             def crows  = path(clustl[1]).readLines()
             def ch     = crows[0].tokenize('\t')
             def cids   = crows.drop(1).collect { line -> line.split('\t', -1)[ch.indexOf('ENSID')] }.sort()
-            def tert   = rows.find { row -> row[cols.indexOf('element_id')] == 'TERT_promoter_fixture' }
-            def strip  = { table, drop ->
-                def header = table[0].split('\t', -1) as List
-                def keep   = (0..<header.size()).findAll { i -> !(header[i] in drop) }
-                table.collect { line -> def f = line.split('\t', -1); keep.collect { i -> f[i] }.join('\t') }.join('\n') + '\n'
-            }
-            def md5 = { String text -> java.security.MessageDigest.getInstance('MD5').digest(text.getBytes('UTF-8')).encodeHex().toString() }
             assert workflow.success
             assertAll(
-                { assert [ 'p_oncodriveclustl', 'q_oncodriveclustl' ].every { c -> c in cols } },
+                // reported alongside: the ActiveDriverWGS-only columns plus p_/q_oncodriveclustl after the
+                // combined caller's, and nothing combined changes (the same checks as the next test)
+                { assert cols - [ 'p_oncodriveclustl', 'q_oncodriveclustl' ] == header },
+                { assert cols[3..4] == [ 'p_oncodriveclustl', 'q_oncodriveclustl' ] },
+                *same_as_adwgs_alone,
+                // OncodriveCLUSTL analysed the ids with >= 2 SNVs; only the TERT promoter has a cluster (tested)
                 { assert cids == [ 'TERT_promoter_fixture', 'elem_B', 'elem_D', 'elem_split' ] },
-                { assert tert[cols.indexOf('p_oncodriveclustl')] != 'NA' && tert[cols.indexOf('consensus_rank')] == '1' },
-                { assert rows.every { row -> row[cols.indexOf('n_tested_callers')] == '1' && row[cols.indexOf('ebm_p')] == row[cols.indexOf('p_activedriverwgs')] } },
-                { assert workflow.out.harmonized.size() == 2 },
-                { assert md5(strip(lines, [ 'p_oncodriveclustl', 'q_oncodriveclustl' ])) == '57d0e3e707209f140ebe712a22dd21c9' }
+                { assert v(rows[0], 'p_oncodriveclustl') != 'NA' && rows.drop(1).every { row -> v(row, 'p_oncodriveclustl') == 'NA' } },
+                { assert workflow.out.harmonized.size() == 2 }
             )
         }
     }
 
+    // ActiveDriverWGS alone: the reference structure of the test above
     test("synthetic TERT cohort - activedriverwgs only") {
 
         when {
@@ -206,9 +235,45 @@ nextflow_workflow {
         }
 
         then {
+            // Platform-independent: the ActiveDriverWGS p-values differ in their last digits across platforms
+            // (see modules/local/activedriverwgs/tests), so the table is not compared by md5. Instead every
+            // combined column is checked against what ActiveDriverWGS alone implies, within this run.
+            def lines  = path(workflow.out.consensus[0][1]).readLines()
+            def cols   = lines[0].tokenize('\t')
+            def rows   = lines.drop(1).collect { line -> line.split('\t', -1) }
+            def v      = { row, name -> row[cols.indexOf(name)] }
+            def n      = rows.size()
+            def p      = rows.collect { row -> v(row, 'p_activedriverwgs') as double }
+            def close  = { double x, double y, double rel -> Math.abs(x - y) <= rel * Math.max(Math.abs(y), Double.MIN_VALUE) }
+            // Benjamini-Hochberg as R p.adjust(method = "BH")
+            def bh     = new double[n]
+            def acc    = 1.0d
+            (0..<n).toList().sort { a, b -> p[b] <=> p[a] }.eachWithIndex { idx, k -> acc = Math.min(acc, n / (double) (n - k) * p[idx]); bh[idx] = acc }
+            // ActiveDriverWGS-only consensus: columns, and element ids in rank order with their p-values (3 significant digits)
+            def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
+                           'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
+                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
+            def adwgs  = [ TERT_promoter_fixture: 1.242e-6d, elem_split: 0.3306d, elem_E: 0.6320d, elem_D: 0.6602d,
+                           elem_C: 0.9011d, elem_B: 0.9726d, elem_A: 0.9798d, elem_empty: 1.0d ]
+            def same_as_adwgs_alone = [
+                { assert rows.collect { row -> v(row, 'element_id') } == adwgs.keySet() as List },
+                { assert rows.every { row -> close(v(row, 'p_activedriverwgs') as double, adwgs[v(row, 'element_id')], 1e-3) } },
+                // one combined caller: EBM and ACAT p are its p, n_tested_callers 1, q = BH of its p
+                { assert rows.every { row -> v(row, 'n_tested_callers') == '1' && v(row, 'ebm_p') == v(row, 'p_activedriverwgs') && v(row, 'acat_p') == v(row, 'p_activedriverwgs') } },
+                { assert (0..<n).every { i -> close(v(rows[i], 'ebm_q') as double, bh[i], 1e-9) && v(rows[i], 'acat_q') == v(rows[i], 'ebm_q') } },
+                { assert rows.every { row -> v(row, 'combination_method') == 'ebm' && v(row, 'consensus_q') == v(row, 'ebm_q') } },
+                // ranks follow the ActiveDriverWGS p-values; RRA of one ranking is the normalised rank
+                { assert p == p.sort(false) && rows.collect { row -> v(row, 'consensus_rank') as int } == (1..n).toList() },
+                { assert (0..<n).every { i -> close(v(rows[i], 'rra_score') as double, (i + 1) / (double) n, 1e-12) && close(v(rows[i], 'rra_q') as double, 1.0d, 1e-12) } },
+                { assert rows.every { row -> (v(row, 'vote_count') as int) == ((v(row, 'q_activedriverwgs') as double) <= 0.1 ? 1 : 0) } },
+                // the TERT promoter is rank 1 and the only consensus element
+                { assert rows.collect { row -> v(row, 'is_consensus') } == [ 'True' ] + [ 'False' ] * (n - 1) }
+            ]
             assert workflow.success
             assertAll(
-                { assert path(workflow.out.consensus[0][1]).md5 == '57d0e3e707209f140ebe712a22dd21c9' }
+                { assert cols == header },
+                *same_as_adwgs_alone,
+                { assert workflow.out.harmonized.size() == 1 }
             )
         }
     }

@@ -87,27 +87,16 @@
     "synthetic TERT cohort - prefiltered rows": {
         "content": [
             [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.tsv:md5,ec0e24b616ff81b50f7cad663f93661b"
-                ]
+                "TERT_promoter_fixture,612,10,10,1",
+                "elem_B,800,2,0,0",
+                "elem_D,700,2,0,0",
+                "elem_split,400,2,0,0"
             ],
             [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.clusters.tsv:md5,28ee9fc36afc5124eb24d1edd7cfec2b"
-                ]
+                "TERT_promoter_fixture,1295113,1295113,1295113,1,10,10"
             ]
         ],
-        "timestamp": "2026-11-02T16:36:58.280740135",
+        "timestamp": "2026-11-03T14:20:15.270853204",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"
@@ -116,24 +105,13 @@
     "synthetic TERT cohort - all catalogue rows": {
         "content": [
             [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.tsv:md5,ec0e24b616ff81b50f7cad663f93661b"
-                ]
+                "TERT_promoter_fixture,612,10,10,1",
+                "elem_B,800,2,0,0",
+                "elem_D,700,2,0,0",
+                "elem_split,400,2,0,0"
             ],
             [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.clusters.tsv:md5,28ee9fc36afc5124eb24d1edd7cfec2b"
-                ]
+                "TERT_promoter_fixture,1295113,1295113,1295113,1,10,10"
             ],
             [
                 [
@@ -143,7 +121,7 @@
                 ]
             ]
         ],
-        "timestamp": "2026-11-02T16:36:46.623573124",
+        "timestamp": "2026-11-03T14:20:04.919018962",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"
@@ -152,33 +130,13 @@
     "synthetic TERT cohort - prefiltered rows, shards of two ids": {
         "content": [
             [
-                "TERT_promoter_fixture,10,10,1,1000.0",
-                "elem_B,2,0,0,0",
-                "elem_D,2,0,0,0",
-                "elem_split,2,0,0,0"
-            ],
-            [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.tsv:md5,ec0e24b616ff81b50f7cad663f93661b"
-                ]
-            ],
-            [
-                [
-                    {
-                        "id": "test",
-                        "cohort": "test",
-                        "assembly": "GRCh38"
-                    },
-                    "test.oncodriveclustl.clusters.tsv:md5,28ee9fc36afc5124eb24d1edd7cfec2b"
-                ]
+                "TERT_promoter_fixture,10,10,1",
+                "elem_B,2,0,0",
+                "elem_D,2,0,0",
+                "elem_split,2,0,0"
             ]
         ],
-        "timestamp": "2026-11-02T16:37:11.606007294",
+        "timestamp": "2026-11-03T14:20:27.743411428",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

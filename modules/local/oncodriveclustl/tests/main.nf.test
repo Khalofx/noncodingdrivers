@@ -36,8 +36,8 @@ nextflow_process {
     }
 
     // Real run on every fixture row (below-cutoff, empty and unplaced elements included); the task keeps
-    // the rows of the ids with >= -emut SNVs. Seeded (--seed 1): the tables are deterministic, so their
-    // md5 is snapshotted.
+    // the rows of the ids with >= -emut SNVs. Seeded (--seed 1); the integer counts and cluster
+    // coordinates are snapshotted, scores and p-values asserted to a tolerance.
     test("synthetic TERT cohort - all catalogue rows") {
 
         when {
@@ -55,34 +55,38 @@ nextflow_process {
         }
 
         then {
-            def lines  = path(process.out.results[0][1]).readLines()
-            def h      = lines[0].tokenize('\t')
-            def rows   = lines.drop(1).collect { l -> l.split('\t', -1) }
-            def tested = rows.findAll { r -> r[h.indexOf('P_ANALYTICAL')] }
-            def tert   = rows.find { r -> r[h.indexOf('ENSID')] == 'TERT_promoter_fixture' }
-            def analysed = rows.findAll { r -> (r[h.indexOf('TOTAL_MUT')] as int) >= 2 }.collect { r -> r[h.indexOf('ENSID')] }
-            // the analysed elements' rows, in table order, as the next test's whole table (md5 below)
-            def analysed_text = ([ lines[0] ] + lines.drop(1).findAll { l -> (l.split('\t', -1)[h.indexOf('TOTAL_MUT')] as int) >= 2 }).join('\n') + '\n'
-            def analysed_md5  = java.security.MessageDigest.getInstance('MD5').digest(analysed_text.getBytes('UTF-8')).encodeHex().toString()
+            // Platform-independent checks: the integer counts and coordinates exactly, scores and
+            // p-values to a relative tolerance (their last digits depend on the CPU's floating-point
+            // code paths, so the tables are not compared by md5)
+            def table  = { f -> def t = path(f).readLines(); def h = t[0].tokenize('\t')
+                               [ h, t.drop(1).collect { line -> def x = line.split('\t', -1); [ h, x.toList() ].transpose().collectEntries() } ] }
+            def close  = { String x, double y, double rel -> x && Math.abs((x as double) - y) <= rel * Math.abs(y) }
+            def counts = [ 'TERT_promoter_fixture,612,10,10,1', 'elem_B,800,2,0,0', 'elem_D,700,2,0,0', 'elem_split,400,2,0,0' ]
+            def ccoord = [ 'TERT_promoter_fixture,1295113,1295113,1295113,1,10,10' ]
+            def (eh, er) = table(process.out.results[0][1])
+            def (ch, cr) = table(process.out.clusters[0][1])
+            def tert     = er.find { r -> r.ENSID == 'TERT_promoter_fixture' }
             assert process.success
             assertAll(
-                { assert analysed.sort() == [ 'TERT_promoter_fixture', 'elem_B', 'elem_D', 'elem_split' ] },
-                { assert (tert[h.indexOf('CLUSTERS')] as int) >= 1 && (tert[h.indexOf('TOTAL_MUT')] as int) == 10 },
-                { assert tested.collect { r -> r[h.indexOf('P_ANALYTICAL')] as double }.min() == (tert[h.indexOf('P_ANALYTICAL')] as double) },
-                { assert rows[0][h.indexOf('ENSID')] == 'TERT_promoter_fixture' },
-                { assert !rows.any { r -> r[h.indexOf('ENSID')] == 'elem_unplaced' } },
-                { assert rows.find { r -> r[h.indexOf('ENSID')] == 'elem_split' }[h.indexOf('TOTAL_MUT')] == '2' },
-                { assert analysed_md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
-                // only the analysed ids reach OncodriveCLUSTL (prefilter in the task)
-                { assert path(process.out.results[0][1]).md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
-                { assert path(process.out.clusters[0][1]).md5 == '28ee9fc36afc5124eb24d1edd7cfec2b' },
-                { assert snapshot(process.out.results, process.out.clusters, process.out.versions_oncodriveclustl).match() }
+                // the task keeps the rows of the ids with >= -emut (2) SNVs: elem_A, elem_C, elem_E (one SNV),
+                // elem_empty (none) and elem_unplaced (off the primary chromosomes) never reach OncodriveCLUSTL
+                { assert eh == [ 'SYMBOL', 'ENSID', 'CGC', 'CHROMOSOME', 'STRAND', 'LENGTH', 'TOTAL_MUT', 'CLUSTERED_MUT', 'CLUSTERS', 'SIM_CLUSTERS', 'SCORE', 'P_EMPIRICAL', 'Q_EMPIRICAL', 'P_ANALYTICAL', 'Q_ANALYTICAL', 'P_TOPCLUSTER', 'Q_TOPCLUSTER' ] },
+                { assert er.collect { r -> [ r.ENSID, r.LENGTH, r.TOTAL_MUT, r.CLUSTERED_MUT, r.CLUSTERS ].join(',') } == counts },
+                { assert er.every { r -> r.CGC == 'Non Available' } },
+                // only the TERT promoter has an observed cluster (tested); one tested element: q = p
+                { assert er.findAll { r -> r.P_ANALYTICAL }.collect { r -> r.ENSID } == [ 'TERT_promoter_fixture' ] },
+                { assert close(tert.SCORE, 1000.0d, 1e-9) && close(tert.P_EMPIRICAL, 0.001d, 1e-9) },
+                { assert close(tert.P_ANALYTICAL, 5.846e-14d, 1e-2) && close(tert.P_TOPCLUSTER, 2.348e-10d, 1e-2) },
+                { assert tert.Q_ANALYTICAL == tert.P_ANALYTICAL && tert.Q_TOPCLUSTER == tert.P_TOPCLUSTER },
+                { assert cr.collect { r -> [ r.ENSID, r.COORDINATES, r.MAX_COORD, r.WIDTH, r.N_MUT, r.N_SAMPLES ].join(',') } == ccoord },
+                { assert close(cr[0].SCORE, 1000.0d, 1e-9) && close(cr[0].P, 2.348e-10d, 1e-2) && cr[0].RANK == '1' },
+                { assert snapshot(counts, ccoord, process.out.versions_oncodriveclustl).match() }
             )
         }
     }
 
     // Prefilter idempotence: the rows of the analysed ids only (what bin/oncodriveclustl_prefilter.py
-    // keeps) give the same tables as every catalogue row (test above).
+    // keeps) give the same counts, clusters and p-values as every catalogue row (test above).
     test("synthetic TERT cohort - prefiltered rows") {
 
         when {
@@ -100,14 +104,31 @@ nextflow_process {
         }
 
         then {
-            def lines = path(process.out.results[0][1]).readLines()
+            // Platform-independent checks: the integer counts and coordinates exactly, scores and
+            // p-values to a relative tolerance (their last digits depend on the CPU's floating-point
+            // code paths, so the tables are not compared by md5)
+            def table  = { f -> def t = path(f).readLines(); def h = t[0].tokenize('\t')
+                               [ h, t.drop(1).collect { line -> def x = line.split('\t', -1); [ h, x.toList() ].transpose().collectEntries() } ] }
+            def close  = { String x, double y, double rel -> x && Math.abs((x as double) - y) <= rel * Math.abs(y) }
+            def counts = [ 'TERT_promoter_fixture,612,10,10,1', 'elem_B,800,2,0,0', 'elem_D,700,2,0,0', 'elem_split,400,2,0,0' ]
+            def ccoord = [ 'TERT_promoter_fixture,1295113,1295113,1295113,1,10,10' ]
+            def (eh, er) = table(process.out.results[0][1])
+            def (ch, cr) = table(process.out.clusters[0][1])
+            def tert     = er.find { r -> r.ENSID == 'TERT_promoter_fixture' }
             assert process.success
             assertAll(
-                { assert lines.size() == 5 },
-                // prefilter exactness: the analysed rows and the clusters of the run on every catalogue row
-                { assert path(process.out.results[0][1]).md5 == 'ec0e24b616ff81b50f7cad663f93661b' },
-                { assert path(process.out.clusters[0][1]).md5 == '28ee9fc36afc5124eb24d1edd7cfec2b' },
-                { assert snapshot(process.out.results, process.out.clusters).match() }
+                // prefilter idempotence: the same rows, counts, clusters and p-values as with every catalogue row
+                { assert eh == [ 'SYMBOL', 'ENSID', 'CGC', 'CHROMOSOME', 'STRAND', 'LENGTH', 'TOTAL_MUT', 'CLUSTERED_MUT', 'CLUSTERS', 'SIM_CLUSTERS', 'SCORE', 'P_EMPIRICAL', 'Q_EMPIRICAL', 'P_ANALYTICAL', 'Q_ANALYTICAL', 'P_TOPCLUSTER', 'Q_TOPCLUSTER' ] },
+                { assert er.collect { r -> [ r.ENSID, r.LENGTH, r.TOTAL_MUT, r.CLUSTERED_MUT, r.CLUSTERS ].join(',') } == counts },
+                { assert er.every { r -> r.CGC == 'Non Available' } },
+                // only the TERT promoter has an observed cluster (tested); one tested element: q = p
+                { assert er.findAll { r -> r.P_ANALYTICAL }.collect { r -> r.ENSID } == [ 'TERT_promoter_fixture' ] },
+                { assert close(tert.SCORE, 1000.0d, 1e-9) && close(tert.P_EMPIRICAL, 0.001d, 1e-9) },
+                { assert close(tert.P_ANALYTICAL, 5.846e-14d, 1e-2) && close(tert.P_TOPCLUSTER, 2.348e-10d, 1e-2) },
+                { assert tert.Q_ANALYTICAL == tert.P_ANALYTICAL && tert.Q_TOPCLUSTER == tert.P_TOPCLUSTER },
+                { assert cr.collect { r -> [ r.ENSID, r.COORDINATES, r.MAX_COORD, r.WIDTH, r.N_MUT, r.N_SAMPLES ].join(',') } == ccoord },
+                { assert close(cr[0].SCORE, 1000.0d, 1e-9) && close(cr[0].P, 2.348e-10d, 1e-2) && cr[0].RANK == '1' },
+                { assert snapshot(counts, ccoord).match() }
             )
         }
     }
@@ -134,16 +155,26 @@ nextflow_process {
         }
 
         then {
-            def lines = path(process.out.results[0][1]).readLines()
-            def h     = lines[0].tokenize('\t')
-            def rows  = lines.drop(1).collect { l -> l.split('\t', -1) }
-            def obs   = rows.collect { r -> [ 'ENSID', 'TOTAL_MUT', 'CLUSTERED_MUT', 'CLUSTERS', 'SCORE' ].collect { c -> r[h.indexOf(c)] }.join(',') }.sort()
-            def log   = path(process.out.log[0][1]).text
+            // Platform-independent checks: the integer counts and coordinates exactly, scores and
+            // p-values to a relative tolerance (their last digits depend on the CPU's floating-point
+            // code paths, so the tables are not compared by md5)
+            def table  = { f -> def t = path(f).readLines(); def h = t[0].tokenize('\t')
+                               [ h, t.drop(1).collect { line -> def x = line.split('\t', -1); [ h, x.toList() ].transpose().collectEntries() } ] }
+            def close  = { String x, double y, double rel -> x && Math.abs((x as double) - y) <= rel * Math.abs(y) }
+            def (eh, er) = table(process.out.results[0][1])
+            def obs  = er.collect { r -> [ r.ENSID, r.TOTAL_MUT, r.CLUSTERED_MUT, r.CLUSTERS ].join(',') }.sort()
+            def tert = er.find { r -> r.ENSID == 'TERT_promoter_fixture' }
+            def log  = path(process.out.log[0][1]).text
             assert process.success
             assertAll(
-                { assert rows.size() == 4 },
+                { assert er.size() == 4 },
                 { assert log.contains('== out.00001') && log.contains('== out.00002') },
-                { assert snapshot(obs, process.out.results, process.out.clusters).match() }
+                // the observed counts and the score do not depend on the layout; with one tested element in
+                // its shard, the q-values over both shards equal its p-values
+                { assert obs == [ 'TERT_promoter_fixture,10,10,1', 'elem_B,2,0,0', 'elem_D,2,0,0', 'elem_split,2,0,0' ] },
+                { assert close(tert.SCORE, 1000.0d, 1e-9) && tert.Q_ANALYTICAL == tert.P_ANALYTICAL },
+                { assert close(tert.P_ANALYTICAL, 5.846e-14d, 1e-2) },
+                { assert snapshot(obs).match() }
             )
         }
     }
