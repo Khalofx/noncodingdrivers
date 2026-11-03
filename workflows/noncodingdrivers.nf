@@ -17,9 +17,6 @@ include { GAWK as GENE_TSS                  } from '../modules/nf-core/gawk/main
 include { GAWK as SIGPROFILER_INPUT         } from '../modules/nf-core/gawk/main'
 include { SIGPROFILER                       } from '../modules/nf-core/sigprofiler/main'
 include { EXPLAIN                           } from '../subworkflows/local/explain'
-include { CONTEXT_LAYERS                    } from '../subworkflows/local/context_layers'
-include { enhancerGeneFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
-include { ccreCelltypeFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { peakFileMeta                      } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { resolveReferences                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { INPUT_HARMONISATION               } from '../subworkflows/local/input_harmonisation'
@@ -27,6 +24,11 @@ include { VARIANT_FLAGS                     } from '../subworkflows/local/varian
 include { NULL_CALIBRATION                  } from '../subworkflows/local/null_calibration'
 include { POSTFILTERFLAGS                   } from '../modules/local/postfilterflags'
 include { WRITEDRIVEREVIDENCE               } from '../modules/local/writedriverevidence'
+// Context layers last: Nextflow numbers eval() outputs in include order, so a component included
+// earlier would rename the eval outputs, and change the task hashes, of every later process
+include { enhancerGeneFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { ccreCelltypeFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { CONTEXT_LAYERS                    } from '../subworkflows/local/context_layers'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

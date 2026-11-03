@@ -6,6 +6,7 @@ process COSMICCONTEXT {
     // Variants file (bin/cosmic_context.py; Python standard library only). Annotation only.
     // Count tables (no COSMIC identifiers) and the provenance JSON go to cosmic/; the COSMIC
     // records (exact_matches) and NOTICE.txt go to cosmic/restricted/ (conf/modules.config).
+    // Version output by env(), not eval(): eval() outputs are numbered in include order.
     // ghcr.io/khalofx/noncodingdrivers-utils:1.0.1 (containers/utils), pinned by digest
     container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
@@ -21,7 +22,7 @@ process COSMICCONTEXT {
     tuple val(meta), path("*.cosmic.provenance.json")     , emit: provenance
     tuple val(meta), path("*.cosmic.exact_matches.tsv")   , emit: exact_matches
     tuple val(meta), path("NOTICE.txt")                   , emit: notice
-    tuple val("${task.process}"), val('python'), eval("python3 --version | sed 's/Python //'"), topic: versions, emit: versions_python
+    tuple val("${task.process}"), val('python'), env('PYTHON_VERSION'), topic: versions, emit: versions_python
 
     when:
     task.ext.when == null || task.ext.when
@@ -32,6 +33,7 @@ process COSMICCONTEXT {
     def md5    = expected_md5 ? "--expected-md5 ${expected_md5}" : ''
     def cons   = consensus ? "--consensus ${consensus}" : ''
     """
+    PYTHON_VERSION=\$(python3 --version 2>&1 | sed 's/Python //')
     cosmic_context.py \\
         --cosmic ${cosmic_ncv} \\
         --release ${release} \\
@@ -46,6 +48,7 @@ process COSMICCONTEXT {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    PYTHON_VERSION=\$(python3 --version 2>&1 | sed 's/Python //')
     printf 'cohort\\tcosmic_release\\n' > ${prefix}.cosmic.mutation_summary.tsv
     printf 'cohort\\tcosmic_release\\n' > ${prefix}.cosmic.element_summary.tsv
     printf 'cohort\\tcosmic_release\\n' > ${prefix}.cosmic.exact_matches.tsv
