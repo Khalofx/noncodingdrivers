@@ -28,7 +28,8 @@ added files.
    mutation table per cohort.
 2. Driver discovery on a CDS-excluded catalogue of Ensembl Regulatory Build elements:
    ActiveDriverWGS (default) and OncodriveFML (opt-in, licence-gated, with user-supplied CADD
-   scores); MutEnricher as a QC-only caller.
+   scores); OncodriveCLUSTL (opt-in, positional clustering, reported alongside the consensus unless
+   named in `--consensus_callers`); MutEnricher as a QC-only caller.
 3. Combination of the caller p-values with the empirical Brown's method (default) or ACAT, with
    Benjamini–Hochberg q-values; ACAT, robust rank aggregation and caller votes are kept as
    sensitivity columns.

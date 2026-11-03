@@ -9,7 +9,7 @@ process WRITEDRIVEREVIDENCE {
     container 'ghcr.io/khalofx/noncodingdrivers-utils@sha256:9c8a5f128d8c64e581c977d58950ac700b6aabf9903e40af77e2e25db6599c6f'
 
     input:
-    tuple val(meta), path(consensus), path(element_flags), path(postfilter), path(calibration), val(coordinates)
+    tuple val(meta), path(consensus), path(element_flags), path(postfilter), path(calibration), val(coordinates), path(oncodriveclustl)
     path(sources)
     val(pipeline_version)
 
@@ -26,7 +26,8 @@ process WRITEDRIVEREVIDENCE {
     def optional = [
         element_flags ? "--element-flags ${element_flags}" : '',
         postfilter    ? "--postfilter ${postfilter}" : '',
-        calibration   ? "--calibration ${calibration}" : ''
+        calibration   ? "--calibration ${calibration}" : '',
+        oncodriveclustl ? "--oncodriveclustl ${oncodriveclustl}" : ''
     ].findAll { arg -> arg }.join(' ')
     """
     write_driver_evidence.py \\

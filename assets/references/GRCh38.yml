@@ -43,7 +43,9 @@
   vep_cache_bsd_sum: "56036 26996736"
   vep_cache_archive_md5: 6e10959391069a9eebb8d8d165fd29be
   oncodrivefml_genome: ${reference_base}/oncodrivefml_genome/datasets/genomereference/hg38-20161209
-  oncodrivefml_genome_note: "official bgdata dataset genomereference/hg38-20161209 (bgdata get datasets/genomereference/hg38), copied unchanged with its .downloaded marker"
+  oncodrivefml_genome_note: "official bgdata dataset genomereference/hg38-20161209 (bgdata get datasets/genomereference/hg38), copied unchanged with its .downloaded marker; read by OncodriveFML and OncodriveCLUSTL"
+  oncodrivefml_genome_manifest_md5: afe063fb3a742af2c16083e9a7e05d8a
+  oncodrivefml_genome_bytes: 4427776705
   regulatory_peaks_dir: ${reference_base}/encode
   regulatory_peaks_note: "49 ENCODE peak BEDs, 12 tissues, <tissue>/<layer>.<accession>.bed.gz; per-file checksums in encode/PROVENANCE.tsv"
   liftover_chain_from_hg19: ${reference_base}/liftover/hg19ToHg38.over.chain.gz

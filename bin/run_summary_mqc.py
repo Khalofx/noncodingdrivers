@@ -10,7 +10,10 @@ custom content.
 WHAT IT REPORTS, and what it deliberately does not.
   It reports counts that describe THE RUN: how many elements were tested, how many
   callers tested each, how many reached the combined-q threshold, and how many rows
-  each caller wrote.
+  each caller wrote. When a caller is reported alongside (its p-values are carried in
+  the consensus table but not combined; --consensus-callers names the combined ones),
+  a caller-roles table labels every caller combined or reported alongside. With every
+  caller combined (the default) that section is not written.
 
   It does NOT rank candidates, does not name a "top hit", and does not describe any
   element as a driver. A QC report answers "did this run behave sensibly?", not
@@ -126,6 +129,9 @@ def main():
                     help="combined-q threshold reported as significant (the pipeline's --fdr_threshold)")
     ap.add_argument("--sample", required=True)
     ap.add_argument("--outdir", default=".")
+    ap.add_argument("--consensus-callers", default=None,
+                    help="comma-separated callers whose p-values are combined (the pipeline's "
+                         "--consensus_callers); default: every caller of the consensus table")
     a = ap.parse_args()
 
     rows = read_tsv(a.consensus)
@@ -180,6 +186,26 @@ def main():
             "one mutation -- but a caller far below its peers indicates a truncated run.",
             "bargraph", {S: cov}, extra={"ylab": "elements with a p-value"})
         written.append(p)
+
+        # ------------ 2b. caller roles (only when a caller is reported alongside) ----
+        named = (cov.keys() if a.consensus_callers is None
+                 else [c for c in a.consensus_callers.split(",") if c])
+        roles = {c: ("combined" if c in named else "reported alongside") for c in cov}
+        if any(r != "combined" for r in roles.values()):
+            p = os.path.join(a.outdir, "%s_noncodingdrivers_caller_roles_mqc.yaml" % S)
+            write_section(
+                p, "noncodingdrivers_caller_roles", "noncodingdrivers: caller roles",
+                "Combined callers enter the p-value combination (consensus_q, vote_count, "
+                "n_tested_callers); callers reported alongside keep their own p- and q-values "
+                "in the consensus table and are not combined.",
+                "table",
+                {"%s: %s" % (S, c): {"role": '"%s"' % roles[c], "elements_with_p": cov[c]}
+                 for c in cov},
+                headers={
+                    "role": {"title": "Role"},
+                    "elements_with_p": {"title": "Elements with a p-value", "format": "{:,.0f}"},
+                })
+            written.append(p)
 
     # ---------------- 3. raw caller output rows -------------------------------
     # Straight from the caller files, so a caller whose output never reached the

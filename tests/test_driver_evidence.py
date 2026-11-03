@@ -15,15 +15,15 @@ SCHEMA = os.path.join(ROOT, "assets", "schema_driver_evidence.json")
 SOURCES = os.path.join(ROOT, "assets", "evidence_sources.tsv")
 
 
-def _run(tmp, mode="pcawg", scope="nominal"):
+def _run(tmp, mode="pcawg", scope="nominal", extra=None, out="test.driver_evidence.tsv"):
     pf = tmp / "test.postfilter.tsv"
     subprocess.run([sys.executable, os.path.join(ROOT, "bin", "postfilter_flags.py"), "--consensus", os.path.join(D, "test.consensus.tsv"),
                     "--element-flags", os.path.join(D, "test.element_flags.tsv"), "--mode", mode, "--output", str(pf)], check=True)
-    ev = tmp / "test.driver_evidence.tsv"
+    ev = tmp / out
     subprocess.run([sys.executable, os.path.join(ROOT, "bin", "write_driver_evidence.py"), "--cohort", "test",
                     "--consensus", os.path.join(D, "test.consensus.tsv"), "--element-flags", os.path.join(D, "test.element_flags.tsv"),
                     "--postfilter", str(pf), "--sources", SOURCES, "--coordinates", "lifted", "--pipeline-version", "1.0.0dev",
-                    "--scope", scope, "--output", str(ev)], check=True)
+                    "--scope", scope, "--output", str(ev)] + (extra or []), check=True)
     return pd.read_csv(pf, sep="\t", dtype=str).set_index("element_id"), ev
 
 
@@ -67,6 +67,49 @@ def test_source_versions_match_module_pins():
     text = lambda p: open(os.path.join(ROOT, p)).read()   # noqa: E731
     assert "noncodingdrivers-activedriverwgs:" + src["p_activedriverwgs"]["source_version"] in text("modules/local/activedriverwgs/main.nf")
     assert src["p_oncodrivefml"]["source_version"] in text("modules/local/oncodrivefml/main.nf")
+    assert "noncodingdrivers-oncodriveclustl:" + src["p_oncodriveclustl"]["source_version"] in text("modules/local/oncodriveclustl/main.nf")
     assert "bedtools=2.31.1" in text("modules/nf-core/bedtools/intersect/environment.yml")
     assert "echtvar=0.2.4" in text("modules/nf-core/echtvar/anno/environment.yml") and "echtvar 0.2.4" in src["frac_germline_pop_common"]["source_version"]
     assert "empiricalbrownsmethod=1.34.0" in text("modules/local/combinepvalues/environment.yml").lower()
+
+
+def test_default_consensus_callers_leave_the_table_unchanged(tmp_path):
+    # --consensus-callers naming every caller of the table (the default) writes no role rows: same bytes
+    _, ev = _run(tmp_path)
+    _, ev_named = _run(tmp_path, extra=["--consensus-callers", "activedriverwgs,oncodrivefml"], out="named.tsv")
+    assert open(ev, "rb").read() == open(ev_named, "rb").read()
+    assert not any(r["evidence_item"].startswith("caller_role_") for r in csv.DictReader(open(ev), delimiter="\t"))
+
+
+def test_caller_reported_alongside_gets_role_rows_and_its_own_items(tmp_path):
+    _, ev = _run(tmp_path, extra=["--consensus-callers", "activedriverwgs"], out="alongside.tsv")
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    errors = list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors(rows))
+    assert not errors, errors[0].message
+    roles = {r["evidence_item"]: (r["element_id"], r["value"], r["unit"], r["status"]) for r in rows if r["evidence_item"].startswith("caller_role_")}
+    assert roles == {"caller_role_activedriverwgs": (".", "1", "status", "combined"),
+                     "caller_role_oncodrivefml": (".", "0", "status", "reported_alongside")}
+    # the alongside caller keeps its p and q rows
+    assert any(r["element_id"] == "promoter_A" and r["evidence_item"] == "q_oncodrivefml" for r in rows)
+
+
+def test_oncodriveclustl_alongside_items_validate(tmp_path):
+    # OncodriveCLUSTL reported alongside: its p/q rows, its cluster counts and the role rows; schema-valid
+    ev = tmp_path / "clustl.driver_evidence.tsv"
+    subprocess.run([sys.executable, os.path.join(ROOT, "bin", "write_driver_evidence.py"), "--cohort", "test",
+                    "--consensus", os.path.join(D, "test.consensus_clustl.tsv"), "--sources", SOURCES, "--coordinates", "native",
+                    "--pipeline-version", "1.0.0dev", "--consensus-callers", "activedriverwgs,oncodrivefml",
+                    "--oncodriveclustl", os.path.join(D, "test.oncodriveclustl.tsv"), "--output", str(ev)], check=True)
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    errors = list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors(rows))
+    assert not errors, errors[0].message
+    get = lambda e, i: next(r for r in rows if r["element_id"] == e and r["evidence_item"] == i)   # noqa: E731
+    assert (get("promoter_A", "p_oncodriveclustl")["value"], get("promoter_A", "q_oncodriveclustl")["status"]) == ("0.0004", "significant")
+    assert (get("promoter_A", "oncodriveclustl_n_clusters")["value"], get("promoter_A", "oncodriveclustl_clustered_mutations")["value"]) == ("2", "8")
+    assert (get("enhancer_C", "oncodriveclustl_n_clusters")["value"], get("enhancer_C", "oncodriveclustl_n_clusters")["status"]) == ("0", "observed")
+    assert (get("promoter_E", "oncodriveclustl_n_clusters")["value"], get("promoter_E", "oncodriveclustl_n_clusters")["status"]) == ("NA", "not_tested")
+    assert get(".", "caller_role_oncodriveclustl")["status"] == "reported_alongside"
+    assert get(".", "caller_role_activedriverwgs")["status"] == "combined"
+    # the caller items keep the fixed order: ActiveDriverWGS, OncodriveFML, then OncodriveCLUSTL
+    items = [r["evidence_item"] for r in rows if r["element_id"] == "promoter_A"]
+    assert items.index("q_oncodrivefml") < items.index("p_oncodriveclustl") < items.index("oncodriveclustl_n_clusters")

@@ -129,6 +129,23 @@ def test_caller_coverage_counts_only_present_p_values(tmp_path):
     assert _val(cov, "activedriverwgs") == "3"
 
 
+def test_caller_roles_section_only_when_a_caller_is_reported_alongside(tmp_path):
+    rows = [
+        {"element_id": "e1", "consensus_q": 0.5, "p_oncodrivefml": 0.2, "p_activedriverwgs": 0.3},
+        {"element_id": "e2", "consensus_q": 0.6, "p_oncodrivefml": "NA", "p_activedriverwgs": 0.4},
+    ]
+    cons = _consensus(tmp_path, rows)
+    _, files_default = _run(tmp_path, cons)
+    _, files_named = _run(tmp_path, cons, extra=["--consensus-callers", "activedriverwgs,oncodrivefml"])
+    assert _sec(files_default, "caller_roles") is None
+    assert files_named == files_default            # the default set writes the same sections, byte for byte
+    proc, files = _run(tmp_path, cons, extra=["--consensus-callers", "activedriverwgs"])
+    assert proc.returncode == 0, proc.stderr
+    roles = _sec(files, "caller_roles")
+    assert '"S1: activedriverwgs":\n        role: "combined"\n        elements_with_p: 2' in roles
+    assert '"S1: oncodrivefml":\n        role: "reported alongside"\n        elements_with_p: 1' in roles
+
+
 def test_absent_caller_file_is_omitted_with_a_message(tmp_path):
     rows = [{"element_id": "e1", "consensus_q": 0.01, "p_oncodrivefml": 0.001}]
     proc, files = _run(tmp_path, _consensus(tmp_path, rows),

@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/environment-schema.json
+# Documentation of the runtime only: OncodriveCLUSTL and bgdata have no Bioconda or conda-forge
+# package, so the module has no conda directive and `-profile conda` is not supported for it.
+# The image (containers/oncodriveclustl) carries oncodriveclustl 1.2.0 (PyPI, hashed lock) on
+# python 3.12.
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - conda-forge::python=3.12

@@ -13,6 +13,17 @@ Statuses: significant | not_significant (consensus_q and caller q against --fdr)
 not_tested (NA p), flagged | not_flagged (mask fractions above --mask-fraction, germline share
 above it), pass | fail | not_applied (post-filters), and the null-calibration band status. No
 evidence item is a tier: tiers are assigned downstream (reports repository).
+
+OncodriveCLUSTL (--oncodriveclustl, its native table): oncodriveclustl_n_clusters (CLUSTERS) and
+oncodriveclustl_clustered_mutations (CLUSTERED_MUT) per element; not_tested for an element absent from
+the table (below the mutation cutoff).
+
+Callers: every p_<caller>/q_<caller> pair of the consensus table is written, combined callers and
+callers reported alongside alike (known callers first, in CALLER_ORDER). --consensus-callers names
+the combined callers (the pipeline's --consensus_callers); when at least one caller of the table is
+not among them, one cohort-level row per caller (element_id '.', caller_role_<caller>) records its
+role: value 1 status combined, or value 0 status reported_alongside. When every caller is combined
+(the default) no role rows are written, so the default table is unchanged.
 """
 import argparse
 import sys
@@ -20,7 +31,9 @@ import sys
 import numpy as np
 import pandas as pd
 
-CALLER_ITEMS = ("p_activedriverwgs", "q_activedriverwgs", "p_oncodrivefml", "q_oncodrivefml")
+CALLER_ORDER = ("activedriverwgs", "oncodrivefml", "oncodriveclustl")
+# Per-element counts from the native OncodriveCLUSTL table (--oncodriveclustl): item -> column
+CLUSTL_ITEMS = (("oncodriveclustl_n_clusters", "CLUSTERS"), ("oncodriveclustl_clustered_mutations", "CLUSTERED_MUT"))
 CONS_ITEMS = ("consensus_q", "consensus_rank", "ebm_p", "ebm_q", "acat_p", "acat_q", "n_tested_callers", "vote_count")
 FLAG_ITEMS = ("n_mutations", "n_patients", "max_sample_fraction", "frac_in_blacklist_v2", "frac_in_segdup",
               "frac_in_low_mappability", "mean_umap_unique_fraction", "frac_germline_pop_common", "callable_fraction")
@@ -54,13 +67,18 @@ def main():
     ap.add_argument("--scope", choices=["nominal", "all"], default="nominal")
     ap.add_argument("--fdr", type=float, default=0.1)
     ap.add_argument("--mask-fraction", type=float, default=0.5)
+    ap.add_argument("--consensus-callers", help="comma-separated combined callers; default: every caller of the table")
+    ap.add_argument("--oncodriveclustl", help="native OncodriveCLUSTL table: cluster counts per element")
     ap.add_argument("--output", required=True)
     args = ap.parse_args()
 
     src = pd.read_csv(args.sources, sep="\t", dtype=str).set_index("evidence_item")
     src["source_version"] = src["source_version"].replace("pipeline", f"noncodingdrivers {args.pipeline_version}")
     cons = pd.read_csv(args.consensus, sep="\t", dtype={"element_id": str})
-    pcols = [c for c in cons.columns if c in CALLER_ITEMS[0::2] or c in ("ebm_p", "acat_p")]
+    callers = [c[2:] for c in cons.columns if c.startswith("p_")]
+    callers = [c for c in CALLER_ORDER if c in callers] + sorted(c for c in callers if c not in CALLER_ORDER)
+    caller_items = tuple(item for c in callers for item in (f"p_{c}", f"q_{c}"))
+    pcols = [c for c in cons.columns if c in caller_items[0::2] or c in ("ebm_p", "acat_p")]
     minp = cons[pcols].apply(pd.to_numeric, errors="coerce").min(axis=1)
     cq = pd.to_numeric(cons["consensus_q"], errors="coerce")
     keep = (minp < 0.01) | (cq < 0.25) if args.scope == "nominal" else pd.Series(True, index=cons.index)
@@ -68,6 +86,8 @@ def main():
     ids = cons["element_id"]
     ef = pd.read_csv(args.element_flags, sep="\t", dtype={"element_id": str}).set_index("element_id") if args.element_flags else None
     pf = pd.read_csv(args.postfilter, sep="\t", dtype=str).set_index("element_id") if args.postfilter else None
+    cl = (pd.read_csv(args.oncodriveclustl, sep="\t", dtype=str, keep_default_na=False).set_index("ENSID")
+          if args.oncodriveclustl else None)
 
     rows = []
 
@@ -78,7 +98,7 @@ def main():
 
     for _, r in cons.iterrows():
         eid = r["element_id"]
-        for item in CONS_ITEMS + CALLER_ITEMS:
+        for item in CONS_ITEMS + caller_items:
             if item not in cons.columns:
                 continue
             v = pd.to_numeric(r[item], errors="coerce")
@@ -88,6 +108,12 @@ def main():
             elif item.startswith("p_") or item.endswith("_p"):
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
             else:
+                add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
+        if cl is not None:
+            # elements below OncodriveCLUSTL's mutation cutoff are not in its table: not tested
+            cr = cl.loc[eid] if eid in cl.index else None
+            for item, col in CLUSTL_ITEMS:
+                v = pd.to_numeric(cr[col], errors="coerce") if cr is not None and cr[col] != "" else np.nan
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
         if ef is not None:
             fr = ef.loc[eid] if eid in ef.index else None
@@ -109,6 +135,13 @@ def main():
             if "q_postfilter" in pf.columns:
                 v = pd.to_numeric(p["q_postfilter"], errors="coerce")
                 add(eid, "q_postfilter", v, "not_tested" if pd.isna(v) else ("significant" if v < args.fdr else "not_significant"), fmt(args.fdr))
+    named = callers if args.consensus_callers is None else [c for c in args.consensus_callers.split(",") if c]
+    if any(c not in named for c in callers):
+        s = src.loc["caller_role"]
+        for c in callers:
+            role = "combined" if c in named else "reported_alongside"
+            rows.append((args.cohort, ".", f"caller_role_{c}", "1" if role == "combined" else "0", s["unit"], role,
+                         "NA", s["source"], s["source_version"], args.coordinates))
     if args.calibration:
         cal = pd.read_csv(args.calibration, sep="\t", dtype=str)
         for _, r in cal[cal["run"] == "null_summary"].iterrows():

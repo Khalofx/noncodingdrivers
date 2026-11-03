@@ -362,7 +362,7 @@
                     "type": "string",
                     "pattern": "^\\S+$",
                     "fa_icon": "fas fa-folder-open",
-                    "description": "Offline bgdata hg38 genome for OncodriveFML: a directory or a .tar.gz of it. Empty means bgdata downloads its own copy.",
+                    "description": "Offline bgdata hg38 genome for OncodriveFML and OncodriveCLUSTL: a directory or a .tar.gz of it. Empty means bgdata downloads its own copy.",
                     "help_text": "Compute nodes without internet access need this (bgdata hg38-20161209). A .tar.gz is unpacked by the nf-core untar module."
                 },
                 "adwgs_shard_size": {
@@ -372,6 +372,28 @@
                     "fa_icon": "fas fa-layer-group",
                     "description": "Elements per ActiveDriverWGS shard.",
                     "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
+                },
+                "run_oncodriveclustl": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-play",
+                    "description": "Run OncodriveCLUSTL (positional clustering of SNVs within each element). Reported alongside the consensus unless named in --consensus_callers.",
+                    "help_text": "OncodriveCLUSTL 1.2.0 is AGPL-3.0-or-later (no licence gate). It reads the bgdata hg38 genome of --oncodrivefml_genome (or the datasheet key oncodrivefml_genome) and tests only elements with at least --oncodriveclustl_element_mutations SNVs and an observed cluster."
+                },
+                "oncodriveclustl_element_mutations": {
+                    "type": "integer",
+                    "default": 2,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-sort-numeric-up",
+                    "description": "OncodriveCLUSTL element mutation cutoff (-emut): elements with fewer SNVs are neither analysed nor passed to OncodriveCLUSTL.",
+                    "help_text": "The same value sets -emut of ONCODRIVECLUSTL and its prefilter of the regions, so the prefilter never removes an element OncodriveCLUSTL would analyse."
+                },
+                "oncodriveclustl_shard_size": {
+                    "type": "integer",
+                    "default": 5000,
+                    "minimum": 1,
+                    "fa_icon": "fas fa-layer-group",
+                    "description": "Element ids per OncodriveCLUSTL run.",
+                    "help_text": "Every shard uses the signature of the whole cohort; q-values are recomputed over all shards. With at most this many analysed ids the result is that of one OncodriveCLUSTL run; with more, the simulations are seeded per shard, so p-values depend on the shard layout (reproducible for a fixed value)."
                 },
                 "run_mutenricher": {
                     "type": "boolean",
@@ -414,6 +436,15 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-forward",
                     "description": "Do not compute ACAT (use when the ACAT package is unavailable, e.g. -profile conda). Not allowed with --combination_method acat."
+                },
+                "consensus_callers": {
+                    "type": "string",
+                    "default": "activedriverwgs,oncodrivefml",
+                    "pattern": "^(activedriverwgs|oncodrivefml|oncodriveclustl)(,(activedriverwgs|oncodrivefml|oncodriveclustl))*$",
+                    "errorMessage": "--consensus_callers is a comma-separated list of: activedriverwgs, oncodrivefml, oncodriveclustl (MutEnricher is QC-only and is never combined)",
+                    "fa_icon": "fas fa-layer-group",
+                    "description": "Callers whose p-values are combined (EBM, ACAT, RRA, votes). Every other enabled caller is reported alongside: its p_/q_ columns are carried in the consensus table but not combined.",
+                    "help_text": "Default: ActiveDriverWGS and OncodriveFML, each when it runs, so the default consensus is unchanged by any caller reported alongside. A caller outside the default may be named only after it passed the opt-in gate for the element catalogue (null calibration and spike-in recovery on SYNTH-NC and Liver-HCC-public, recorded in docs/validation.md); the pipeline warns when one is combined. A non-default caller named here must also be enabled with its --run_ flag. MutEnricher is QC-only and cannot be combined."
                 }
             }
         },

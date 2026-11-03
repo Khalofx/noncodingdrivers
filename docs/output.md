@@ -51,6 +51,10 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - `callers/oncodrivefml/`
   - `<cohort>.oncodrivefml.tsv`: the native OncodriveFML table (`GENE_ID` is the element id; `P_VALUE`, `Q_VALUE` and their `_NEG` counterparts, mutation and sample counts).
   - `<cohort>.oncodrivefml.status.txt`: the exit code of the OncodriveFML run.
+- `callers/oncodriveclustl/` (`--run_oncodriveclustl`)
+  - `<cohort>.oncodriveclustl.tsv`: the native OncodriveCLUSTL element table (`ENSID` is the element id; `TOTAL_MUT`, `CLUSTERED_MUT`, `CLUSTERS`, `SIM_CLUSTERS`, `SCORE`, `P_`/`Q_EMPIRICAL`, `P_`/`Q_ANALYTICAL`, `P_`/`Q_TOPCLUSTER`; `CGC` is `Non Available` on hg38). One row per element with at least `--oncodriveclustl_element_mutations` SNVs; p-values are empty for elements without an observed cluster (not tested). q-values are Benjamini–Hochberg over the tested elements of all shards. `P_ANALYTICAL`/`Q_ANALYTICAL` are harmonised as `p_oncodriveclustl`/`q_oncodriveclustl`.
+  - `<cohort>.oncodriveclustl.clusters.tsv`: one row per cluster (`RANK` of its element, coordinates, `MAX_COORD`, `WIDTH`, `N_MUT`, `N_SAMPLES`, `FRA_UNIQ_SAMPLES`, `SCORE`, `P`).
+  - `<cohort>.oncodriveclustl.log`: the OncodriveCLUSTL log of every shard.
 - `callers/mutenricher/` (`--run_mutenricher`): the native MutEnricher region table (SNVs only, sample-count statistic, local background). QC only: it never enters the combination.
 
 </details>
@@ -61,7 +65,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 <summary>Output files</summary>
 
 - `consensus/`
-  - `<cohort>.consensus.tsv`: one row per element tested by at least one caller. `p_<caller>`, `q_<caller>`: per-caller p- and q-values; `chrom`, `start`, `end`, `n_fragments`: the element span (a catalogue id split by the coding-sequence exclusion spans several fragments); `n_tested_callers`; `ebm_p`, `ebm_q` (empirical Brown's method) and `acat_p`, `acat_q` (ACAT), each with Benjamini–Hochberg q-values; `rra_score`, `rra_q` (robust rank aggregation) and `vote_count` (callers with their own q <= `--fdr_threshold`) as sensitivity columns; `combination_method`, `consensus_q` (the q-value of the chosen combination), `consensus_rank` and `is_consensus` (`True` when `consensus_q` < `--fdr_threshold`).
+  - `<cohort>.consensus.tsv`: one row per element tested by at least one combined caller (`--consensus_callers`). `p_<caller>`, `q_<caller>`: per-caller p- and q-values, of the combined callers and of every caller reported alongside (carried, not combined); `chrom`, `start`, `end`, `n_fragments`: the element span (a catalogue id split by the coding-sequence exclusion spans several fragments); `n_tested_callers` (combined callers that tested the element); `ebm_p`, `ebm_q` (empirical Brown's method) and `acat_p`, `acat_q` (ACAT), each with Benjamini–Hochberg q-values; `rra_score`, `rra_q` (robust rank aggregation) and `vote_count` (combined callers with their own q <= `--fdr_threshold`) as sensitivity columns; `combination_method`, `consensus_q` (the q-value of the chosen combination), `consensus_rank` and `is_consensus` (`True` when `consensus_q` < `--fdr_threshold`).
   - `<cohort>.consensus.ebm_parameters.tsv`: the callers combined, the number of elements and of complete elements, the sum of the off-diagonal covariance, and Brown's scale `brown_c` and degrees of freedom `brown_df`.
 - `consensus/intermediate/`
   - `elements.coords.tsv`: span and fragment count of every catalogue id.
@@ -97,7 +101,7 @@ derived downstream from `driver_evidence.tsv`.
 - `postfilter/`
   - `<cohort>.postfilter.tsv`: one row per element of the consensus table with a value, a threshold and `pass`, `fail` or `not_applied` for minimum support (`--postfilter_min_mutations`, `--postfilter_min_patients`), mappability (share of the element's mutations outside GIAB low mappability above `--postfilter_min_mappable_fraction`) and maximum sample fraction (`--postfilter_max_sample_fraction`), and `postfilter_status`. With `--postfilter_mode pcawg`, `q_postfilter`: Benjamini-Hochberg after failing elements are set to p = 1; `consensus_q` is never changed.
 - `evidence/`
-  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values, the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`). `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
+  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values (combined callers and callers reported alongside; with `--run_oncodriveclustl` also `oncodriveclustl_n_clusters` and `oncodriveclustl_clustered_mutations` from its native table, `not_tested` for elements below its mutation cutoff), the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`). When a caller is reported alongside, one cohort-level row per caller records its role (`caller_role_<caller>`: value `1`, status `combined`, or value `0`, status `reported_alongside`); with every caller combined (the default) these rows are not written. `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
 
 </details>
 
@@ -110,7 +114,12 @@ positive under the null. A method is `excluded_for_inflation` when a null replic
 above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
 `conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
 that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
-`docs/validation.md`).
+`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is listed like the other
+callers, but it tests only elements with an observed cluster: its `lambda` rests on the few such
+elements in the ActiveDriverWGS element set (none or one per run on SYNTH-NC), and its band status
+(`excluded_for_inflation` on SYNTH-NC) is not a calibration verdict. Read its null runs' q-values
+instead; `docs/validation.md` records the statistic used for OncodriveCLUSTL (the null
+false-positive rate over the elements it analysed).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -169,7 +178,7 @@ filters or re-ranks an element.
 
 [MultiQC](http://multiqc.info) is a visualization tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in the report data directory.
 
-The report holds the run summary of each cohort (elements tested, per-caller coverage and output rows, without candidate ranking), the VEP summary when `--run_vep` is set, and the software versions of the run. For more information about how to use MultiQC reports, see <http://multiqc.info>.
+The report holds the run summary of each cohort (elements tested, per-caller coverage and output rows, without candidate ranking; when a caller is reported alongside, a caller-roles table labels each caller combined or reported alongside), the VEP summary when `--run_vep` is set, and the software versions of the run. For more information about how to use MultiQC reports, see <http://multiqc.info>.
 
 ### Pipeline information
 

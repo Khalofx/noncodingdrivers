@@ -58,4 +58,97 @@ nextflow_process {
             )
         }
     }
+
+    // --callers with the default set selects exactly the columns combined without it: same bytes as
+    // the snapshot of "synthetic matched table" (test.consensus.tsv md5 932f3f8aee2c65401bb3ddd1a423d4cf)
+    test("synthetic matched table - default callers") {
+
+        when {
+            params {
+                combine_callers = 'activedriverwgs,oncodrivefml'
+            }
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/combinepvalues/matched_test.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assertAll(
+                { assert path(process.out.consensus[0][1]).md5 == '932f3f8aee2c65401bb3ddd1a423d4cf' }
+            )
+        }
+    }
+
+    // A caller reported alongside: its p_/q_ columns are carried, nothing combined changes. Without the
+    // two carried columns the table has the bytes of the two-caller snapshot.
+    test("matched table with a caller reported alongside - default callers") {
+
+        when {
+            params {
+                combine_callers = 'activedriverwgs,oncodrivefml'
+            }
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/combinepvalues/matched_test_clustl.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            def lines  = path(process.out.consensus[0][1]).readLines()
+            def header = lines[0].split('\t', -1) as List
+            def keep   = (0..<header.size()).findAll { i -> !(header[i] in [ 'p_oncodriveclustl', 'q_oncodriveclustl' ]) }
+            def cut    = lines.collect { line -> def f = line.split('\t', -1); keep.collect { i -> f[i] }.join('\t') }.join('\n') + '\n'
+            def md5    = java.security.MessageDigest.getInstance('MD5').digest(cut.getBytes('UTF-8')).encodeHex().toString()
+            def params_line = path(process.out.ebm_parameters[0][1]).readLines()[1]
+            assert process.success
+            assertAll(
+                { assert 'p_oncodriveclustl' in header && 'q_oncodriveclustl' in header },
+                { assert md5 == '932f3f8aee2c65401bb3ddd1a423d4cf' },
+                { assert params_line.tokenize('\t')[0] == 'p_activedriverwgs,p_oncodrivefml' }
+            )
+        }
+    }
+
+    // Opt-in: the third caller is combined (EBM covariance over the elements all three tested)
+    test("matched table - three combined callers") {
+
+        when {
+            params {
+                combine_callers = 'activedriverwgs,oncodrivefml,oncodriveclustl'
+            }
+            process {
+                """
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("${projectDir}/tests/data/combinepvalues/matched_test_clustl.tsv", checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            def lines  = path(process.out.consensus[0][1]).readLines()
+            def cols   = lines[0].tokenize('\t')
+            def tested = lines.drop(1).collect { line -> line.split('\t', -1)[cols.indexOf('n_tested_callers')] as int }
+            def ebm    = path(process.out.ebm_parameters[0][1]).readLines()
+            def ecols  = ebm[0].tokenize('\t')
+            def evals  = ebm[1].tokenize('\t')
+            assert process.success
+            assertAll(
+                { assert tested.max() == 3 },
+                { assert evals[ecols.indexOf('callers')] == 'p_activedriverwgs,p_oncodriveclustl,p_oncodrivefml' },
+                { assert evals[ecols.indexOf('complete_elements')] == '4' }
+            )
+        }
+    }
 }

@@ -103,6 +103,23 @@ in the datasheet: it is supplied by the user (`--oncodrivefml_score`).
   process { withName: 'ONCODRIVEFML' { container = 'oncodrivefml-local:2.5.0' } }
   ```
 
+- **OncodriveCLUSTL** (`--run_oncodriveclustl`, default `false`): positional clustering of an
+  element's SNVs against a local, trinucleotide-matched simulation (OncodriveCLUSTL 1.2.0,
+  AGPL-3.0-or-later, no licence gate; public image). It is **reported alongside** the consensus
+  unless named in `--consensus_callers` (below). It reads the same offline bgdata hg38 genome as
+  OncodriveFML (`--oncodrivefml_genome`, datasheet key `oncodrivefml_genome`). Options (fixed in
+  `conf/modules.config`): mutation-centred simulation (31 bp), smoothing and clustering windows
+  of 11 bp, k-mer 3, 1,000 simulations, `--seed` from `--seed`, no `--concatenate` (the fragments
+  of a CDS-split element are not joined into one sequence). OncodriveCLUSTL analyses only
+  elements with at least `--oncodriveclustl_element_mutations` (2) SNVs and tests only those with
+  an observed cluster (a few thousand elements per cohort); its run time grows with the size of
+  the regions file, so the pipeline passes only the catalogue rows of the ids with enough SNVs
+  (exact: the analysed elements' results do not change). Elements are run in shards of
+  `--oncodriveclustl_shard_size` (5,000) ids with the signature of the whole cohort, and the
+  q-values are recomputed over all shards; a cohort with more analysed ids than one shard gets
+  per-shard simulation seeds, so its p-values depend on the shard size (reproducible for a fixed
+  value). The COSMIC Cancer Gene Census list bundled in the OncodriveCLUSTL wheel is reduced to its
+  header in the image; the `CGC` column is `Non Available` on hg38 in any case.
 - **MutEnricher** (`--run_mutenricher`, default `false`): QC only. Its native region table is
   published and never enters the combination; it reads the per-sample VCFs.
 
@@ -112,12 +129,33 @@ one sets `consensus_q` and `is_consensus` (Benjamini–Hochberg, `--fdr_threshol
 aggregation and the caller votes are sensitivity columns. `--skip_acat true` leaves out ACAT where
 the package is unavailable.
 
+### Combined and alongside callers
+
+`--consensus_callers` (default `activedriverwgs,oncodrivefml`) names the callers whose p-values are
+combined. A default caller that does not run is simply left out (OncodriveFML is off by default).
+Every other enabled caller is **reported alongside**: it is harmonised and joined on `element_id`,
+its `p_<caller>` and `q_<caller>` columns are carried in the consensus table and the evidence
+table, and it runs on the null replicates, but it does not enter EBM, ACAT, RRA, `vote_count`,
+`n_tested_callers` or `consensus_q`. The rows of the consensus table are the elements tested by at
+least one combined caller, so turning on a caller reported alongside adds its two columns and
+changes nothing else.
+
+A caller outside the default set may be named in `--consensus_callers` only after it has passed
+the opt-in gate for the element catalogue in use: null calibration within band with no null element
+at q < `--fdr_threshold` over at least three replicates, and recovery of the planted SYNTH-NC
+elements at least as good as the default consensus, on SYNTH-NC and Liver-HCC-public, recorded in
+`docs/validation.md`. The pipeline warns when such a caller is combined. A non-default caller named
+in `--consensus_callers` must also be enabled with its `--run_` flag; unknown names, duplicates and
+MutEnricher (QC-only) stop the run before any task. Combining another caller changes the EBM
+covariance set (elements tested by every combined caller) and therefore every consensus q-value.
+
 ### Software licences
 
 | Software                                              | Licence                                                     |
 | ----------------------------------------------------- | ----------------------------------------------------------- |
 | ActiveDriverWGS                                       | GPL-3.0-only                                                |
 | OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)     |
+| OncodriveCLUSTL                                       | AGPL-3.0-or-later                                           |
 | CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence |
 | MutEnricher                                           | MIT                                                         |
 | EmpiricalBrownsMethod                                 | MIT                                                         |

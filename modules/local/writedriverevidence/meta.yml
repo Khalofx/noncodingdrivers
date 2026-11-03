@@ -41,6 +41,11 @@ input:
     - coordinates:
         type: string
         description: Coordinate provenance of the cohort's mutations (native, lifted or mixed)
+    - oncodriveclustl:
+        type: file
+        description: Optional native OncodriveCLUSTL table of the cohort (cluster counts per element); `[]` when the caller is not run
+        pattern: "*.oncodriveclustl.tsv"
+        ontologies: []
   - sources:
       type: file
       description: Evidence item registry (assets/evidence_sources.tsv)
