@@ -114,11 +114,12 @@ positive under the null. A method is `excluded_for_inflation` when a null replic
 above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
 `conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
 that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
-`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is calibrated like the other
-callers, but it tests only elements with an observed cluster, so its `lambda` over those elements
-is inflated by construction in the observed and the null runs alike and its band status is not a
-calibration verdict; `docs/validation.md` records the statistic used for OncodriveCLUSTL instead
-(the null false-positive rate over the elements it analysed).
+`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is listed like the other
+callers, but it tests only elements with an observed cluster: its `lambda` rests on the few such
+elements in the ActiveDriverWGS element set (none or one per run on SYNTH-NC), and its band status
+(`excluded_for_inflation` on SYNTH-NC) is not a calibration verdict. Read its null runs' q-values
+instead; `docs/validation.md` records the statistic used for OncodriveCLUSTL (the null
+false-positive rate over the elements it analysed).
 
 <details markdown="1">
 <summary>Output files</summary>

@@ -200,6 +200,116 @@ Mb: the first test-profile run showed that the sites VCF for the gnomAD lookup m
 contigs absent from the FASTA index (bcftools sort stops on an undeclared contig). Fixed before
 these runs; the germline columns of such rows are NA.
 
+## Opt-in callers: OncodriveCLUSTL and `--consensus_callers`
+
+Branch `feat/new-callers` on Karakoram, SYNTH-NC `test_full`. Run A: `--run_oncodriveclustl true
+--run_null_calibration true --null_replicates 3` (job 390177; 446 tasks, 104.5 CPU-h). Default-identity
+and resume runs, all from one launch and work folder: D, dev at the merge-base `abcbe40` with
+defaults (jobs 390406 and 390555, resumed after a scheduler stop); E, the branch (`430cb65`) with
+defaults from its own checkout (job 390556, effectively fresh: 3 of 403 tasks reused); E2, the branch
+checked out in D's worktree with defaults, `-resume` (job 390602); F2, the same with
+`--run_oncodriveclustl true`, `-resume` (job 390603). Comparisons cover every published file except
+`pipeline_info/` and the MultiQC report, plots, log, JSON, parquet and source lists (146 files).
+
+**Default identity.** Two fresh runs of the same code already differ in bytes. They differ in the
+`##` header lines of the bcftools outputs (command and date), in the tabix index of a VCF whose header
+changed length, and in the row order of `consensus/intermediate/<cohort>.matched.tsv` (csvtk join). So
+the reference is the fresh dev run D, and two comparisons are made:
+
+| Comparison                                        | Byte-identical | Different | Different after normalisation                                           |
+| ------------------------------------------------- | -------------- | --------- | ----------------------------------------------------------------------- |
+| E2 (branch, defaults, `-resume` D) vs D           | 146 of 146     | 0         | 0                                                                       |
+| E (branch, defaults, fresh) vs D                  | 30 of 146      | 116       | 55, all `harmonisation/vcf/*.pass.vcf.gz.tbi`; their VCFs are identical |
+| D (dev, fresh) vs the Step 7 results (dev, fresh) | 32 of 146      | 114       | 53, all `*.pass.vcf.gz.tbi`                                             |
+
+Normalisation drops the `##` lines (60 VCFs) and sorts the `matched.tsv` rows (1 file). The consensus
+table is byte-identical in D, E, E2 and the Step 7 run (md5 `6f9ef619a74556c51e48be57b393fd2f`).
+In E2 the 13 tasks that ran again are COMBINEPVALUES (its script and command changed: `--callers`) and
+the 12 tasks downstream of its consensus table. Their outputs are byte-identical to D's.
+
+**Task hashes.** Nextflow 25.10 names every `eval()` output `nxf_out_eval_<n>` from one counter
+over the pipeline's process definitions, and the name enters the task hash
+(nextflow-io/nextflow#7572). A new module with an `eval()` output therefore renames the outputs of
+later modules and `-resume` re-runs them. The first version of this branch had three nf-core
+`gawk`/`bedtools intersect` helper processes for the OncodriveCLUSTL prefilter. Its run A matched D's
+`eval` output names in 4 of 34 processes, and a default run resumed from A reused 1 of the 387 tasks it started.
+ONCODRIVECLUSTL now emits its version with `env()` and prefilters inside its task
+(`bin/oncodriveclustl_prefilter.py`). The branch's default run matches D's `eval` names in 33 of 33
+processes, and E2 reuses 390 of 403 tasks. Enabling OncodriveCLUSTL on a resumed default run (F2)
+reuses 389 of 405 tasks: ActiveDriverWGS, OncodriveFML and every task upstream stay cached. The 16
+that run are ONCODRIVECLUSTL, its HARMONIZECALLS, ANCHOR_JOIN, COMBINEPVALUES and the 12 consensus
+consumers. A resume also needs the same checkout path: staged `projectDir` assets are hashed by path,
+size and modification time, so E, from another worktree of the same commit, reused 3 tasks.
+
+**Prefilter.** OncodriveCLUSTL analyses only elements with at least `-emut` SNVs, and its run time
+grows with the size of the regions file, so the task passes only the rows of those ids. On SYNTH-NC
+and its three null replicates, `bin/oncodriveclustl_prefilter.py` writes the same bytes as the
+earlier `gawk` + `bedtools intersect -c` + `gawk` path. It keeps 3,088, 3,195, 3,227 and 3,219 of
+544,737 ids (4,700-4,938 of 595,725 rows) in 2 s with 0.34 GB maximum RSS. F2 (prefilter in the
+task) and A (helper processes) give the same OncodriveCLUSTL tables and the same consensus.
+
+**SYNTH-NC: OncodriveCLUSTL reported alongside.** Cutting the two carried columns
+(`p_oncodriveclustl`, `q_oncodriveclustl`) from the consensus of A or F2 leaves the default consensus
+(md5 `6f9ef619a74556c51e48be57b393fd2f`; EBM parameters identical). OncodriveCLUSTL analysed 3,088
+elements and tested 36; an element is tested only if it has an observed cluster. Two of the 36 are at
+q < 0.1. Its tables are identical to the design prototype's (md5 `d4cd8ad7c4f4f71386680b0c68e244ee`,
+clusters `64dd8852938a1c7339013bd834c53f60`).
+
+| Planted (design)                                   | SNVs | Clusters (clustered SNVs) | OncodriveCLUSTL p | q      | Rank of 36 tested | Consensus rank (EBM q) |
+| -------------------------------------------------- | ---- | ------------------------- | ----------------- | ------ | ----------------- | ---------------------- |
+| E1 `promoter_ENSR00000746745` (TERT hotspots)      | 18   | 2 (18)                    | 3.75e-5           | 0.0014 | 1                 | 1 (6.5e-32)            |
+| E2 `enhancer_ENSR00001140199` (top-CADD positions) | 14   | 3 (13)                    | 0.0055            | 0.099  | 2                 | 2 (1.7e-28)            |
+| E3 `enhancer_ENSR00000839370` (random positions)   | 10   | 0                         | not tested        |        |                   | 4 (1.5e-15)            |
+| E4 `enhancer_ENSR00001144769` (4 top-CADD SNVs)    | 4    | 1 (4)                     | 0.23              | 0.33   | 23                | 5 (7.8e-9)             |
+| E5 `enhancer_ENSR00001173236` (random positions)   | 3    | 0                         | not tested        |        |                   | 8 (0.31)               |
+| E6 `enhancer_ENSR00001022568` (spectrum decoy)     | 12   | 1 (2)                     | 0.76              | 0.76   | 36                | 3 (3.3e-24)            |
+
+OncodriveCLUSTL recovers the two planted elements whose SNVs cluster (E1, E2) and ranks the spectrum
+decoy E6 last of the 36 tested. The consensus ranks E6 third. Burden at random positions (E3, E5) is
+not a clustering signal. OncodriveCLUSTL complements the combined callers here and does not replace
+them.
+
+**Null calibration (OncodriveCLUSTL).** The median-p `lambda` of CALIBRATECALLERS is not defined for
+OncodriveCLUSTL. Within the ActiveDriverWGS element set (expected count >= 1), OncodriveCLUSTL has a
+p-value for 0, 1, 1 and 0 elements (observed run, nulls 1-3). Its null summary (`lambda` 2.32 from
+two single elements, `excluded_for_inflation`) is therefore no verdict. The statistic used instead is
+the null false-positive rate over the elements OncodriveCLUSTL analysed:
+
+| Run      | Analysed | Tested | Minimum p | p <= 0.05 | p <= 0.01 | q < 0.1 |
+| -------- | -------- | ------ | --------- | --------- | --------- | ------- |
+| observed | 3,088    | 36     | 3.75e-5   | 3         | 2         | 2       |
+| null 1   | 3,195    | 30     | 0.014     | 3         | 0         | 0       |
+| null 2   | 3,227    | 30     | 0.053     | 0         | 0         | 0       |
+| null 3   | 3,219    | 34     | 0.057     | 0         | 0         | 0       |
+
+No null element reaches q < 0.1; the gate allows at most one per replicate. Over all analysed null
+elements, 3 of 9,641 are at p <= 0.05, with untested elements counted as p = 1. Over the 94 tested null
+elements it is 3 (3.2%; binomial P(X >= 3) = 0.85 at a 5% rate), and none is at p <= 0.01.
+OncodriveCLUSTL is not inflated on SYNTH-NC. This is one synthetic cohort: combining it
+(`--consensus_callers`) still prints the opt-in warning until it passes calibration on real cohorts.
+
+**Shards.** A used one shard (3,088 ids; `--oncodriveclustl_shard_size` 5,000). With seven shards of 500
+ids (job 390252) the following are unchanged:
+
+- the observed counts and scores (TOTAL_MUT, CLUSTERED_MUT, CLUSTERS, SCORE, LENGTH);
+- the 36 tested elements and the 39 cluster coordinates;
+- the two elements at q < 0.1, with q-values that are Benjamini-Hochberg over all shards.
+
+The simulated p-values change with the layout, because each shard draws its own simulations from
+`--seed`: 35 of 36 differ, by at most 0.48 in log10 (E1: 3.75e-5 with one shard, 1.25e-5 with seven).
+
+**Run time.** ONCODRIVECLUSTL on SYNTH-NC takes 48.5 s, and each null replicate 44-54 s. The largest
+single process uses 1.49 GB (`/usr/bin/time`, job 389973). Nextflow's process-tree `peak_rss` for the same
+run was 1.3 GB in A and 9.3 GB in F2: it adds up the forked workers, whose shared pages count once per
+worker, at its sampling times. `process_medium` allows 36 GB. For comparison, OncodriveFML takes 17.6
+min and ActiveDriverWGS 26 min on the same cohort.
+
+**OncodriveFML coordinates (S7A.14).** OncodriveFML 2.5.0 reads the START of its regions as 1-based when
+it maps mutations, but queries its CADD background with 0-based half-open coordinates. With the
+adapter's START = BED start (unchanged), the scored positions are exactly the BED interval. One extra 5'
+base per fragment is mapped, but it has no score and is dropped (43 of 231,472 SYNTH-NC SNVs). START + 1
+would drop the first base of every fragment from the background. The adapter is kept.
+
 ## Recorded differences from the baseline
 
 - **Candidate rows** come from every fragment of a significant element; the baseline located them by
