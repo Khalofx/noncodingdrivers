@@ -91,6 +91,27 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   site profile.
 - Regression baseline records (`tests/regression/`) and gate tools (`benchmarks/`); pytest and ruff
   CI.
+- Context layers (`CONTEXT_LAYERS`, after `EXPLAIN`; each off by default, annotation only, own
+  tables): COSMIC known-cancer context (`--run_cosmic_context`, local `COSMICCONTEXT`,
+  `bin/cosmic_context.py` ported from `benchmarks/cosmic_compare.py`): exact GRCh38 matches of the
+  candidate mutations in the user's own COSMIC Non-Coding Variants file, given at run time
+  (`--cosmic_ncv`, `--cosmic_release`, `--cosmic_ncv_md5`; never in the datasheet), with file-name
+  release and assembly checks, MD5 and provenance JSON and exact sample-name self-overlap flags;
+  counts in `cosmic/`, COSMIC records only in `cosmic/restricted/` with a NOTICE.
+- Cancer gene-list labels (`--cancer_gene_list`, local `CANCERGENECONTEXT`): nearest gene, nearest
+  protein-coding gene (nf-core `bedtools/closest` on protein_coding TSSs) and ENCODE-rE2G targets
+  against the COSMIC Cancer Gene Census or a plain list (`cancer_genes/`).
+- ENCODE-rE2G enhancer-gene links (`--run_enhancer_gene_links`, `--enhancer_gene_tissues`; nf-core
+  `bedtools/intersect` and gawk): links per element and file with the self-promoter split and the
+  agreement with the nearest gene (`enhancer_gene/`). Coverage table
+  `assets/references/encode_re2g.GRCh38.tsv` (12 tissues supported; 407 DNaseOnly files selected:
+  the 11-file liver set and the normal tissue samples of the other tissues); an unsupported or
+  unstaged tissue stops the run, never a substitute.
+- SCREEN Registry V4 cCRE overlay (`--run_ccre_overlay`, optional `--ccre_celltype_tissues`): V4
+  classes, covered fraction and dominant class per element (`ccre/`). Datasheet keys
+  `enhancer_gene_dir`, `ccre_v4_bed` (ENCFF420VPZ, MD5 checked at start), `ccre_v4_md5`,
+  `ccre_v4_rows`, `ccre_v4_source`, `ccre_celltype_dir`, `encode_licence`, `cosmic_licence`;
+  staging recipe in `docs/references.md`.
 
 ### `Dependencies`
 

@@ -198,4 +198,6 @@ workflow EXPLAIN {
     avi_summary  = ch_avi_summary             // channel: [ val(meta), path(avi.element_summary.tsv) ]
     opencravat   = ch_opencravat              // channel: [ val(meta), path(opencravat.tsv) ]
     mqc          = ch_mqc                     // channel: path(report) for MultiQC
+    significant  = ch_significant.some        // channel: [ val(meta), path(significant.sorted.bed) ] fragments (CONTEXT_LAYERS)
+    midpoints    = SORT_MIDPOINTS.out.sorted  // channel: [ val(meta), path(midpoints.sorted.bed) ] (CONTEXT_LAYERS)
 }

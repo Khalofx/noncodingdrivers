@@ -1,0 +1,40 @@
+{
+    "plain list without rE2G links": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cancer_gene_context.tsv:md5,86baf41229480507f1f9d45e9ce54118"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T15:54:18.570490743",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "Census-layout list with rE2G links": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cancer_gene_context.tsv:md5,dd876fc97d3974138eda2161d69b4599"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T15:54:14.164931583",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

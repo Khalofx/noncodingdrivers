@@ -1,0 +1,111 @@
+{
+    "all layers on": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.mutation_summary.tsv:md5,f7f3b676fbd8c38e1dfc1e1353b8e168"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.element_summary.tsv:md5,019ea50217d99c0d706f6b23d77f6b79"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.exact_matches.tsv:md5,f041685247e683635c795cb26117ff1a"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cosmic.provenance.json:md5,c5b2d5ab027545a84adf52f0b6e0ee7c"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.enhancer_gene_links.tsv:md5,3fae31d9b38dc3fa8843b2de3793183d"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.enhancer_gene_summary.tsv:md5,ec18524af75661970acaef4532840258"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.ccre_v4.tsv:md5,642dd30f16e3b247fa286e44afaa92d8"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.ccre_v4_summary.tsv:md5,f3499cde9cfdb313769ecaac9c79a91f"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.ccre_v4_celltype.tsv:md5,2e04a0456e5517255a74887ae42c9f00"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.cancer_gene_context.tsv:md5,dd876fc97d3974138eda2161d69b4599"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T15:59:12.104617851",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

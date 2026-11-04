@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "context_layers"
+description: Known-cancer and regulatory-target context of the significant elements (COSMIC exact matches, cancer gene-list labels, ENCODE-rE2G enhancer-gene links, SCREEN Registry V4 cCREs); every layer is off by default and none filters, re-ranks or weights a candidate
+keywords:
+  - annotation
+  - cosmic
+  - cancer gene census
+  - enhancer-gene links
+  - ccre
+components:
+  - gawk
+  - bedtools/intersect
+  - bedtools/closest
+  - cosmiccontext
+  - cancergenecontext
+input:
+  - ch_consensus:
+      type: file
+      description: |
+        Consensus table per cohort
+        Structure: [ val(meta), path(consensus) ]
+      pattern: "*.consensus.tsv"
+  - ch_significant:
+      type: file
+      description: |
+        Sorted BED4 of the fragments of the significant elements (EXPLAIN), cohorts with at least one
+        Structure: [ val(meta), path(bed) ]
+      pattern: "*.significant.sorted.bed"
+  - ch_candidates:
+      type: file
+      description: |
+        Candidate table of EXPLAIN (sample x mutation x significant element fragment)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.candidates.tsv"
+  - ch_nearest:
+      type: file
+      description: |
+        Nearest-gene table of EXPLAIN, or an empty channel
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.nearest_gene.tsv"
+  - ch_midpoints:
+      type: file
+      description: |
+        Sorted midpoints of the significant element spans (EXPLAIN)
+        Structure: [ val(meta), path(bed) ]
+      pattern: "*.midpoints.sorted.bed"
+  - ch_gene_tss:
+      type: file
+      description: |
+        Sorted gene TSS BED6+2 (gene_type in column 8), value channel or empty
+        Structure: [ val(meta2), path(bed) ]
+      pattern: "*.bed"
+  - ch_cosmic_ncv:
+      type: file
+      description: User-supplied COSMIC Non-Coding Variants file (value channel), or empty
+      pattern: "Cosmic_NonCodingVariants_v*_GRCh38.tsv{,.gz}"
+  - ch_re2g:
+      type: file
+      description: |
+        One staged ENCODE-rE2G thresholded link file per item, meta with tissue, biosample and accession; or empty
+        Structure: [ val(meta3), path(bed.gz) ]
+      pattern: "*.bed.gz"
+  - ch_ccre_v4:
+      type: file
+      description: |
+        SCREEN Registry V4 agnostic cCREs (value channel), or empty
+        Structure: [ val(meta4), path(bed.gz) ]
+      pattern: "*.bed.gz"
+  - ch_ccre_celltype:
+      type: file
+      description: |
+        One SCREEN V4 biosample cCRE file per item, meta with tissue, biosample and accession; or empty
+        Structure: [ val(meta5), path(bed.gz) ]
+      pattern: "*.bed.gz"
+  - gene_list:
+      type: file
+      description: Cancer gene list, or []
+  - awk_dir:
+      type: directory
+      description: Directory with the gawk adapter programs (assets/awk)
+  - options:
+      type: map
+      description: "[ cosmic: bool, cosmic_release: str, cosmic_md5: str, re2g: bool, re2g_tissues: str, re2g_n_files: str, ccre: bool, ccre_celltype: bool, gene_list_name: str ]"
+output:
+  - cosmic_mutations:
+      type: file
+      description: |
+        COSMIC counts per distinct candidate variant (no COSMIC identifiers)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.cosmic.mutation_summary.tsv"
+  - cosmic_elements:
+      type: file
+      description: |
+        COSMIC counts per significant element (no COSMIC identifiers)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.cosmic.element_summary.tsv"
+  - cosmic_prov:
+      type: file
+      description: |
+        COSMIC provenance (release, file name, MD5s, totals, rules)
+        Structure: [ val(meta), path(json) ]
+      pattern: "*.cosmic.provenance.json"
+  - cosmic_exact:
+      type: file
+      description: |
+        COSMIC records of the exact matches (restricted; published under cosmic/restricted/)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.cosmic.exact_matches.tsv"
+  - re2g_links:
+      type: file
+      description: |
+        ENCODE-rE2G links per element x file x rE2G element x target gene
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.enhancer_gene_links.tsv"
+  - re2g_summary:
+      type: file
+      description: |
+        ENCODE-rE2G summary per element x tissue (self-promoter split, nearest-gene status)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.enhancer_gene_summary.tsv"
+  - ccre:
+      type: file
+      description: |
+        SCREEN V4 cCREs per element
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.ccre_v4.tsv"
+  - ccre_summary:
+      type: file
+      description: |
+        SCREEN V4 summary per element (covered fraction, dominant class)
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.ccre_v4_summary.tsv"
+  - ccre_celltype:
+      type: file
+      description: |
+        SCREEN V4 biosample cCRE classes per element x file
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.ccre_v4_celltype.tsv"
+  - cancer_genes:
+      type: file
+      description: |
+        Cancer gene-list labels per element
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.cancer_gene_context.tsv"
+authors:
+  - "@Khalofx"
+maintainers:
+  - "@Khalofx"

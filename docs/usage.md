@@ -151,39 +151,42 @@ covariance set (elements tested by every combined caller) and therefore every co
 
 ### Software licences
 
-| Software                                              | Licence                                                     |
-| ----------------------------------------------------- | ----------------------------------------------------------- |
-| ActiveDriverWGS                                       | GPL-3.0-only                                                |
-| OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)     |
-| OncodriveCLUSTL                                       | AGPL-3.0-or-later                                           |
-| CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence |
-| MutEnricher                                           | MIT                                                         |
-| EmpiricalBrownsMethod                                 | MIT                                                         |
-| ACAT                                                  | GPL-3.0-only                                                |
-| RobustRankAggreg                                      | GPL-2.0-only                                                |
-| motifbreakR                                           | GPL-2.0-only                                                |
-| universalmotif                                        | GPL-3.0-only                                                |
-| JASPAR 2026 CORE vertebrates (bundled motifs)         | CC BY 4.0                                                   |
-| bcftools, htslib                                      | MIT                                                         |
-| bedtools                                              | MIT                                                         |
-| csvtk                                                 | MIT                                                         |
-| echtvar                                               | MIT                                                         |
-| GNU Awk                                               | GPL-3.0-or-later                                            |
-| Picard                                                | MIT                                                         |
-| vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                  |
-| EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                  |
-| Ensembl VEP                                           | Apache-2.0                                                  |
-| VEP AVI plugin (`AVI.pm`, in the VEP image)           | Apache-2.0                                                  |
-| AlphaGenome AVI SNV scores (user-downloaded)          | permissive-use download: commercial and non-commercial use  |
-| OpenCRAVAT 3.2.4 and its modules' code                | MIT                                                         |
-| OpenCRAVAT module data (ccre_screen, repeat, clinvar) | ENCODE, UCSC table and NCBI terms: unrestricted use         |
-| MultiQC                                               | GPL-3.0-or-later                                            |
-| SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                |
-| gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                             |
-| ENCODE Blacklist v2                                   | GPL-3.0 (repository licence)                                |
-| GIAB v3.6 stratifications                             | U.S. Government work (NIST)                                 |
-| Umap k100                                             | GPL                                                         |
-| Pipeline code (`bin/`, local modules)                 | MIT                                                         |
+| Software                                              | Licence                                                       |
+| ----------------------------------------------------- | ------------------------------------------------------------- |
+| ActiveDriverWGS                                       | GPL-3.0-only                                                  |
+| OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)       |
+| OncodriveCLUSTL                                       | AGPL-3.0-or-later                                             |
+| CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence   |
+| MutEnricher                                           | MIT                                                           |
+| EmpiricalBrownsMethod                                 | MIT                                                           |
+| ACAT                                                  | GPL-3.0-only                                                  |
+| RobustRankAggreg                                      | GPL-2.0-only                                                  |
+| motifbreakR                                           | GPL-2.0-only                                                  |
+| universalmotif                                        | GPL-3.0-only                                                  |
+| JASPAR 2026 CORE vertebrates (bundled motifs)         | CC BY 4.0                                                     |
+| bcftools, htslib                                      | MIT                                                           |
+| bedtools                                              | MIT                                                           |
+| csvtk                                                 | MIT                                                           |
+| echtvar                                               | MIT                                                           |
+| GNU Awk                                               | GPL-3.0-or-later                                              |
+| Picard                                                | MIT                                                           |
+| vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                    |
+| EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                    |
+| Ensembl VEP                                           | Apache-2.0                                                    |
+| VEP AVI plugin (`AVI.pm`, in the VEP image)           | Apache-2.0                                                    |
+| AlphaGenome AVI SNV scores (user-downloaded)          | permissive-use download: commercial and non-commercial use    |
+| OpenCRAVAT 3.2.4 and its modules' code                | MIT                                                           |
+| OpenCRAVAT module data (ccre_screen, repeat, clinvar) | ENCODE, UCSC table and NCBI terms: unrestricted use           |
+| MultiQC                                               | GPL-3.0-or-later                                              |
+| SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                  |
+| gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                               |
+| ENCODE Blacklist v2                                   | GPL-3.0 (repository licence)                                  |
+| GIAB v3.6 stratifications                             | U.S. Government work (NIST)                                   |
+| Umap k100                                             | GPL                                                           |
+| COSMIC data (user-supplied, `--cosmic_ncv`)           | restricted: COSMIC licence (registration; commercial: QIAGEN) |
+| ENCODE data (ENCODE-rE2G links, SCREEN V4 cCREs)      | unrestricted (ENCODE data use policy)                         |
+| ENCODE-rE2G code (predictions only, not run)          | MIT                                                           |
+| Pipeline code (`bin/`, local modules)                 | MIT                                                           |
 
 ## Flags, evidence and null calibration
 
@@ -288,6 +291,139 @@ and Simple Repeats tables are free for public and commercial use; ClinVar is NCB
 restrictions on use (some submitters may claim rights in their records); the hg38 gene mapper uses
 GENCODE 47 gene models and the UCSC hg38 sequence; the Gene Ontology module installed with the
 viewer widgets is CC BY 4.0 and is not run.
+
+## Context layers
+
+Four more layers describe what is already known about each significant element. Each is off by
+default, publishes its own tables ([output](output.md#context-layers)) and never filters, re-ranks
+or weights an element or a mutation; with all four off the run is unchanged.
+
+| Layer                           | Switch                      | Input                                                                                                            | Output folder                   |
+| ------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| COSMIC known-cancer context     | `--run_cosmic_context`      | your COSMIC Non-Coding Variants file (`--cosmic_ncv`, `--cosmic_release`, optional `--cosmic_ncv_md5`)           | `cosmic/`, `cosmic/restricted/` |
+| Cancer gene-list labels         | `--cancer_gene_list`        | Cancer Gene Census or any gene list (`--cancer_gene_list_name`)                                                  | `cancer_genes/`                 |
+| ENCODE-rE2G enhancer-gene links | `--run_enhancer_gene_links` | staged ENCODE-rE2G files (`--enhancer_gene_dir`, `--enhancer_gene_tissues`)                                      | `enhancer_gene/`                |
+| SCREEN Registry V4 cCREs        | `--run_ccre_overlay`        | V4 agnostic cCREs (`--ccre_v4_bed`); optional biosample files (`--ccre_celltype_dir`, `--ccre_celltype_tissues`) | `ccre/`                         |
+
+### COSMIC
+
+The layer matches every candidate mutation exactly (same GRCh38 chromosome, position, reference
+and alternate allele; the candidate table's `-` equals COSMIC's empty allele) against your own copy
+of the COSMIC Non-Coding Variants file. COSMIC is never bundled, downloaded or pinned by the
+pipeline, and it is not in the reference datasheet: give the file, its release and (optionally) its
+MD5 at run time.
+
+1. Log in at <https://cancer.sanger.ac.uk/cosmic/download/cosmic> with your own registered account
+   (academic use; commercial use needs a QIAGEN licence). Never put your COSMIC password into a
+   Nextflow config, a parameter file, a script in this repository or a shared folder.
+2. Select GRCh38 and the current release, then download "Non Coding Variants TSV"
+   (`Cosmic_NonCodingVariants_Tsv_v<release>_GRCh38.tar`) and, for the gene-list labels, "Cancer
+   Gene Census" (`Cosmic_CancerGeneCensus_Tsv_v<release>_GRCh38.tar`).
+3. Check the MD5 of each tar against the download page, extract it (`tar -xf`) and keep the
+   extracted file names unchanged. Record the MD5 of the extracted `.tsv.gz` if you want the run to
+   check it (`--cosmic_ncv_md5`).
+4. Run with, for example,
+   `--run_cosmic_context true --cosmic_ncv <dir>/Cosmic_NonCodingVariants_v104_GRCh38.tsv.gz --cosmic_release v104`.
+
+The file name must be COSMIC's own, `Cosmic_NonCodingVariants_v<release>_GRCh38.tsv.gz`: its release
+must equal `--cosmic_release`, and a GRCh37 file stops the run (`COSMIC_ASSEMBLY`); COSMIC is never
+lifted. Columns are read by name (`MUTATION_NC_ID` or `COSMIC_NCV_ID`), CRLF line ends are
+accepted, every `CHROMOSOME` value must be 1-22, X, Y or MT, and the MD5 of the file is computed
+while it is read and recorded in the provenance JSON.
+
+**Use the current release.** COSMIC supports its latest release and the three before it; using an
+older one is at your own risk, and COSMIC recommends the most recent release. When a new release
+appears (about twice a year), download it and rerun the layer. The release and the MD5 of the file
+used are in `cosmic/<cohort>.cosmic.provenance.json`.
+
+**Same-cohort observations.** A COSMIC observation is flagged `possible_self_overlap` only when its
+`SAMPLE_NAME` or `COSMIC_SAMPLE_ID` equals a sample id of the cohort exactly; every other match is
+`not_assessed`, because COSMIC may already hold the cohort under other names (PCAWG aliquot UUIDs
+never equal COSMIC sample names). `benchmarks/cosmic_sample_audit.py` crosswalks PCAWG names for
+benchmark audits. COSMIC recurrence reflects mutational processes and curation as well as
+selection; it is a prior observation, not a driver label.
+
+**Sharing results.** The COSMIC licence (<https://www.cosmickb.org/terms/>, clause 2.1.2) lets
+academic users disclose COSMIC data "solely to the extent necessary to enable publication" of their
+papers, with an acknowledgement that names the COSMIC release; any other sharing, including on a
+public website or repository, needs written consent. COSMIC identifiers count as COSMIC data. The
+pipeline therefore writes counts without COSMIC identifiers to `cosmic/` and the matched COSMIC
+records only to `cosmic/restricted/` with a `NOTICE.txt`: do not re-host that folder.
+
+### Cancer gene list
+
+`--cancer_gene_list` labels three gene assignments of every significant element: the nearest gene
+(any biotype, from `candidates/<cohort>.nearest_gene.tsv`, which is not changed), the nearest
+protein-coding gene (bedtools closest from the element midpoint to the protein_coding TSSs of the
+same TSS BED) and, with `--run_enhancer_gene_links`, the ENCODE-rE2G target genes. The list may be
+the COSMIC Cancer Gene Census TSV (`GENE_SYMBOL`, `TIER`, `ROLE_IN_CANCER`; Ensembl ids in
+`SYNONYMS` are used), a table with a `gene_symbol` column (optional `ensembl_gene_id`, `tier`,
+`role`) or one symbol per line, optionally gzipped. A gene matches by Ensembl id without version
+when the list has one for it, otherwise by exact, case-sensitive symbol. The Census is COSMIC data
+under the same licence as above.
+
+### ENCODE-rE2G enhancer-gene links
+
+ENCODE-rE2G (Gschwind et al. 2026) predicts which genes an element regulates in a biosample; the
+ENCODE portal holds its thresholded predictions (DNaseOnly model) for 1,458 biosample files. The
+layer intersects the fragments of every significant element with the staged files of the requested
+tissues and reports each link with its target gene, score and self-promoter flag, and a summary per
+element and tissue: self-promoter genes apart from distal targets, the top target and whether the
+nearest gene is the top target, among the targets, or not linked (`nearest_gene_status`).
+
+Self-promoter links (`isSelfPromoter TRUE`) arise because a promoter element is linked to its own
+gene by construction; they are reported, but separately from distal links. Predictions come from
+normal tissues and cell lines, not tumours.
+
+Tissues are the folders of `--enhancer_gene_dir` (datasheet: `${reference_base}/encode_re2g`),
+named as the regulatory-context tissues. `--enhancer_gene_tissues liver` selects one; without it
+every staged supported tissue is used. A tissue without ENCODE-rE2G predictions stops the run with
+`ENHANCER_GENE_TISSUE_UNSUPPORTED`, and a supported tissue without staged files with
+`ENHANCER_GENE_TISSUE_NOT_STAGED`: **no other tissue is ever used as a substitute**. The coverage
+table `assets/references/encode_re2g.GRCh38.tsv` lists every ENCODE-rE2G file of each tissue
+(matched by the ENCODE organ slim) with its biosample, accession, MD5 and size; the `selected`
+column marks the files the staging recipe ([references](references.md#encode-re2g-and-screen-v4))
+downloads: for liver the 11 files of decision D-E1 (HepG2, liver, right lobe of liver, hepatocyte),
+for every other tissue its normal tissue samples (cell lines and primary cells are listed but not
+staged). A staged file that is not in the table is used with a warning.
+
+| Tissue folder     | ENCODE-rE2G files on the portal | Files staged and used | Staged biosamples (files)                                                                                      |
+| ----------------- | ------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `brain`           | 245                             | 219                   | 18 tissue biosamples (e.g. head of caudate nucleus, dorsolateral prefrontal cortex, posterior cingulate gyrus) |
+| `esophagus`       | 3                               | 2                     | esophagus muscularis mucosa (1), esophagus squamous epithelium (1)                                             |
+| `kidney`          | 87                              | 70                    | 10 tissue biosamples (e.g. kidney, renal cortex interstitium, renal pelvis)                                    |
+| `liver`           | 15                              | 11                    | HepG2 (2), hepatocyte (2), liver (2), right lobe of liver (5)                                                  |
+| `lung`            | 82                              | 52                    | 7 tissue biosamples (e.g. left lung, lung, right lung)                                                         |
+| `ovary`           | 9                               | 9                     | ovary (9)                                                                                                      |
+| `pancreas`        | 18                              | 12                    | body of pancreas (4), pancreas (8)                                                                             |
+| `prostate_gland`  | 8                               | 1                     | prostate gland (1)                                                                                             |
+| `skin_of_body`    | 58                              | 5                     | lower leg skin (2), skin of body (1), suprapubic skin (2)                                                      |
+| `stomach`         | 21                              | 21                    | stomach (21)                                                                                                   |
+| `thyroid_gland`   | 4                               | 4                     | thyroid gland (4)                                                                                              |
+| `urinary_bladder` | 1                               | 1                     | urinary bladder (1)                                                                                            |
+
+All 12 tissue folders of the regulatory-context layer are supported (ENCODE-rE2G files queried
+on 2 November 2026; every released GRCh38 ENCODE-rE2G thresholded file uses the DNaseOnly model, so
+no tissue depends on another model).
+
+### SCREEN Registry V4 cCREs
+
+`--run_ccre_overlay` reports the SCREEN Registry V4 cCREs (Moore et al. 2026) covering each
+significant element: one row per element and cCRE with its class (PLS, pELS, dELS, CA-H3K4me3,
+CA-CTCF, CA-TF, CA, TF) and overlap, and a summary with the covered fraction and the class with
+most bases. The cell-type-agnostic registry (ENCODE ENCFF420VPZ, datasheet `ccre_v4_bed`, checked
+against its MD5) is used by default; `--ccre_celltype_tissues liver` adds the biosample-specific
+classes of the files staged under `--ccre_celltype_dir/<tissue>/` (staged: HepG2 ENCFF762XMN and
+liver ENCFF253OXM). This is annotation only: the element universe stays the Regulatory Build
+catalogue.
+
+### Data licences of the context layers
+
+| Data                                           | Licence                                                                                                                      | In the pipeline                                                                |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| COSMIC Non-Coding Variants, Cancer Gene Census | COSMIC licence: registration for academic use, QIAGEN licence for commercial use; disclosure only for Publication Enablement | user-supplied at run time, never bundled; records only in `cosmic/restricted/` |
+| ENCODE-rE2G predictions, SCREEN V4 cCREs       | ENCODE data use policy: free to download, analyse and publish                                                                | staged by the recipe, checksummed                                              |
+| ENCODE-rE2G code (not run by the pipeline)     | MIT                                                                                                                          | predictions used as published                                                  |
 
 ## Karakoram
 

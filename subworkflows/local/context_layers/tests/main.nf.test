@@ -1,0 +1,113 @@
+nextflow_workflow {
+
+    name "Test Subworkflow CONTEXT_LAYERS"
+    script "../main.nf"
+    workflow "CONTEXT_LAYERS"
+    config "./nextflow.config"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "context_layers"
+
+    // Inputs (tests/data/context) are EXPLAIN's outputs on tests/data/explain: TERT_promoter_fixture
+    // and frag_F (two fragments, chr5:1400000-1400200 and 1400500-1400700) are significant.
+    // Every ENCODE-format and COSMIC-format file is SYNTHETIC (invented scores, accessions and ids):
+    //   re2g/liver: HepG2 (TERT self-promoter 1.0, CLPTM1L distal 0.35, SLC6A3 on frag_F 0.42, a link
+    //               in frag_F's gap and one on the non-significant elem_B) and liver (TERT 0.9, CLPTM1L
+    //               on frag_F 0.25, SLC6A3 0.30); re2g/lung: one link on elem_A only
+    //   screen_v4:  six agnostic cCREs (PLS, pELS, dELS, CA-CTCF) and one HepG2 cell-type file
+    test("all layers on") {
+
+        when {
+            workflow {
+                """
+                def d = "${projectDir}/tests/data/context"
+                def m = [ id:'test', cohort:'test', assembly:'GRCh38' ]
+                input[0]  = channel.of([ m, file("${projectDir}/tests/data/explain/consensus.tsv", checkIfExists: true) ])
+                input[1]  = channel.of([ m, file("\${d}/test.significant.sorted.bed", checkIfExists: true) ])
+                input[2]  = channel.of([ m, file("\${d}/test.candidates.tsv", checkIfExists: true) ])
+                input[3]  = channel.of([ m, file("\${d}/test.nearest_gene.tsv", checkIfExists: true) ])
+                input[4]  = channel.of([ m, file("\${d}/test.midpoints.sorted.bed", checkIfExists: true) ])
+                input[5]  = channel.value([ [ id:'gene_tss' ], file("${projectDir}/tests/data/explain/gene_tss.bed", checkIfExists: true) ])
+                input[6]  = channel.value(file("${projectDir}/tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh38.tsv.gz", checkIfExists: true))
+                input[7]  = channel.of(
+                    [ [ id:'liver.HepG2.ENCFFSYN001', tissue:'liver', biosample:'HepG2', accession:'ENCFFSYN001' ], file("\${d}/re2g/liver/HepG2.ENCFFSYN001.bed.gz", checkIfExists: true) ],
+                    [ [ id:'liver.liver.ENCFFSYN002', tissue:'liver', biosample:'liver', accession:'ENCFFSYN002' ], file("\${d}/re2g/liver/liver.ENCFFSYN002.bed.gz", checkIfExists: true) ],
+                    [ [ id:'lung.lung.ENCFFSYN003', tissue:'lung', biosample:'lung', accession:'ENCFFSYN003' ], file("\${d}/re2g/lung/lung.ENCFFSYN003.bed.gz", checkIfExists: true) ]
+                )
+                input[8]  = channel.value([ [ id:'ccre_v4' ], file("\${d}/screen_v4/GRCh38-cCREs.V4.synthetic.bed.gz", checkIfExists: true) ])
+                input[9]  = channel.of([ [ id:'liver.HepG2.ENCFFSYN010', tissue:'liver', biosample:'HepG2', accession:'ENCFFSYN010' ], file("\${d}/screen_v4/celltype/liver/HepG2.ENCFFSYN010.bed.gz", checkIfExists: true) ])
+                input[10] = file("\${d}/cancer_genes.census_layout.tsv", checkIfExists: true)
+                input[11] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[12] = [ cosmic: true, cosmic_release: 'v999', cosmic_md5: '27c29be67b74514d1eb75cf696856fe8', re2g: true, re2g_tissues: 'liver,lung',
+                              re2g_n_files: 'liver:2,lung:1', ccre: true, ccre_celltype: true, gene_list_name: 'synthetic Census layout' ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def links = table(workflow.out.re2g_links[0][1])
+            def summ  = table(workflow.out.re2g_summary[0][1]).collectEntries { r -> [ "${r.element_id}/${r.tissue}".toString(), r ] }
+            def ccre  = table(workflow.out.ccre_summary[0][1]).collectEntries { r -> [ r.element_id, r ] }
+            def genes = table(workflow.out.cancer_genes[0][1]).collectEntries { r -> [ r.element_id, r ] }
+            assert workflow.success
+            assertAll(
+                // rE2G: 6 link rows on the two significant elements; the gap and elem_B links do not overlap a fragment
+                { assert links.size() == 6 && links*.element_id.toSet() == [ 'TERT_promoter_fixture', 'frag_F' ] as Set },
+                { assert !links.any { r -> r.re2g_element == 'chr5:1400250-1400450' } },
+                { assert summ['TERT_promoter_fixture/liver'].subMap([ 'self_promoter_genes', 'top_target_any', 'top_distal_target', 'n_files', 'n_files_with_link' ]) ==
+                    [ self_promoter_genes: 'TERT', top_target_any: 'TERT', top_distal_target: 'CLPTM1L', n_files: '2', n_files_with_link: '2' ] },
+                { assert summ['frag_F/liver'].distal_targets_by_max_score == 'SLC6A3:0.420,CLPTM1L:0.250' },
+                { assert summ['frag_F/lung'].nearest_gene_status == 'no_link' && summ['frag_F/lung'].n_files == '1' },
+                // SCREEN V4: classes by covered bases; frag_F's gap is not counted
+                { assert ccre.TERT_promoter_fixture.subMap([ 'dominant_class', 'ccre_v4_classes_bp', 'covered_bp', 'element_bp' ]) ==
+                    [ dominant_class: 'pELS', ccre_v4_classes_bp: 'pELS:300,PLS:161', covered_bp: '461', element_bp: '612' ] },
+                { assert ccre.frag_F.subMap([ 'n_ccre', 'covered_bp', 'element_bp' ]) == [ n_ccre: '3', covered_bp: '140', element_bp: '400' ] },
+                // cancer gene list: TERT is the nearest protein-coding gene and an rE2G target of the TERT promoter
+                { assert genes.TERT_promoter_fixture.nearest_protein_coding_gene == 'TERT' && genes.TERT_promoter_fixture.re2g_targets_in_list == 'CLPTM1L,TERT' },
+                // COSMIC
+                { assert path(workflow.out.cosmic_prov[0][1]).json.cosmic_matched_distinct_mutations == 3 },
+                { assert snapshot(workflow.out.cosmic_mutations, workflow.out.cosmic_elements, workflow.out.cosmic_exact, workflow.out.cosmic_prov,
+                                  workflow.out.re2g_links, workflow.out.re2g_summary, workflow.out.ccre, workflow.out.ccre_summary,
+                                  workflow.out.ccre_celltype, workflow.out.cancer_genes).match() }
+            )
+        }
+    }
+
+    test("rE2G without a nearest-gene table") {
+
+        when {
+            workflow {
+                """
+                def d = "${projectDir}/tests/data/context"
+                def m = [ id:'test', cohort:'test', assembly:'GRCh38' ]
+                input[0]  = channel.of([ m, file("${projectDir}/tests/data/explain/consensus.tsv", checkIfExists: true) ])
+                input[1]  = channel.of([ m, file("\${d}/test.significant.sorted.bed", checkIfExists: true) ])
+                input[2]  = channel.of([ m, file("\${d}/test.candidates.tsv", checkIfExists: true) ])
+                input[3]  = channel.empty()
+                input[4]  = channel.of([ m, file("\${d}/test.midpoints.sorted.bed", checkIfExists: true) ])
+                input[5]  = channel.empty()
+                input[6]  = channel.empty()
+                input[7]  = channel.of([ [ id:'liver.HepG2.ENCFFSYN001', tissue:'liver', biosample:'HepG2', accession:'ENCFFSYN001' ], file("\${d}/re2g/liver/HepG2.ENCFFSYN001.bed.gz", checkIfExists: true) ])
+                input[8]  = channel.empty()
+                input[9]  = channel.empty()
+                input[10] = []
+                input[11] = file("${projectDir}/assets/awk", checkIfExists: true)
+                input[12] = [ cosmic: false, re2g: true, re2g_tissues: 'liver', re2g_n_files: 'liver:1', ccre: false, ccre_celltype: false ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def summ  = table(workflow.out.re2g_summary[0][1])
+            assert workflow.success
+            assertAll(
+                { assert summ.size() == 2 },
+                { assert summ.every { r -> r.nearest_gene == 'NA' && r.nearest_gene_status == 'no_nearest_gene' } },
+                { assert workflow.out.cosmic_mutations.size() == 0 && workflow.out.ccre.size() == 0 && workflow.out.cancer_genes.size() == 0 }
+            )
+        }
+    }
+}

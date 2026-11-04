@@ -87,6 +87,7 @@ workflow PIPELINE_INITIALISATION {
     //
     def refs = resolveReferences()
     validateDriverParameters(refs)
+    validateContextParameters(refs)
 
     //
     // Create channel from input file provided through params.input:
@@ -271,7 +272,12 @@ def resolveReferences() {
         umap_bed            : pickRef(sheet, 'umap_bed', 'umap_bed'),
         gnomad_echtvar      : pickRef(sheet, 'gnomad_echtvar', 'gnomad_echtvar'),
         alphagenome_avi     : pickRef(sheet, 'alphagenome_avi', 'alphagenome_avi'),
+        enhancer_gene_dir   : pickRef(sheet, 'enhancer_gene_dir', 'enhancer_gene_dir'),
+        ccre_v4_bed         : pickRef(sheet, 'ccre_v4_bed', 'ccre_v4_bed'),
+        ccre_celltype_dir   : pickRef(sheet, 'ccre_celltype_dir', 'ccre_celltype_dir'),
     ]
+    // checksum of the datasheet's V4 file; not applied to an explicit --ccre_v4_bed
+    refs.ccre_v4_md5 = params.ccre_v4_bed ? null : sheet.ccre_v4_md5
     // FASTA and its companions
     refs.fasta = pickRef(sheet, 'fasta', 'fasta')
     if (params.fasta) {
@@ -482,6 +488,157 @@ def peakFileMeta(peak) {
 }
 
 //
+// Context layers (CONTEXT_LAYERS): parameter and file checks before any task runs
+//
+def validateContextParameters(refs) {
+    if (params.run_cosmic_context) {
+        if (!params.cosmic_ncv) {
+            error("COSMIC_NCV_MISSING: --run_cosmic_context needs --cosmic_ncv: your own copy of the COSMIC Non-Coding Variants file, " +
+                  "Cosmic_NonCodingVariants_v<release>_GRCh38.tsv.gz (extracted from the download tar, name unchanged). COSMIC data are " +
+                  "licensed (registration for academic use, a QIAGEN licence for commercial use) and are never bundled or downloaded by the pipeline.")
+        }
+        if (!(params.cosmic_release ==~ /^v\d+$/)) {
+            error("COSMIC_RELEASE_MISSING: --run_cosmic_context needs --cosmic_release, the COSMIC release of --cosmic_ncv (e.g. v104).")
+        }
+        def name  = file(params.cosmic_ncv).name
+        def match = name =~ /^Cosmic_NonCodingVariants_(v\d+)_(GRCh3[78])\.tsv(\.gz)?$/
+        if (!match.matches()) {
+            error("COSMIC_FILE_NAME: --cosmic_ncv '${name}' is not COSMIC's file name Cosmic_NonCodingVariants_v<release>_GRCh38.tsv.gz. " +
+                  "Give the .tsv.gz extracted from the download tar (not the .tar) under its own name, so that release and assembly can be checked.")
+        }
+        if (match.group(2) != 'GRCh38') {
+            error("COSMIC_ASSEMBLY: --cosmic_ncv '${name}' is the ${match.group(2)} file set. The pipeline analyses GRCh38 and never lifts COSMIC: " +
+                  "download the GRCh38 Non-Coding Variants file.")
+        }
+        if (match.group(1) != params.cosmic_release) {
+            error("COSMIC_RELEASE_MISMATCH: --cosmic_ncv '${name}' is release ${match.group(1)}, but --cosmic_release is ${params.cosmic_release}.")
+        }
+    } else if (params.cosmic_ncv || params.cosmic_release || params.cosmic_ncv_md5) {
+        log.warn("--cosmic_ncv/--cosmic_release/--cosmic_ncv_md5 are set but --run_cosmic_context is false: the COSMIC layer is not run.")
+    }
+    if (params.cancer_gene_list && !params.gene_tss_bed && !refs.gencode_gtf) {
+        log.warn("--cancer_gene_list needs the nearest-gene table (--gencode_gtf or --gene_tss_bed): no cancer gene labels are written.")
+    }
+    if (params.run_enhancer_gene_links) {
+        enhancerGeneFiles(refs).warnings.each { message -> log.warn(message) }
+    } else if (params.enhancer_gene_tissues) {
+        log.warn("--enhancer_gene_tissues is set but --run_enhancer_gene_links is false: the ENCODE-rE2G layer is not run.")
+    }
+    if (params.run_ccre_overlay) {
+        if (!refs.ccre_v4_bed) {
+            error("CCRE_V4_MISSING: --run_ccre_overlay needs --ccre_v4_bed (or --reference_base for the datasheet): the SCREEN Registry V4 agnostic cCREs, " +
+                  "ENCODE ENCFF420VPZ (GRCh38-cCREs.V4.ENCFF420VPZ.bed.gz; recipe in docs/references.md).")
+        }
+        def v4 = file(refs.ccre_v4_bed, checkIfExists: true)
+        if (refs.ccre_v4_md5) {
+            def md5 = fileMd5(v4)
+            if (md5 != refs.ccre_v4_md5) {
+                error("CCRE_V4_CHECKSUM: ${v4} has MD5 ${md5}, the datasheet expects ${refs.ccre_v4_md5} (ENCFF420VPZ). Re-stage it with the recipe in docs/references.md.")
+            }
+        }
+        if (params.ccre_celltype_tissues) {
+            ccreCelltypeFiles(refs)
+        }
+    } else if (params.ccre_celltype_tissues) {
+        log.warn("--ccre_celltype_tissues is set but --run_ccre_overlay is false: the SCREEN V4 layer is not run.")
+    }
+}
+
+def fileMd5(path) {
+    def digest = java.security.MessageDigest.getInstance('MD5')
+    path.withInputStream { stream -> stream.eachByte(1 << 20) { buffer, n -> digest.update(buffer, 0, n) } }
+    return digest.digest().encodeHex().toString()
+}
+
+//
+// ENCODE-rE2G files of the requested tissues: <enhancer_gene_dir>/<tissue>/<biosample>.<accession>.bed.gz.
+// A tissue is supported when assets/references/encode_re2g.GRCh38.tsv lists ENCODE-rE2G
+// predictions for it; an unsupported or unstaged tissue stops the run (never a substitute).
+// Returns [ tissues, files: [ [ meta, path ] ], n_files: 'tissue:N,...', warnings ].
+//
+def enhancerGeneFiles(refs) {
+    if (!refs.enhancer_gene_dir) {
+        error("ENHANCER_GENE_DIR_MISSING: --run_enhancer_gene_links needs --enhancer_gene_dir (or --reference_base for the datasheet): one folder per tissue " +
+              "holding <biosample>.<accession>.bed.gz ENCODE-rE2G thresholded link files (recipe in docs/references.md).")
+    }
+    def rows      = file("${projectDir}/assets/references/encode_re2g.GRCh38.tsv", checkIfExists: true).splitCsv(header: true, sep: '\t')
+    def supported = rows.findAll { row -> row.accession ==~ /^ENCFF\w+$/ }.collect { row -> row.tissue }.unique().sort()
+    def dir       = file(refs.enhancer_gene_dir, checkIfExists: true)
+    def staged    = dir.listFiles().findAll { entry -> entry.isDirectory() }.collect { entry -> entry.name }.sort()
+    def warnings  = []
+    def requested = params.enhancer_gene_tissues
+        ? params.enhancer_gene_tissues.toString().tokenize(',').collect { tissue -> tissue.trim() }.unique()
+        : staged.findAll { tissue -> tissue in supported }
+    def unsupported = requested.findAll { tissue -> !(tissue in supported) }
+    if (unsupported) {
+        error("ENHANCER_GENE_TISSUE_UNSUPPORTED: ENCODE-rE2G has no thresholded enhancer-gene predictions for ${unsupported.join(', ')} " +
+              "(assets/references/encode_re2g.GRCh38.tsv). Supported tissues: ${supported.join(', ')}. No other tissue is used as a substitute: " +
+              "remove it from --enhancer_gene_tissues or set --run_enhancer_gene_links false.")
+    }
+    if (!requested) {
+        error("ENHANCER_GENE_TISSUE_NOT_STAGED: no supported tissue folder is staged under ${dir} (supported: ${supported.join(', ')}); " +
+              "stage the files with the recipe in docs/references.md or set --enhancer_gene_tissues.")
+    }
+    def files = []
+    requested.each { tissue ->
+        def folder = dir.resolve(tissue)
+        def beds   = folder.exists() ? folder.listFiles().findAll { entry -> entry.name.endsWith('.bed.gz') }.sort { entry -> entry.name } : []
+        if (!beds) {
+            error("ENHANCER_GENE_TISSUE_NOT_STAGED: tissue '${tissue}' has ENCODE-rE2G predictions but no <biosample>.<accession>.bed.gz file is staged in ${folder}. " +
+                  "Stage them with the recipe in docs/references.md.")
+        }
+        def listed   = rows.findAll { row -> row.tissue == tissue }.collect { row -> row.file_name }
+        def selected = rows.findAll { row -> row.tissue == tissue && row.selected == 'yes' }.collect { row -> row.file_name }
+        def names    = beds.collect { bed -> bed.name }
+        def unknown  = names.findAll { name -> !(name in listed) }
+        def missing  = selected.findAll { name -> !(name in names) }
+        if (unknown) {
+            warnings << "ENCODE-rE2G tissue '${tissue}': ${unknown.size()} staged file(s) not in assets/references/encode_re2g.GRCh38.tsv are used as staged: ${unknown.join(', ')}".toString()
+        }
+        if (missing) {
+            warnings << "ENCODE-rE2G tissue '${tissue}': ${missing.size()} of the ${selected.size()} selected file(s) are not staged: ${missing.join(', ')}".toString()
+        }
+        beds.each { bed -> files << [ contextFileMeta(bed, tissue), bed ] }
+    }
+    def n_files = requested.collect { tissue -> "${tissue}:${files.count { item -> item[0].tissue == tissue }}" }.join(',')
+    return [ tissues: requested, files: files, n_files: n_files, warnings: warnings ]
+}
+
+//
+// SCREEN V4 biosample-specific cCRE files of --ccre_celltype_tissues:
+// <ccre_celltype_dir>/<tissue>/<biosample>.<accession>.bed.gz
+//
+def ccreCelltypeFiles(refs) {
+    if (!refs.ccre_celltype_dir) {
+        error("CCRE_CELLTYPE_DIR_MISSING: --ccre_celltype_tissues needs --ccre_celltype_dir (or --reference_base for the datasheet): one folder per tissue " +
+              "holding <biosample>.<accession>.bed.gz SCREEN V4 biosample cCRE files.")
+    }
+    def dir   = file(refs.ccre_celltype_dir, checkIfExists: true)
+    def files = []
+    params.ccre_celltype_tissues.toString().tokenize(',').collect { tissue -> tissue.trim() }.unique().each { tissue ->
+        def folder = dir.resolve(tissue)
+        def beds   = folder.exists() ? folder.listFiles().findAll { entry -> entry.name.endsWith('.bed.gz') }.sort { entry -> entry.name } : []
+        if (!beds) {
+            error("CCRE_CELLTYPE_TISSUE_NOT_STAGED: no SCREEN V4 biosample cCRE file is staged for '${tissue}' in ${folder} (recipe in docs/references.md). " +
+                  "No other tissue is used as a substitute.")
+        }
+        beds.each { bed -> files << [ contextFileMeta(bed, tissue), bed ] }
+    }
+    return [ files: files ]
+}
+
+//
+// Meta map of a staged context file <tissue>/<biosample>.<accession>.bed.gz
+//
+def contextFileMeta(bed, tissue) {
+    def tokens = bed.name.tokenize('.')
+    if (tokens.size() != 4 || !(tokens[1] ==~ /^ENCFF\w+$/)) {
+        error("Context file ${bed}: expected <biosample>.<ENCODE accession>.bed.gz (biosample without dots), e.g. HepG2.ENCFF960GTR.bed.gz.")
+    }
+    return [ id: "${tissue}.${tokens[0]}.${tokens[1]}", tissue: tissue, biosample: tokens[0], accession: tokens[1] ]
+}
+
+//
 // Generate methods description for MultiQC
 //
 def toolCitationText() {
@@ -502,6 +659,10 @@ def toolCitationText() {
             params.run_motifbreakr ? "motifbreakR (Coetzee et al. 2015) with JASPAR (Rauluseviciute et al. 2024)," : "",
             params.run_alphagenome_avi ? "AlphaGenome Variant Impact scores (Avsec et al. 2026; Cheng et al. 2026) through the VEP AVI plugin," : "",
             params.run_opencravat ? "OpenCRAVAT (Pagel et al. 2020)," : "",
+            params.run_cosmic_context ? "COSMIC (Sondka et al. 2024)," : "",
+            params.cancer_gene_list ? "a cancer gene list (e.g. the COSMIC Cancer Gene Census, Sondka et al. 2018)," : "",
+            params.run_enhancer_gene_links ? "ENCODE-rE2G enhancer-gene predictions (Gschwind et al. 2026; ENCODE Project Consortium 2020)," : "",
+            params.run_ccre_overlay ? "the SCREEN Registry V4 of candidate cis-regulatory elements (Moore et al. 2026)," : "",
             "MultiQC (Ewels et al. 2016)",
             ".",
             callerRolesText()
@@ -553,6 +714,21 @@ def toolBibliographyText() {
         ] : []) +
         (params.run_opencravat ? [
             "<li>Pagel, K. A., et al. (2020). Integrated informatics analysis of cancer-related variants. JCO Clinical Cancer Informatics, (4), 310–317. doi: <a href=\"https://doi.org/10.1200/CCI.19.00132\">10.1200/CCI.19.00132</a></li>"
+        ] : []) +
+        (params.run_cosmic_context ? [
+            "<li>Sondka, Z., et al. (2024). COSMIC: a curated database of somatic variants and clinical data for cancer. Nucleic Acids Research, 52(D1). doi: <a href=\"https://doi.org/10.1093/nar/gkad986\">10.1093/nar/gkad986</a></li>",
+        ] : []) +
+        (params.cancer_gene_list ? [
+            "<li>Sondka, Z., et al. (2018). The COSMIC Cancer Gene Census: describing genetic dysfunction across all human cancers. Nature Reviews Cancer, 18(11). doi: <a href=\"https://doi.org/10.1038/s41568-018-0060-1\">10.1038/s41568-018-0060-1</a></li>",
+        ] : []) +
+        (params.run_enhancer_gene_links ? [
+            "<li>Gschwind, A. R., et al. (2026). An encyclopedia of human enhancer-gene regulatory interactions. Nature, 657. doi: <a href=\"https://doi.org/10.1038/s41586-026-10781-4\">10.1038/s41586-026-10781-4</a></li>",
+        ] : []) +
+        ((params.run_enhancer_gene_links || params.run_ccre_overlay) ? [
+            "<li>ENCODE Project Consortium, et al. (2020). Expanded encyclopaedias of DNA elements in the human and mouse genomes. Nature, 583. doi: <a href=\"https://doi.org/10.1038/s41586-020-2493-4\">10.1038/s41586-020-2493-4</a></li>",
+        ] : []) +
+        (params.run_ccre_overlay ? [
+            "<li>Moore, J. E., et al. (2026). An expanded registry of candidate cis-regulatory elements. Nature. doi: <a href=\"https://doi.org/10.1038/s41586-025-09909-9\">10.1038/s41586-025-09909-9</a></li>",
         ] : []) +
         [
             "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics, 32(19), 3047–3048. doi: <a href=\"https://doi.org/10.1093/bioinformatics/btw354\">10.1093/bioinformatics/btw354</a></li>"

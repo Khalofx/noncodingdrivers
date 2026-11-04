@@ -24,6 +24,11 @@ include { VARIANT_FLAGS                     } from '../subworkflows/local/varian
 include { NULL_CALIBRATION                  } from '../subworkflows/local/null_calibration'
 include { POSTFILTERFLAGS                   } from '../modules/local/postfilterflags'
 include { WRITEDRIVEREVIDENCE               } from '../modules/local/writedriverevidence'
+// Context layers last: Nextflow numbers eval() outputs in include order, so a component included
+// earlier would rename the eval outputs, and change the task hashes, of every later process
+include { enhancerGeneFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { ccreCelltypeFiles                 } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
+include { CONTEXT_LAYERS                    } from '../subworkflows/local/context_layers'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -322,6 +327,32 @@ workflow NONCODINGDRIVERS {
         avi_files
     )
     ch_multiqc_files = ch_multiqc_files.mix(EXPLAIN.out.mqc)
+
+    //
+    // SUBWORKFLOW: context layers (COSMIC, cancer gene list, ENCODE-rE2G, SCREEN V4). Each is off
+    // by default; with all of them off this block creates no process. Annotation only.
+    //
+    if (params.run_cosmic_context || params.cancer_gene_list || params.run_enhancer_gene_links || params.run_ccre_overlay) {
+        def re2g     = params.run_enhancer_gene_links ? enhancerGeneFiles(refs) : [ tissues: [], files: [], n_files: '' ]
+        def celltype = params.run_ccre_overlay && params.ccre_celltype_tissues ? ccreCelltypeFiles(refs) : [ files: [] ]
+        CONTEXT_LAYERS(
+            DRIVER_DISCOVERY.out.consensus,
+            EXPLAIN.out.significant,
+            EXPLAIN.out.candidates,
+            EXPLAIN.out.nearest,
+            EXPLAIN.out.midpoints,
+            ch_gene_tss,
+            params.run_cosmic_context ? channel.value(file(params.cosmic_ncv, checkIfExists: true)) : channel.empty(),
+            channel.fromList(re2g.files),
+            params.run_ccre_overlay ? channel.value([ [ id: 'ccre_v4' ], file(refs.ccre_v4_bed, checkIfExists: true) ]) : channel.empty(),
+            channel.fromList(celltype.files),
+            params.cancer_gene_list ? file(params.cancer_gene_list, checkIfExists: true) : [],
+            file("${projectDir}/assets/awk", checkIfExists: true),
+            [ cosmic: params.run_cosmic_context, cosmic_release: params.cosmic_release, cosmic_md5: params.cosmic_ncv_md5 ?: '',
+              re2g: params.run_enhancer_gene_links, re2g_tissues: re2g.tissues.join(','), re2g_n_files: re2g.n_files,
+              ccre: params.run_ccre_overlay, ccre_celltype: celltype.files.size() > 0, gene_list_name: params.cancer_gene_list_name ?: '' ]
+        )
+    }
 
     //
     // Optional cohort-level QC: SigProfiler signature exposures per sample (nf-core sigprofiler).

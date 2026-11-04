@@ -1,0 +1,75 @@
+nextflow_process {
+
+    name "Test Process COSMICCONTEXT"
+    script "../main.nf"
+    process "COSMICCONTEXT"
+
+    tag "modules"
+    tag "modules_local"
+    tag "cosmiccontext"
+
+    config "./nextflow.config"
+
+    // tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh38.tsv.gz: SYNTHETIC COSMIC-format file
+    // (v104 column order, CRLF, invented COSV/COSS/COSU ids and sample names), 20 rows. Candidates:
+    // tests/data/context/test.candidates.tsv (EXPLAIN on tests/data/explain): TERT C228T in S1 and
+    // S2, C250T in S3, a deletion and an SNV in frag_F.
+    test("synthetic v999 file - exact matches, self-overlap by exact name, md5 checked") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                             file("${projectDir}/tests/data/context/test.candidates.tsv", checkIfExists: true),
+                             file("${projectDir}/tests/data/explain/consensus.tsv", checkIfExists: true) ]
+                input[1] = file("${projectDir}/tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh38.tsv.gz", checkIfExists: true)
+                input[2] = 'v999'
+                input[3] = '27c29be67b74514d1eb75cf696856fe8'
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def mut   = table(process.out.mutation_summary[0][1]).collectEntries { r -> [ r.pos, r ] }
+            def prov  = path(process.out.provenance[0][1]).json
+            assert process.success
+            assertAll(
+                { assert mut['1295113'].subMap([ 'cosmic_match', 'n_cosmic_samples', 'n_confirmed_somatic_samples', 'independence_status' ]) ==
+                    [ cosmic_match: 'yes', n_cosmic_samples: '3', n_confirmed_somatic_samples: '2', independence_status: 'not_assessed' ] },
+                { assert mut['1295135'].independence_status == 'possible_self_overlap' },   // COSMIC sample name S3 == cohort sample S3
+                { assert mut['1400100'].independence_status == 'not_assessed' },           // S1_T is not S1
+                { assert mut['1400600'].cosmic_match == 'no' },                             // COSMIC has T>A, the candidate T>C
+                { assert prov.md5_check == 'match' && prov.cosmic_release == 'v999' && prov.cosmic_line_endings == 'CRLF' },
+                { assert prov.cosmic_rows_scanned == 20 && prov.cosmic_matched_distinct_mutations == 3 },
+                { assert !path(process.out.mutation_summary[0][1]).text.contains('COSVSYN') },   // counts only
+                { assert path(process.out.exact_matches[0][1]).text.contains('COSVSYN01') },
+                { assert path(process.out.notice[0][1]).text.contains('COSMIC v999') },
+                { assert snapshot(process.out.mutation_summary, process.out.element_summary, process.out.exact_matches,
+                                  process.out.provenance, process.out.notice).match() }
+            )
+        }
+    }
+
+    test("wrong md5 stops the task") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                             file("${projectDir}/tests/data/context/test.candidates.tsv", checkIfExists: true), [] ]
+                input[1] = file("${projectDir}/tests/data/cosmic/Cosmic_NonCodingVariants_v999_GRCh38.tsv.gz", checkIfExists: true)
+                input[2] = 'v999'
+                input[3] = '00000000000000000000000000000000'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.failed },
+                { assert (process.stdout + process.stderr).any { line -> line.contains('expected 00000000000000000000000000000000') } }
+            )
+        }
+    }
+}

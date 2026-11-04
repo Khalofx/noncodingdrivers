@@ -1,0 +1,3 @@
+tissue	biosample	accession	dataset	md5	bytes	file_name
+liver	HepG2	ENCFF762XMN	ENCSR399UGX	5b9e13c3b8a7e3f3103da1738a0838b9	32632375	HepG2.ENCFF762XMN.bed.gz
+liver	liver	ENCFF253OXM	ENCSR092OEM	8f45a4b66952a8aafd7a2029936262ba	32855577	liver.ENCFF253OXM.bed.gz

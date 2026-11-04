@@ -1,0 +1,3 @@
+element_id	chrom	start	end	nearest_gene	nearest_gene_ensembl_id	gene_type	nearest_tss	gene_strand	distance_to_tss	abs_distance_to_tss	relative_position	nearest_gene_status
+TERT_promoter_fixture	chr5	1294989	1295601	ENSG00000300381	ENSG00000300381.1	lncRNA	1295139	+	156	156	overlapping_tss	assigned
+frag_F	chr5	1400000	1400700	ENSG00000300645	ENSG00000300645.1	lncRNA	1386420	-	-13930	13930	upstream	assigned
