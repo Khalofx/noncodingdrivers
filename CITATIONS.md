@@ -29,6 +29,8 @@
 - GNU Awk — https://www.gnu.org/software/gawk/
 - Ensembl VEP — McLaren W, et al. Genome Biol 2016. doi:10.1186/s13059-016-0974-4
 - motifbreakR — Coetzee SG, et al. Bioinformatics 2015. doi:10.1093/bioinformatics/btv470
+- AlphaGenome (AVI scores, `--run_alphagenome_avi`) — Avsec Ž, et al. Advancing regulatory variant effect prediction with AlphaGenome. Nature 2026;649:1206–1218. doi:10.1038/s41586-025-10014-0; Cheng J, et al. AlphaGenome Atlas: in silico mutagenesis of the entire human genome improves prioritization and interpretation of non-coding variants. medRxiv 2026 (preprint). doi:10.64898/2026.09.16.26363192
+- OpenCRAVAT (`--run_opencravat`) — Pagel KA, et al. Integrated informatics analysis of cancer-related variants. JCO Clin Cancer Inform 2020;(4):310–317. doi:10.1200/CCI.19.00132
 - universalmotif — https://bioconductor.org/packages/universalmotif/
 - JASPAR — Rauluseviciute I, et al. Nucleic Acids Res 2024. doi:10.1093/nar/gkad1059
 - PCAWG non-coding drivers — Rheinbay E, et al. Nature 2020. doi:10.1038/s41586-020-1965-x

@@ -94,6 +94,28 @@ PACA-CA under `--combination_method acat` has no element with `is_consensus == T
 `no element has is_consensus == True; candidate mutations, nearest genes and annotation layers are
 skipped, no candidate file is written` and publishes no candidate, nearest-gene or annotation file.
 
+## Variant annotation layers (Step 7A: AlphaGenome AVI, OpenCRAVAT)
+
+SYNTH-NC (`-profile test_full,karakoram`), 2 November 2026, in one launch folder with `-resume`.
+Run A is the `dev` commit b56908a with `--run_vep`; runs B to D are this branch. The AVI score file
+is synthetic (`tests/data/avi/make_avi_fixture.sh` over the 42 candidate SNVs, invented scores):
+the AlphaGenome download had not been staged.
+
+| Run                                                   | Check                                                                                                             | Result                                                                                                                                                                                                     |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B: `--run_vep`, layers off                            | task cache against run A                                                                                          | 404 of 405 tasks cached, `ENSEMBLVEP_VEP` among them (same hash `01/ddaf8d`); only MultiQC re-ran (its methods file is rewritten every run). 143/143 published files byte-identical to run A               |
+| D: all defaults                                       | published files against run A                                                                                     | byte-identical (every file of A except the two VEP files)                                                                                                                                                  |
+| D: all defaults                                       | published files against the Step 7 run (`runs/SYNTH-NC-test_full`, 28 Oct), `pipeline_info/` and `multiqc/` aside | 141/141 files present; 24 byte-identical, 116 differ only in `##` header lines (bcftools command lines with their dates), `consensus/intermediate/SYNTH-NC.matched.tsv` has the same rows in another order |
+| C: `--run_vep --run_alphagenome_avi --run_opencravat` | VEP table                                                                                                         | 1,342 rows as in run A; the 14 Step 7 columns identical, `AVI_PHRED` and `AVI_RAW` added and filled in all 1,342 rows                                                                                      |
+| C                                                     | `candidates/avi/SYNTH-NC.avi.tsv`                                                                                 | 42 of 42 candidate variants (all SNVs) `scored`; every value equal to the score file                                                                                                                       |
+| C                                                     | `candidates/avi/SYNTH-NC.avi.element_summary.tsv`                                                                 | 6 elements                                                                                                                                                                                                 |
+| C                                                     | `opencravat/SYNTH-NC.opencravat.tsv`                                                                              | 42 of 42 variants `annotated`, 71 columns, no hg19 column; SCREEN class for 10 (PLS 2, dELS 4, CTCF-only 4), a repeat for 10, a ClinVar record for 2                                                       |
+| C                                                     | `opencravat/SYNTH-NC.opencravat.network.tsv`, `.telemetry.tsv`                                                    | connection attempts only to 127.0.0.1:9 (3 connect, 3 lookup calls), 0 non-local targets; 1 metrics payload kept locally by OpenCRAVAT and deleted by the task                                             |
+| C                                                     | other published files against run D                                                                               | byte-identical                                                                                                                                                                                             |
+
+The Liver-HCC-public check with the real AVI file (at most 201 of its 213 candidate variants can be
+scored; 12 are indels) is pending the user's download (to-do S7A.15).
+
 ## Input tiers and hg19 liftover (Liver-HCC-public, 261 donors)
 
 The same cohort was run from three inputs: the canonical `mutations` table (the validated

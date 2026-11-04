@@ -1,7 +1,7 @@
 //
 // EXPLAIN: annotation layers on top of the consensus. None of them filters or re-ranks an
-// element or a mutation. Every analytic step is a published tool (bedtools, Ensembl VEP,
-// motifbreakR); the in-house code is gawk format adapters (assets/awk/*.awk).
+// element or a mutation. Every analytic step is a published tool (bedtools, Ensembl VEP with its
+// AVI plugin, motifbreakR, OpenCRAVAT); the in-house code is gawk format adapters (assets/awk/*.awk).
 //
 include { GAWK as SIGNIFICANT_BED              } from '../../../modules/nf-core/gawk/main'
 include { GAWK as MUTATION_BED                 } from '../../../modules/nf-core/gawk/main'
@@ -19,6 +19,11 @@ include { BEDTOOLS_COVERAGE as REGCTX_OVERLAP  } from '../../../modules/nf-core/
 include { BEDTOOLS_MAP as REGCTX_SIGNAL        } from '../../../modules/nf-core/bedtools/map/main'
 include { ENSEMBLVEP_VEP                       } from '../../../modules/nf-core/ensemblvep/vep/main'
 include { MOTIFBREAKR                          } from '../../../modules/local/motifbreakr'
+include { GAWK as AVI_TABLE                    } from '../../../modules/nf-core/gawk/main'
+include { GAWK as AVI_ELEMENT_SUMMARY          } from '../../../modules/nf-core/gawk/main'
+include { GAWK as OPENCRAVAT_INPUT             } from '../../../modules/nf-core/gawk/main'
+include { OPENCRAVAT                           } from '../../../modules/local/opencravat'
+include { GAWK as OPENCRAVAT_TABLE             } from '../../../modules/nf-core/gawk/main'
 
 workflow EXPLAIN {
 
@@ -31,12 +36,16 @@ workflow EXPLAIN {
     ch_vep_cache   // channel: [ val(meta5), path(cache) ]       offline VEP cache (value channel), or empty
     awk_dir        // path: directory with the gawk adapter programs (assets/awk)
     motifs         // path: JASPAR PFM file, or []
-    options        // map: [ regctx: bool, vep: bool, motifs: bool, vep_cache_version: int ]
+    options        // map: [ regctx: bool, vep: bool, motifs: bool, vep_cache_version: int, avi: bool, opencravat: bool ]
+    avi_files      // list: [ AVI score file (bgzip TSV), its .tbi ] for --run_alphagenome_avi, or []
 
     main:
     def ch_regctx      = channel.empty()
     def ch_vep         = channel.empty()
     def ch_motif_tf    = channel.empty()
+    def ch_avi         = channel.empty()
+    def ch_avi_summary = channel.empty()
+    def ch_opencravat  = channel.empty()
     def ch_mqc         = channel.empty()
 
     // Calls-only cohorts have a consensus but no mutation table: log the skip, publish nothing.
@@ -130,11 +139,28 @@ workflow EXPLAIN {
             options.vep_cache_version,
             ch_vep_cache,
             [ [], [] ],
-            [],
+            options.avi ? avi_files : [],
             [ [], [] ]
         )
         ch_vep = ENSEMBLVEP_VEP.out.tab
         ch_mqc = ch_mqc.mix(ENSEMBLVEP_VEP.out.report.map { _meta, _process, _tool, report -> report })
+
+        //
+        // 5b. AlphaGenome AVI scores (opt-in; annotation and hypothesis only): the VEP AVI plugin
+        //     adds AVI_PHRED and AVI_RAW to the tab file; the adapters write one row per distinct
+        //     candidate variant and one per element. AVI_TABLE fails when the VEP table has no
+        //     AVI_PHRED column, which turns a plugin that did not load (VEP exits 0) into an error.
+        //
+        if (options.avi) {
+            AVI_TABLE(
+                ch_candidates.join(ENSEMBLVEP_VEP.out.tab).map { meta, tsv, tab -> [ meta, [ tsv, tab ], 'tsv' ] },
+                awk_dir.resolve('avi_table.awk'),
+                false
+            )
+            AVI_ELEMENT_SUMMARY(AVI_TABLE.out.output.map { meta, tsv -> [ meta, tsv, 'tsv' ] }, awk_dir.resolve('avi_element_summary.awk'), false)
+            ch_avi         = AVI_TABLE.out.output
+            ch_avi_summary = AVI_ELEMENT_SUMMARY.out.output
+        }
     }
 
     //
@@ -145,11 +171,31 @@ workflow EXPLAIN {
         ch_motif_tf = MOTIFBREAKR.out.per_tf
     }
 
+    //
+    // 7. OpenCRAVAT on candidate mutations (opt-in; annotation only): native input of the
+    //    distinct sample x variant pairs, `oc run -l hg38` in the image (no liftover in either
+    //    direction, telemetry to a closed local port), text report joined back to the candidates
+    //    by chrom, pos, ref and alt of the input.
+    //
+    if (options.opencravat) {
+        OPENCRAVAT_INPUT(ch_candidates.map { meta, tsv -> [ meta, tsv, 'txt' ] }, awk_dir.resolve('opencravat_input.awk'), false)
+        OPENCRAVAT(OPENCRAVAT_INPUT.out.output)
+        OPENCRAVAT_TABLE(
+            ch_candidates.join(OPENCRAVAT.out.report).map { meta, tsv, report -> [ meta, [ tsv, report ], 'tsv' ] },
+            awk_dir.resolve('opencravat_table.awk'),
+            false
+        )
+        ch_opencravat = OPENCRAVAT_TABLE.out.output
+    }
+
     emit:
     candidates   = ch_candidates              // channel: [ val(meta), path(candidates.tsv) ]
     nearest      = NEAREST_TABLE.out.output   // channel: [ val(meta), path(nearest_gene.tsv) ]
     regctx       = ch_regctx                  // channel: [ val(meta), path(regulatory_context.tsv) ]
     vep          = ch_vep                     // channel: [ val(meta), path(vep.tab.gz) ]
     motif_per_tf = ch_motif_tf                // channel: [ val(meta), path(motifbreakr.per_tf.tsv) ]
+    avi          = ch_avi                     // channel: [ val(meta), path(avi.tsv) ]
+    avi_summary  = ch_avi_summary             // channel: [ val(meta), path(avi.element_summary.tsv) ]
+    opencravat   = ch_opencravat              // channel: [ val(meta), path(opencravat.tsv) ]
     mqc          = ch_mqc                     // channel: path(report) for MultiQC
 }

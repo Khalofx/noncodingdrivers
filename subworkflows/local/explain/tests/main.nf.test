@@ -32,6 +32,7 @@ nextflow_workflow {
                 input[6] = file("${projectDir}/assets/awk", checkIfExists: true)
                 input[7] = []
                 input[8] = [ regctx: true, vep: false, motifs: false, vep_cache_version: 116 ]
+                input[9] = []
                 """
             }
         }
@@ -81,6 +82,7 @@ nextflow_workflow {
                 input[6] = file("${projectDir}/assets/awk", checkIfExists: true)
                 input[7] = []
                 input[8] = [ regctx: false, vep: false, motifs: false, vep_cache_version: 116 ]
+                input[9] = []
                 """
             }
         }

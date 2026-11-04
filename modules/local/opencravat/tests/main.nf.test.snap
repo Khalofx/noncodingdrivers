@@ -1,0 +1,229 @@
+{
+    "five synthetic variants - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.report.tsv:md5,bcdd83eb9eb84742e992d3f09254de85"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.sqlite:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.log:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "3": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.network.tsv:md5,b83d2a4c8d30dfbd4d5cc7ab66f9c612"
+                    ]
+                ],
+                "4": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.telemetry.tsv:md5,ee2cc0f3f9f28b14d8e22e42e7b4182b"
+                    ]
+                ],
+                "5": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat",
+                        "3.2.4"
+                    ]
+                ],
+                "6": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-hg38",
+                        "1.47.2"
+                    ]
+                ],
+                "7": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-ccre_screen",
+                        "1.0.2"
+                    ]
+                ],
+                "8": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-repeat",
+                        "2020.10.16"
+                    ]
+                ],
+                "9": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-clinvar",
+                        "2026.10.01"
+                    ]
+                ],
+                "log": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.log:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "network": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.network.tsv:md5,b83d2a4c8d30dfbd4d5cc7ab66f9c612"
+                    ]
+                ],
+                "report": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.report.tsv:md5,bcdd83eb9eb84742e992d3f09254de85"
+                    ]
+                ],
+                "sqlite": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.sqlite:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "telemetry": [
+                    [
+                        {
+                            "id": "test",
+                            "cohort": "test",
+                            "assembly": "GRCh38"
+                        },
+                        "test.opencravat.telemetry.tsv:md5,ee2cc0f3f9f28b14d8e22e42e7b4182b"
+                    ]
+                ],
+                "versions_ccre_screen": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-ccre_screen",
+                        "1.0.2"
+                    ]
+                ],
+                "versions_clinvar": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-clinvar",
+                        "2026.10.01"
+                    ]
+                ],
+                "versions_hg38": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-hg38",
+                        "1.47.2"
+                    ]
+                ],
+                "versions_opencravat": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat",
+                        "3.2.4"
+                    ]
+                ],
+                "versions_repeat": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-repeat",
+                        "2020.10.16"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-02T16:42:49.443491751",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "five synthetic variants": {
+        "content": [
+            {
+                "versions_ccre_screen": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-ccre_screen",
+                        "1.0.2"
+                    ]
+                ],
+                "versions_clinvar": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-clinvar",
+                        "2026.10.01"
+                    ]
+                ],
+                "versions_hg38": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-hg38",
+                        "1.47.2"
+                    ]
+                ],
+                "versions_opencravat": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat",
+                        "3.2.4"
+                    ]
+                ],
+                "versions_repeat": [
+                    [
+                        "OPENCRAVAT",
+                        "opencravat-repeat",
+                        "2020.10.16"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-02T16:43:05.119141873",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

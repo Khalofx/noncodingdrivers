@@ -1,0 +1,38 @@
+{
+    "OPENCRAVAT_TABLE - report joined back to the candidates, hg19 columns dropped": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "prefix": "test.opencravat"
+                    },
+                    "test.opencravat.tsv:md5,e232d731d984943b530f1577a8ffdfc6"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T16:47:29.171778908",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "OPENCRAVAT_INPUT - one line per distinct sample x variant": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "prefix": "test.opencravat_input"
+                    },
+                    "test.opencravat_input.txt:md5,80a7732772c290b2be9ec646963c5dca"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T16:47:24.821958755",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

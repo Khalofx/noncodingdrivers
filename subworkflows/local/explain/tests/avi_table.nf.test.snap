@@ -1,0 +1,38 @@
+{
+    "AVI_ELEMENT_SUMMARY - per-element counts and maximum": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "prefix": "test.avi.element_summary"
+                    },
+                    "test.avi.element_summary.tsv:md5,98d4acde78490d8c1a1673314a2b50b5"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T16:47:06.634479478",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
+    "AVI_TABLE - VEP table with the AVI plugin columns": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "prefix": "test.avi"
+                    },
+                    "test.avi.tsv:md5,99baa09d3bf7dd883a32a38cd9777673"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-02T16:46:57.367467101",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

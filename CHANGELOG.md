@@ -65,9 +65,25 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   `bedtools/map`), Ensembl VEP 116.3 on candidate mutations (`--run_vep`; nf-core
   `ensemblvep/vep`, offline cache) and motifbreakR 2.24.0 on candidate SNVs (`--run_motifbreakr`;
   JASPAR 2026 CORE vertebrates bundled).
+- AlphaGenome Variant Impact scores of the candidate SNVs (`--run_alphagenome_avi`, off by
+  default, needs `--run_vep`): the Ensembl VEP AVI plugin of the ensembl-vep 116.3 image adds
+  `AVI_PHRED` and `AVI_RAW` to the VEP table; gawk adapters write `candidates/avi/<cohort>.avi.tsv`
+  (one row per candidate variant with `avi_status`) and `<cohort>.avi.element_summary.tsv`. The
+  user-downloaded score file (`--alphagenome_avi`, datasheet key `alphagenome_avi`, checksums
+  pending the download) is checked with its `.tbi` before any task (`AVI_NEEDS_VEP`,
+  `AVI_FILE_MISSING`, `AVI_INDEX_MISSING`), and `AVI_TABLE` fails when the plugin did not load.
+  Annotation only; with the layer off the VEP command is unchanged.
+- OpenCRAVAT 3.2.4 on the candidate mutations (`--run_opencravat`, off by default; local
+  `OPENCRAVAT` with gawk adapters): `oc run -l hg38` with the annotators `ccre_screen`, `repeat`
+  and `clinvar`, joined back to the candidates by chrom, pos, ref and alt
+  (`opencravat/<cohort>.opencravat.tsv`). Telemetry is neutralised: every remote address of the
+  OpenCRAVAT configuration is a closed local port, every connection attempt is audited
+  (`<cohort>.opencravat.network.tsv`) and a non-local one fails the task, and the locally saved
+  metrics payload is deleted (`<cohort>.opencravat.telemetry.tsv`). No liftover: the image holds
+  no `hg19` annotator and no UCSC chain file, so `encode_tfbs` is not included.
 - Optional cohort-level signature QC (`--run_sigprofiler`; nf-core `sigprofiler`).
 - MultiQC 1.35 report with a per-cohort run summary (`RUNSUMMARYMQC`).
-- Pipeline-owned images `ghcr.io/khalofx/noncodingdrivers-{utils,activedriverwgs,mutenricher,combinepvalues,motifbreakr}`,
+- Pipeline-owned images `ghcr.io/khalofx/noncodingdrivers-{utils,activedriverwgs,mutenricher,combinepvalues,motifbreakr,opencravat}`,
   built from `containers/` by `.github/workflows/build-containers.yml` and pinned by digest; the
   OncodriveFML image is built locally from `containers/oncodrivefml/`.
 - Profiles `test` (synthetic TERT-window cohort), `test_full` (SYNTH-NC, synthetic genome-wide
@@ -97,5 +113,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 | Ensembl VEP           | 116.3   |
 | motifbreakR           | 2.24.0  |
 | universalmotif        | 1.28.0  |
+| VEP AVI plugin        | 116     |
+| OpenCRAVAT            | 3.2.4   |
 | SigProfilerExtractor  | 1.2.2   |
 | MultiQC               | 1.35    |

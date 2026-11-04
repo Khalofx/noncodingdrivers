@@ -1,0 +1,9 @@
+variant_id	chrom	pos	ref	alt	vtype	element_ids	n_samples	avi_phred	avi_raw	avi_status
+chr1:1000000:T:A	chr1	1000000	T	A	SNP	elem_B	1	1.0	0.010	scored
+chr5:1295113:G:A	chr5	1295113	G	A	SNP	promoter_ENSR00000746745	2	11.1	1.111	scored
+chr5:1295113:G:T	chr5	1295113	G	T	SNP	promoter_ENSR00000746745	1	33.3	3.333	scored
+chr5:1295135:G:A	chr5	1295135	G	A	SNP	promoter_ENSR00000746745,elem_C	1	4.4	0.444	scored
+chr5:1295140:C:-	chr5	1295140	C	-	DEL	promoter_ENSR00000746745	1	NA	NA	not_scored_non_snv
+chr5:1295150:-:T	chr5	1295150	-	T	INS	promoter_ENSR00000746745	1	NA	NA	not_scored_non_snv
+chr5:1295160:C:T	chr5	1295160	C	T	SNP	promoter_ENSR00000746745	1	NA	NA	not_in_avi_file
+chr5:1295200:GG:AA	chr5	1295200	GG	AA	DNP	promoter_ENSR00000746745	1	NA	NA	not_scored_non_snv

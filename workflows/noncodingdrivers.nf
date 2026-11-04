@@ -300,6 +300,10 @@ workflow NONCODINGDRIVERS {
     def motifs = params.run_motifbreakr
         ? file(refs.jaspar_motifs, checkIfExists: true)
         : []
+    // AlphaGenome AVI score file and its .tbi for the VEP AVI plugin (validated before any task)
+    def avi_files = params.run_alphagenome_avi
+        ? [ file(refs.alphagenome_avi, checkIfExists: true), file("${refs.alphagenome_avi}.tbi", checkIfExists: true) ]
+        : []
 
     //
     // SUBWORKFLOW: annotation layers (none of them filters or re-ranks a candidate)
@@ -314,7 +318,8 @@ workflow NONCODINGDRIVERS {
         file("${projectDir}/assets/awk", checkIfExists: true),
         motifs,
         [ regctx: params.run_regulatory_context, vep: params.run_vep, motifs: params.run_motifbreakr,
-          vep_cache_version: params.vep_cache_version ]
+          vep_cache_version: params.vep_cache_version, avi: params.run_alphagenome_avi, opencravat: params.run_opencravat ],
+        avi_files
     )
     ch_multiqc_files = ch_multiqc_files.mix(EXPLAIN.out.mqc)
 
