@@ -205,12 +205,17 @@ None of these options filters a mutation or changes a p- or q-value; they add fi
   needs none of this sets `--run_variant_flags false`.
 - **Post-filter flags and the evidence table** (`--run_driver_evidence`, default `true`).
   `--postfilter_mode pcawg` adds `q_postfilter` beside the unchanged q-values; `--evidence_scope all`
-  writes every element instead of the nominal ones. Evidence tiers are assigned downstream from
+  writes every element instead of the nominal ones. Each annotation or context layer that is on
+  (AlphaGenome AVI, OpenCRAVAT, COSMIC, cancer gene list, ENCODE-rE2G, SCREEN V4) adds a few
+  element-level summary items per significant element (`avi_*`, `opencravat_*`, `cosmic_*` counts
+  only, `cancer_gene_*`, `re2g_*`, `ccre_v4_*`; [output](output.md#post-filter-flags-and-evidence-table));
+  with every layer off the table is unchanged. Evidence tiers are assigned downstream from
   `driver_evidence.tsv`.
 - **Null calibration** (`--run_null_calibration`, default `false`) re-runs the callers on
   `--null_replicates` neutral copies of each cohort (seed `--seed` + replicate), each costing about
   as much as the observed run, and reports the inflation factor of every caller and combination
-  against `--null_lambda_band`.
+  against `--null_lambda_band`. OncodriveCLUSTL, which tests only clustered elements, gets a
+  false-positive-rate check per null replicate instead (`null_fpr.tsv`).
 
 ## Annotation layers
 

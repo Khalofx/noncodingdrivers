@@ -36,11 +36,13 @@ added files.
 4. Variant flags (on by default): ENCODE Blacklist v2, GIAB v3.6 segmental duplications and low
    mappability, Umap k100 uniqueness and gnomAD v4.1 genomes, per mutation and per element, and
    each element's callable fraction.
-5. PCAWG-style post-filter flags and a long-form evidence table per cohort.
-6. Optional null calibration: the callers re-run on neutral copies of the cohort.
+5. PCAWG-style post-filter flags and a long-form evidence table per cohort, with element-level
+   summary items from every annotation and context layer that is on.
+6. Optional null calibration: the callers re-run on neutral copies of the cohort (inflation factor
+   per caller; a false-positive-rate check for OncodriveCLUSTL).
 7. Annotation of the significant elements: their mutations per patient and the nearest gene, plus
-   the optional ENCODE regulatory context, Ensembl VEP and motifbreakR. SigProfiler signature QC
-   is optional.
+   the optional ENCODE regulatory context, Ensembl VEP, AlphaGenome Variant Impact scores (VEP AVI
+   plugin), motifbreakR and OpenCRAVAT. SigProfiler signature QC is optional.
 8. Optional context layers, each with its own tables: exact matches in the user's own COSMIC
    Non-Coding Variants file, cancer gene-list labels (e.g. the Cancer Gene Census), ENCODE-rE2G
    enhancer-gene links for the chosen tissues and SCREEN Registry V4 cCRE classes.
@@ -74,7 +76,9 @@ nextflow run khalofx/noncodingdrivers -r 1.0.0 \
 
 OncodriveFML runs only with `--run_oncodrivefml true --accept_oncodrivefml_licence true` and a
 CADD v1.7 score file (`--oncodrivefml_score`). Its licence and CADD's restrict commercial use, and
-its image must be built locally ([usage](docs/usage.md#callers-and-licences)).
+its image must be built locally ([usage](docs/usage.md#callers-and-licences)). GRCh37/hg19 input
+(`--allow_hg19_liftover`) needs the UCSC hg19ToHg38 chain, which UCSC licenses for non-commercial use
+only; COSMIC files are licensed separately ([usage](docs/usage.md#software-licences)).
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/running/run-pipelines#using-parameter-files).
