@@ -115,12 +115,10 @@ positive under the null. A method is `excluded_for_inflation` when a null replic
 above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
 `conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
 that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
-`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is listed like the other
-callers, but it tests only elements with an observed cluster: its `lambda` rests on the few such
-elements in the ActiveDriverWGS element set (none or one per run on SYNTH-NC), and its band status
-(`excluded_for_inflation` on SYNTH-NC) is not a calibration verdict. Read its null runs' q-values
-instead; `docs/validation.md` records the statistic used for OncodriveCLUSTL (the null
-false-positive rate over the elements it analysed).
+`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) tests only elements with an
+observed cluster, a data-dependent subset, so the median-p `lambda` is not defined for it: it has no
+row in `null_calibration.tsv` and no QQ points. It gets a false-positive-rate check per null
+replicate instead (`null_fpr.tsv`, below).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -128,6 +126,7 @@ false-positive rate over the elements it analysed).
 - `null_calibration/`
   - `<cohort>.null_calibration.tsv`: per run (`observed`, `null1` ... `null<n>`) and method (each combined caller, `ebm`, `acat`): the element set (ActiveDriverWGS expected count >= 1), median p, inflation factor `lambda` (median chi-squared quantile / 0.4549) and the number of elements with q < `--fdr_threshold`; the `null_summary` rows give the median, minimum and maximum null `lambda` and the band status (`within_band`, `excluded_for_inflation` above `--null_lambda_band`, `conservative` below it).
   - `<cohort>.null_qq.tsv`: expected and observed -log10 p per run and method (all points with observed -log10 p >= 2 and up to 500 evenly spaced ranks).
+  - `<cohort>.null_fpr.tsv` (with `--run_oncodriveclustl`): OncodriveCLUSTL's false-positive-rate check per run (`observed`, `null1` ... `null<n>`): `n_analysed` (elements in its native table, at least `--oncodriveclustl_element_mutations` SNVs), `n_tested` (elements with a p-value), `min_p`, `n_p_le_0.05`, `n_p_le_0.01`, `n_q_lt_fdr` and `fpr_p_le_0.05` (= `n_p_le_0.05` / `n_tested`). The `null_summary` row sums the counts over the replicates (pooled `fpr_p_le_0.05`), keeps the smallest p and the largest per-replicate `n_q_lt_fdr`, and is `pass` when no null replicate has more than one element at q < `--fdr_threshold`, otherwise `fail`.
   - `simulation/<cohort>.null<r>.null_summary.tsv`: rows carried, non-SNV rows not carried, SNVs dropped (REF mismatch, undefined context) and duplicates collapsed per replicate.
 
 </details>

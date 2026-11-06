@@ -49,17 +49,35 @@ workflow NULL_CALIBRATION {
             .filter { _meta, table -> table.name.endsWith('.activedriverwgs.tsv') }
             .map { meta, table -> [ meta.id, table ] }
         : ch_consensus.map { meta, _consensus -> [ meta.id, [] ] }
+    // OncodriveCLUSTL native tables (analysed elements) for its false-positive-rate check
+    def with_clustl = 'oncodriveclustl' in null_callers
+    def ch_null_clustl = with_clustl
+        ? DRIVERS_ON_NULL.out.raw
+            .filter { _meta, table -> table.name.endsWith('.oncodriveclustl.tsv') }
+            .map { meta, table -> [ meta.null_of, table ] }
+            .groupTuple(size: replicates)
+        : ch_null_cons.map { id, _consensus -> [ id, [] ] }
+    def ch_obs_clustl = with_clustl
+        ? ch_raw
+            .filter { _meta, table -> table.name.endsWith('.oncodriveclustl.tsv') }
+            .map { meta, table -> [ meta.id, table ] }
+        : ch_consensus.map { meta, _consensus -> [ meta.id, [] ] }
     CALIBRATECALLERS(
         ch_consensus
             .map { meta, consensus -> [ meta.id, meta, consensus ] }
             .join(ch_obs_adwgs)
             .join(ch_null_cons)
             .join(ch_null_adwgs)
-            .map { _id, meta, observed, observed_adwgs, nulls, null_adwgs -> [ meta, observed, observed_adwgs, nulls, null_adwgs ] }
+            .join(ch_obs_clustl)
+            .join(ch_null_clustl)
+            .map { _id, meta, observed, observed_adwgs, nulls, null_adwgs, observed_clustl, null_clustl ->
+                [ meta, observed, observed_adwgs, nulls, null_adwgs, observed_clustl, null_clustl ]
+            }
     )
 
     emit:
     calibration = CALIBRATECALLERS.out.calibration // channel: [ val(meta), path(null_calibration.tsv) ]
     qq          = CALIBRATECALLERS.out.qq          // channel: [ val(meta), path(null_qq.tsv) ]
+    fpr         = CALIBRATECALLERS.out.fpr         // channel: [ val(meta), path(null_fpr.tsv) ] OncodriveCLUSTL only
     summary     = SIMULATENULL.out.summary         // channel: [ val(meta), val(replicate), path(null_summary.tsv) ]
 }

@@ -40,6 +40,16 @@ input:
         description: ActiveDriverWGS tables of the null replicates, or []
         pattern: "*.null*.activedriverwgs.tsv"
         ontologies: []
+    - observed_clustl:
+        type: file
+        description: Native OncodriveCLUSTL table of the observed run (analysed elements), or []
+        pattern: "*.oncodriveclustl.tsv"
+        ontologies: []
+    - null_clustl:
+        type: file
+        description: Native OncodriveCLUSTL tables of the null replicates, <cohort>.null<r>.oncodriveclustl.tsv, or []
+        pattern: "*.null*.oncodriveclustl.tsv"
+        ontologies: []
 
 output:
   calibration:
@@ -59,6 +69,15 @@ output:
           type: file
           description: Expected and observed -log10 p per run and method (thinned)
           pattern: "*.null_qq.tsv"
+          ontologies: []
+  fpr:
+    - - meta:
+          type: map
+          description: Cohort meta map
+      - "*.null_fpr.tsv":
+          type: file
+          description: OncodriveCLUSTL false-positive-rate check per run (analysed and tested elements, counts at p <= 0.05, p <= 0.01 and q < FDR) and the null summary; only when OncodriveCLUSTL runs
+          pattern: "*.null_fpr.tsv"
           ontologies: []
   versions_python:
     - - ${task.process}:
