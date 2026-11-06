@@ -8,6 +8,11 @@ The pipeline analyses GRCh38. Its reference set is described by one datasheet,
 datasheet records every file with its checksum and source; the same checksums are kept in
 `tests/regression/PROVENANCE.md`, and `tests/test_references_datasheet.py` checks that the two agree.
 
+`datasheet_version` records changes of the datasheet: `1.0.0` is the Step 5-6 reference set;
+`1.1.0` adds the Step 7A keys (OncodriveFML/OncodriveCLUSTL bgdata genome manifest, AlphaGenome AVI,
+ENCODE-rE2G and SCREEN V4 keys, and the licence keys including `liftover_chain_licence`).
+`tests/test_references_datasheet.py` checks that the version in the datasheet is the last one listed here.
+
 - Paths that start with `${reference_base}` are completed with `--reference_base <dir>`. Without
   it those entries stay unset, and the matching parameters must be given explicitly.
 - Paths that start with `assets/` ship with the pipeline (the JASPAR motifs and the contig
@@ -118,6 +123,14 @@ UCSC `hg19ToHg38.over.chain.gz` (MD5 `35887f73fe5e2231656504d1f6430900`) from
 unplaced contigs that the 25-contig FASTA lacks; Picard LiftoverVcf runs with
 `--WARN_ON_MISSING_CONTIG true`, so such records are rejected (`NoTarget`) and published with the
 other rejects instead of stopping the run.
+
+Licence (datasheet key `liftover_chain_licence`): UCSC chain files are property of the Regents of the
+University of California and free for non-commercial use by independent researchers and nonprofit
+organisations; any other use needs a commercial licence from UCSC, and redistribution must include
+UCSC's liftOver `README.txt` with these restrictions (EULA <https://genome.ucsc.edu/license/EULA.pdf>).
+The chain is staged by the user and never bundled; it is read only for GRCh37/hg19 rows with
+`--allow_hg19_liftover true`. The chain fixture of the test-datasets repository is real UCSC-derived
+data under the same terms, not a synthetic file (its README is added in that repository).
 
 ### OncodriveFML genome
 

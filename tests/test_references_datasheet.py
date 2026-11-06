@@ -151,3 +151,13 @@ def test_encode_re2g_manifest():
                      "ENCFF284LMY", "ENCFF955UNH", "ENCFF043RAT", "ENCFF429OPN", "ENCFF603ILE"}
     assert all(r["biosample_classification"] == "tissue" for r in selected if r["tissue"] != "liver")
     assert len(selected) == 407
+
+
+def test_datasheet_version_and_chain_licence():
+    # the datasheet version is the last one recorded in docs/references.md; the UCSC chain licence is stated
+    e = yaml.safe_load(open(SHEET))[0]
+    listed = re.findall(r"`(\d+\.\d+\.\d+)` (?:is|adds)", open(os.path.join(ROOT, "docs", "references.md")).read())
+    assert listed and e["datasheet_version"] == listed[-1]
+    assert "non-commercial" in e["liftover_chain_licence"] and "README" in e["liftover_chain_licence"]
+    assert "liftover chain" in e["licence_summary"]
+

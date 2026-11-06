@@ -63,7 +63,11 @@ GRCh37/hg19 rows stop the run with `ASSEMBLY_NOT_ENABLED` unless `--allow_hg19_l
 set; they then need the hg19 FASTA (`HG19_FASTA_MISSING` otherwise) and the chain (see
 [references](references.md)). Rejected liftover records are published under
 `harmonisation/liftover_rejects/`. Lifted rows are labelled as such in the evidence table
-(`native_or_lifted`).
+(`native_or_lifted`). The UCSC chain (`hg19ToHg38.over.chain.gz`, `--liftover_chain`) is staged by
+you and is not open data: UCSC makes chain files free for non-commercial use by independent
+researchers and nonprofit organisations only; commercial use needs a UCSC licence, and a copy you
+redistribute must carry UCSC's liftOver README (see [references](references.md#liftover-chain)).
+The chain fixture of the test-datasets repository is a real UCSC-derived file under the same terms.
 
 ```csv title="samplesheet.csv"
 sample,entry,cohort,cancer_type,assembly,mutations,vcf,index,maf,vcf_tumour_id
@@ -157,6 +161,7 @@ covariance set (elements tested by every combined caller) and therefore every co
 | OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)       |
 | OncodriveCLUSTL                                       | AGPL-3.0-or-later                                             |
 | CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence   |
+| UCSC hg19ToHg38 liftover chain (user-staged)          | UCSC Chain Files: non-commercial use by independent researchers and nonprofits; other use needs a UCSC licence; redistribution with UCSC's README |
 | MutEnricher                                           | MIT                                                           |
 | EmpiricalBrownsMethod                                 | MIT                                                           |
 | ACAT                                                  | GPL-3.0-only                                                  |

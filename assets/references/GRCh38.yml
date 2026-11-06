@@ -9,7 +9,7 @@
 # Asset recipes for every derived file: docs/references.md.
 - genome: GRCh38
   assembly: GRCh38
-  datasheet_version: "1.0.0"
+  datasheet_version: "1.1.0"
   species: homo_sapiens
   chr_style: ucsc
   native: true
@@ -50,6 +50,7 @@
   regulatory_peaks_note: "49 ENCODE peak BEDs, 12 tissues, <tissue>/<layer>.<accession>.bed.gz; per-file checksums in encode/PROVENANCE.tsv"
   liftover_chain_from_hg19: ${reference_base}/liftover/hg19ToHg38.over.chain.gz
   liftover_chain_md5: 35887f73fe5e2231656504d1f6430900
+  liftover_chain_licence: "UCSC Chain Files licence: free for non-commercial use by independent researchers and nonprofit organisations; any other use needs a UCSC commercial licence; redistribution must include the UCSC liftOver README; user-staged, never bundled (EULA https://genome.ucsc.edu/license/EULA.pdf)"
   liftover_source_assembly: hg19
   liftover_source_fasta: ${reference_base}/hg19/hg19.fa
   liftover_source_fasta_md5: 530d89d3ef07fdb2a9b3c701fb4ca486
@@ -92,4 +93,4 @@
   cosmic_licence: "COSMIC: registration (academic) or a QIAGEN licence (commercial); user-supplied at run time (--cosmic_ncv), never bundled or pinned here; current release only"
   cadd_snv_version: "v1.7"
   cadd_snv_licence: "Restricted: free for non-commercial use; user-supplied via --oncodrivefml_score, never bundled"
-  licence_summary: "open, except CADD (user-supplied, non-commercial) and COSMIC (user-supplied, licensed)"
+  licence_summary: "open, except CADD (user-supplied, non-commercial), the UCSC hg19ToHg38 liftover chain (user-staged, non-commercial; GRCh37/hg19 rows only) and COSMIC (user-supplied, licensed)"
