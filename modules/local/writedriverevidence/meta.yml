@@ -46,6 +46,15 @@ input:
         description: Optional native OncodriveCLUSTL table of the cohort (cluster counts per element); `[]` when the caller is not run
         pattern: "*.oncodriveclustl.tsv"
         ontologies: []
+    - tables:
+        type: file
+        description: |
+          Optional tables of the layers that are on, recognised by name: *.avi.element_summary.tsv,
+          *.opencravat.tsv, *.cosmic.element_summary.tsv, *.cancer_gene_context.tsv,
+          *.enhancer_gene_summary.tsv, *.ccre_v4_summary.tsv and the OncodriveCLUSTL *.null_fpr.tsv;
+          `[]` with every layer off
+        pattern: "*.tsv"
+        ontologies: []
   - sources:
       type: file
       description: Evidence item registry (assets/evidence_sources.tsv)

@@ -1,0 +1,5 @@
+cohort	run	replicate	method	element_set	n_analysed	n_tested	min_p	n_p_le_0.05	n_p_le_0.01	n_q_lt_fdr	fdr	fpr_p_le_0.05	status
+test	observed	NA	oncodriveclustl	oncodriveclustl_analysed	120	6	0.0004	2	1	1	0.1	0.333333	NA
+test	null1	1	oncodriveclustl	oncodriveclustl_analysed	118	30	0.014	3	0	0	0.1	0.1	NA
+test	null2	2	oncodriveclustl	oncodriveclustl_analysed	121	34	0.057	0	0	0	0.1	0	NA
+test	null_summary	2	oncodriveclustl	oncodriveclustl_analysed	239	64	0.014	3	0	0	0.1	0.046875	pass

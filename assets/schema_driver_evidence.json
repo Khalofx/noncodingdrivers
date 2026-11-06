@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/khalofx/noncodingdrivers/master/assets/schema_driver_evidence.json",
     "title": "khalofx/noncodingdrivers driver_evidence.tsv",
-    "description": "Long-form evidence table (WRITEDRIVEREVIDENCE): one row per cohort x element x evidence item. Every field is text; numbers are written with up to six significant digits, NA when missing. Cohort-level rows (null calibration, caller roles) have element_id '.'. No field is a tier.",
+    "description": "Long-form evidence table (WRITEDRIVEREVIDENCE): one row per cohort x element x evidence item. Every field is text; numbers are written with up to six significant digits, NA when missing. Cohort-level rows (null calibration, caller roles) have element_id '.'. Annotation and context layers add element-level summary items (avi_, opencravat_, cosmic_, cancer_gene_, re2g_, ccre_v4_) for the significant elements when the layer is on; label items (re2g_top_distal_target, ccre_v4_dominant_class) carry a gene or class name as value. No field is a tier.",
     "type": "array",
     "items": {
         "type": "object",
@@ -19,17 +19,26 @@
             },
             "evidence_item": {
                 "type": "string",
-                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|p_oncodriveclustl|q_oncodriveclustl|oncodriveclustl_n_clusters|oncodriveclustl_clustered_mutations|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|null_lambda_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
+                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|p_oncodriveclustl|q_oncodriveclustl|oncodriveclustl_n_clusters|oncodriveclustl_clustered_mutations|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|avi_max_phred|avi_n_scored|avi_n_unscored|opencravat_n_ccre_screen|opencravat_n_repeat|opencravat_n_clinvar|cosmic_n_matched_mutations|cosmic_n_samples|cosmic_n_sample_name_overlaps|cancer_gene_nearest_in_list|cancer_gene_nearest_pc_in_list|cancer_gene_re2g_targets_in_list|re2g_n_distal_targets|re2g_top_distal_target|ccre_v4_dominant_class|ccre_v4_covered_fraction|null_lambda_[a-z0-9_]+|null_fpr_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
                 "description": "Evidence item (assets/evidence_sources.tsv)"
             },
             "value": {
                 "type": "string",
-                "pattern": "^(NA|-?[0-9]+(\\.[0-9]+)?([eE][-+]?[0-9]+)?)$",
-                "description": "Numeric value, or NA"
+                "description": "Numeric value, or NA; a gene or class name for the label items (unit label)"
             },
             "unit": {
                 "type": "string",
-                "enum": ["count", "fraction", "lambda", "p", "q", "rank", "status"]
+                "enum": [
+                    "count",
+                    "fraction",
+                    "lambda",
+                    "p",
+                    "q",
+                    "rank",
+                    "status",
+                    "score",
+                    "label"
+                ]
             },
             "status": {
                 "type": "string",
@@ -48,7 +57,14 @@
                     "conservative",
                     "not_assessable",
                     "combined",
-                    "reported_alongside"
+                    "reported_alongside",
+                    "in_list",
+                    "not_in_list",
+                    "top_is_nearest",
+                    "nearest_in_targets",
+                    "nearest_not_in_targets",
+                    "no_link",
+                    "no_nearest_gene"
                 ]
             },
             "threshold": {
@@ -66,7 +82,11 @@
             },
             "native_or_lifted": {
                 "type": "string",
-                "enum": ["native", "lifted", "mixed"]
+                "enum": [
+                    "native",
+                    "lifted",
+                    "mixed"
+                ]
             }
         },
         "required": [
@@ -81,6 +101,40 @@
             "source_version",
             "native_or_lifted"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+            {
+                "if": {
+                    "properties": {
+                        "evidence_item": {
+                            "enum": [
+                                "re2g_top_distal_target",
+                                "ccre_v4_dominant_class"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "evidence_item"
+                    ]
+                },
+                "then": {
+                    "properties": {
+                        "value": {
+                            "pattern": "^(NA|[A-Za-z0-9._@/+-]+)$"
+                        },
+                        "unit": {
+                            "const": "label"
+                        }
+                    }
+                },
+                "else": {
+                    "properties": {
+                        "value": {
+                            "pattern": "^(NA|-?[0-9]+(\\.[0-9]+)?([eE][-+]?[0-9]+)?)$"
+                        }
+                    }
+                }
+            }
+        ]
     }
 }

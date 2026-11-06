@@ -19,7 +19,7 @@ nextflow_process {
                 """
                 def d = "${projectDir}/tests/data/driver_evidence"
                 input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.consensus.tsv", checkIfExists: true),
-                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native', [] ]
+                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native', [], [] ]
                 input[1] = file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true)
                 input[2] = '1.0.0dev'
                 """
@@ -37,6 +37,44 @@ nextflow_process {
                 { assert rows.find { r -> r.element_id == 'enhancer_B' && r.evidence_item == 'frac_in_segdup' }.status == 'flagged' },
                 { assert rows.find { r -> r.element_id == 'promoter_A' && r.evidence_item == 'consensus_q' }.status == 'significant' },
                 { assert rows.every { r -> r.native_or_lifted == 'native' } },
+                { assert snapshot(process.out.evidence).match() }
+            )
+        }
+    }
+
+    // Every layer on (synthetic layer tables, tests/data/driver_evidence): summary items per
+    // significant element and layer, and the OncodriveCLUSTL null false-positive rate (S7A.33, S7A.41)
+    test("consensus, element flags and every layer table - nominal scope") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/driver_evidence"
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("\${d}/test.consensus.tsv", checkIfExists: true),
+                             file("\${d}/test.element_flags.tsv", checkIfExists: true), [], [], 'native', [],
+                             [ 'avi.element_summary', 'opencravat', 'cosmic.element_summary', 'cancer_gene_context', 'enhancer_gene_summary',
+                               'ccre_v4_summary', 'null_fpr' ].collect { t -> file("\${d}/test.\${t}.tsv", checkIfExists: true) } ]
+                input[1] = file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true)
+                input[2] = '1.0.0dev'
+                """
+            }
+        }
+
+        then {
+            def lines = path(process.out.evidence[0][1]).readLines()
+            def cols = lines[0].tokenize('\t')
+            def rows = lines.drop(1).collect { r -> [ cols, r.split('\t', -1).toList() ].transpose().collectEntries() }
+            def prefixes = [ 'avi_', 'opencravat_', 'cosmic_', 'cancer_gene_', 're2g_', 'ccre_v4_' ]
+            def layer = rows.findAll { r -> prefixes.any { p -> r.evidence_item.startsWith(p) } }
+            assert process.success
+            assertAll(
+                { assert layer*.element_id.toSet() == [ 'promoter_A', 'enhancer_B', 'enhancer_C', 'promoter_E' ] as Set },
+                { assert layer.size() == 4 * 16 },
+                { assert rows.find { r -> r.element_id == 'promoter_A' && r.evidence_item == 'cosmic_n_matched_mutations' }.value == '2' },
+                { assert rows.find { r -> r.element_id == 'enhancer_B' && r.evidence_item == 're2g_top_distal_target' }.status == 'nearest_in_targets' },
+                { assert rows.find { r -> r.element_id == '.' && r.evidence_item == 'null_fpr_oncodriveclustl' }.value == '0.046875' },
+                // with the layer rows removed, the table is the one of the test above, byte for byte
+                { assert (lines.findAll { l -> !(prefixes + [ 'null_fpr_' ]).any { p -> l.tokenize('\t')[2].startsWith(p) } }.join('\n') + '\n').md5() == '11a81e919fad03330521a60d44aa6eed' },
                 { assert snapshot(process.out.evidence).match() }
             )
         }
