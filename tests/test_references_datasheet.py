@@ -160,4 +160,3 @@ def test_datasheet_version_and_chain_licence():
     assert listed and e["datasheet_version"] == listed[-1]
     assert "non-commercial" in e["liftover_chain_licence"] and "README" in e["liftover_chain_licence"]
     assert "liftover chain" in e["licence_summary"]
-

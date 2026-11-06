@@ -28,17 +28,7 @@
             },
             "unit": {
                 "type": "string",
-                "enum": [
-                    "count",
-                    "fraction",
-                    "lambda",
-                    "p",
-                    "q",
-                    "rank",
-                    "status",
-                    "score",
-                    "label"
-                ]
+                "enum": ["count", "fraction", "lambda", "p", "q", "rank", "status", "score", "label"]
             },
             "status": {
                 "type": "string",
@@ -82,11 +72,7 @@
             },
             "native_or_lifted": {
                 "type": "string",
-                "enum": [
-                    "native",
-                    "lifted",
-                    "mixed"
-                ]
+                "enum": ["native", "lifted", "mixed"]
             }
         },
         "required": [
@@ -107,15 +93,10 @@
                 "if": {
                     "properties": {
                         "evidence_item": {
-                            "enum": [
-                                "re2g_top_distal_target",
-                                "ccre_v4_dominant_class"
-                            ]
+                            "enum": ["re2g_top_distal_target", "ccre_v4_dominant_class"]
                         }
                     },
-                    "required": [
-                        "evidence_item"
-                    ]
+                    "required": ["evidence_item"]
                 },
                 "then": {
                     "properties": {
