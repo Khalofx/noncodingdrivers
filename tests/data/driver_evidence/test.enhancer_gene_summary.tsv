@@ -1,0 +1,7 @@
+element_id	tissue	nearest_gene	nearest_gene_ensembl_id	n_files	n_files_with_link	n_link_rows	self_promoter_genes	n_distal_targets	distal_targets_by_max_score	top_distal_target	top_distal_score	n_targets	top_target_any	top_any_score	nearest_gene_status	nearest_gene_status_any	threshold	threshold_source
+enhancer_B	liver	GENEX	ENSG00000000002.1	2	1	2		2	GENEX:0.912,GENEY:0.300	GENEX	0.9119	2	GENEX	0.9119	top_is_nearest	top_is_nearest	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)
+enhancer_B	heart	GENEX	ENSG00000000002.1	1	1	1		1	GENEZ:0.950	GENEZ	0.95	1	GENEZ	0.95	nearest_not_in_targets	nearest_not_in_targets	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)
+enhancer_C	liver			2	1	1		1	GENEQ:0.500	GENEQ	0.5	1	GENEQ	0.5	no_nearest_gene	no_nearest_gene	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)
+enhancer_C	heart			1	0	0		0				0			no_nearest_gene	no_nearest_gene	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)
+promoter_A	liver	GENEA	ENSG00000000001.1	2	2	2	GENEA	0				1	GENEA	0.99	no_link	top_is_nearest	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)
+promoter_A	heart	GENEA	ENSG00000000001.1	1	0	0		0				0			no_link	no_link	NA	ENCODE-rE2G thresholded predictions (threshold at 70% recall of CRISPR-validated links; not in the file)

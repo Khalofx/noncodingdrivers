@@ -1,4 +1,23 @@
 {
+    "consensus, element flags and every layer table - nominal scope": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.driver_evidence.tsv:md5,4889b93f5bd944fcb9e103b6f130672b"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-06T14:24:33.14542786",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
     "consensus and element flags - nominal scope": {
         "content": [
             [

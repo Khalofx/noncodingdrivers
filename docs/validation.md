@@ -293,9 +293,16 @@ them.
 
 **Null calibration (OncodriveCLUSTL).** The median-p `lambda` of CALIBRATECALLERS is not defined for
 OncodriveCLUSTL. Within the ActiveDriverWGS element set (expected count >= 1), OncodriveCLUSTL has a
-p-value for 0, 1, 1 and 0 elements (observed run, nulls 1-3). Its null summary (`lambda` 2.32 from
-two single elements, `excluded_for_inflation`) is therefore no verdict. The statistic used instead is
-the null false-positive rate over the elements OncodriveCLUSTL analysed:
+p-value for 0, 1, 1 and 0 elements (observed run, nulls 1-3). Its former null summary (`lambda` 2.32
+from two single elements, `excluded_for_inflation`) was therefore no verdict, and CALIBRATECALLERS no
+longer reports a `lambda` or QQ points for it (S7A.41). It writes the null false-positive rate over
+the elements OncodriveCLUSTL analysed instead, per run, in `null_calibration/<cohort>.null_fpr.tsv`
+(and `null_fpr_oncodriveclustl` in `driver_evidence.tsv`). On the staged inputs of run A's
+CALIBRATECALLERS task (observed and three null consensus tables, the four native OncodriveCLUSTL
+tables), the new script reproduces the table below exactly; its `null_summary` row is 9,641
+analysed, 94 tested, minimum p 0.014, 3 at p <= 0.05 (0.032), 0 at p <= 0.01, 0 at q < 0.1, `pass`.
+The other methods' rows of `null_calibration.tsv` and `null_qq.tsv` are byte-identical to run A's
+with the OncodriveCLUSTL rows removed.
 
 | Run      | Analysed | Tested | Minimum p | p <= 0.05 | p <= 0.01 | q < 0.1 |
 | -------- | -------- | ------ | --------- | --------- | --------- | ------- |

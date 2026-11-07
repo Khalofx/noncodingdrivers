@@ -113,3 +113,84 @@ def test_oncodriveclustl_alongside_items_validate(tmp_path):
     # the caller items keep the fixed order: ActiveDriverWGS, OncodriveFML, then OncodriveCLUSTL
     items = [r["evidence_item"] for r in rows if r["element_id"] == "promoter_A"]
     assert items.index("q_oncodrivefml") < items.index("p_oncodriveclustl") < items.index("oncodriveclustl_n_clusters")
+
+
+LAYER_PREFIXES = ("avi_", "opencravat_", "cosmic_", "cancer_gene_", "re2g_", "ccre_v4_", "null_fpr_")
+LAYER_ARGS = ["--avi-summary", os.path.join(D, "test.avi.element_summary.tsv"), "--opencravat", os.path.join(D, "test.opencravat.tsv"),
+              "--cosmic-elements", os.path.join(D, "test.cosmic.element_summary.tsv"),
+              "--cancer-genes", os.path.join(D, "test.cancer_gene_context.tsv"),
+              "--re2g-summary", os.path.join(D, "test.enhancer_gene_summary.tsv"), "--ccre-summary", os.path.join(D, "test.ccre_v4_summary.tsv"),
+              "--null-fpr", os.path.join(D, "test.null_fpr.tsv")]
+
+
+def test_layer_summary_items_validate(tmp_path):
+    # every layer on (synthetic tables): one fixed set of summary items per significant element and layer
+    _, ev = _run(tmp_path, extra=LAYER_ARGS, out="layers.tsv")
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    errors = list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors(rows))
+    assert not errors, errors[0].message
+    get = lambda e, i: next(r for r in rows if r["element_id"] == e and r["evidence_item"] == i)   # noqa: E731
+    layer = [r for r in rows if r["evidence_item"].startswith(LAYER_PREFIXES) and r["element_id"] != "."]
+    # 16 items per significant element of the nominal scope (CTCF_D is outside it, its AVI row is not read)
+    assert {r["element_id"] for r in layer} == {"promoter_A", "enhancer_B", "enhancer_C", "promoter_E"}
+    assert len(layer) == 4 * 16
+    assert (get("promoter_A", "avi_max_phred")["value"], get("promoter_A", "avi_max_phred")["unit"]) == ("31.2", "score")
+    assert (get("promoter_A", "avi_n_scored")["value"], get("promoter_A", "avi_n_unscored")["value"]) == ("2", "1")
+    assert (get("enhancer_B", "avi_max_phred")["value"], get("enhancer_B", "avi_max_phred")["status"]) == ("NA", "not_applied")
+    assert get("enhancer_C", "avi_n_scored")["status"] == "not_applied"            # no row in the AVI summary
+    # OpenCRAVAT: candidate variants with an annotation per annotator; a variant shared by two elements counts in both
+    assert [get("promoter_A", f"opencravat_n_{a}")["value"] for a in ("ccre_screen", "repeat", "clinvar")] == ["2", "1", "1"]
+    assert [get("enhancer_B", f"opencravat_n_{a}")["value"] for a in ("ccre_screen", "repeat", "clinvar")] == ["1", "1", "1"]
+    assert get("promoter_E", "opencravat_n_clinvar")["value"] == "0"
+    # COSMIC: counts only, release in source_version
+    assert [get("promoter_A", i)["value"] for i in ("cosmic_n_matched_mutations", "cosmic_n_samples", "cosmic_n_sample_name_overlaps")] == ["2", "150", "1"]
+    assert get("promoter_A", "cosmic_n_samples")["source_version"] == "COSMIC v999"
+    assert all(re.fullmatch(r"NA|[0-9]+", r["value"]) for r in rows if r["evidence_item"].startswith("cosmic_"))
+    assert not any(re.search(r"COS[VMS][0-9]", "\t".join(r.values())) for r in rows)
+    # cancer gene list labels
+    assert (get("promoter_A", "cancer_gene_nearest_in_list")["value"], get("promoter_A", "cancer_gene_nearest_in_list")["status"]) == ("1", "in_list")
+    assert get("enhancer_C", "cancer_gene_nearest_in_list")["status"] == "not_applied"   # no nearest gene
+    assert get("promoter_E", "cancer_gene_re2g_targets_in_list")["value"] == "2"
+    assert get("promoter_E", "cancer_gene_nearest_pc_in_list")["source_version"].startswith("synthetic list (md5 0123456789abcdef")
+    # ENCODE-rE2G over two tissues: union of distal targets, top by score, nearest status over the tissues
+    assert (get("enhancer_B", "re2g_n_distal_targets")["value"], get("enhancer_B", "re2g_top_distal_target")["value"]) == ("3", "GENEZ")
+    assert get("enhancer_B", "re2g_top_distal_target")["status"] == "nearest_in_targets"
+    assert (get("promoter_A", "re2g_top_distal_target")["value"], get("promoter_A", "re2g_top_distal_target")["status"]) == ("NA", "no_link")
+    assert get("enhancer_C", "re2g_top_distal_target")["status"] == "no_nearest_gene"
+    assert get("promoter_E", "re2g_n_distal_targets")["status"] == "not_applied"
+    assert get("enhancer_B", "re2g_n_distal_targets")["source_version"].endswith("tissues liver,heart")
+    # SCREEN V4
+    assert (get("promoter_E", "ccre_v4_dominant_class")["value"], get("promoter_E", "ccre_v4_covered_fraction")["value"]) == ("CA-H3K4me3", "1")
+    assert get("enhancer_B", "ccre_v4_dominant_class")["value"] == "none"
+    # element-level summaries of GRCh38 resources are native; mutation-based ones carry the cohort's provenance
+    assert get("promoter_A", "ccre_v4_covered_fraction")["native_or_lifted"] == "native"
+    assert get("promoter_A", "avi_n_scored")["native_or_lifted"] == "lifted"
+    # OncodriveCLUSTL null false-positive rate (cohort level)
+    assert (get(".", "null_fpr_oncodriveclustl")["value"], get(".", "null_fpr_oncodriveclustl")["threshold"]) == ("0.046875", "0.05")
+    # layer items follow the element's other items, in the fixed layer order
+    items = [r["evidence_item"] for r in rows if r["element_id"] == "promoter_A"]
+    assert items.index("postfilter_status") < items.index("avi_max_phred") < items.index("opencravat_n_ccre_screen") \
+        < items.index("cosmic_n_matched_mutations") < items.index("cancer_gene_nearest_in_list") < items.index("re2g_n_distal_targets") \
+        < items.index("ccre_v4_dominant_class")
+
+
+def test_layers_add_rows_only(tmp_path):
+    # with the layer rows removed, the layers-on table is the layers-off table, byte for byte; scope all
+    # adds no layer row for an element that is not significant
+    for scope in ("nominal", "all"):
+        _, off = _run(tmp_path, scope=scope, out=f"off.{scope}.tsv")
+        _, on = _run(tmp_path, scope=scope, extra=LAYER_ARGS, out=f"on.{scope}.tsv")
+        kept = [line for line in open(on) if not line.split("\t")[2].startswith(LAYER_PREFIXES)]
+        assert "".join(kept) == open(off).read()
+        sig = {r["element_id"] for r in csv.DictReader(open(on), delimiter="\t") if r["evidence_item"].startswith("ccre_v4_")}
+        assert sig == {"promoter_A", "enhancer_B", "enhancer_C", "promoter_E"}
+
+
+def test_label_values_only_for_label_items(tmp_path):
+    # the schema keeps numeric values for every other item
+    _, ev = _run(tmp_path, extra=LAYER_ARGS, out="labels.tsv")
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    bad = dict(next(r for r in rows if r["evidence_item"] == "ccre_v4_covered_fraction"), value="dELS")
+    assert list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors([bad]))
+    src = {r["evidence_item"]: r for r in csv.DictReader(open(SOURCES), delimiter="\t")}
+    assert {i for i, r in src.items() if r["unit"] == "label"} == {"re2g_top_distal_target", "ccre_v4_dominant_class"}

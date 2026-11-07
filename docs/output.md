@@ -102,7 +102,19 @@ derived downstream from `driver_evidence.tsv`.
 - `postfilter/`
   - `<cohort>.postfilter.tsv`: one row per element of the consensus table with a value, a threshold and `pass`, `fail` or `not_applied` for minimum support (`--postfilter_min_mutations`, `--postfilter_min_patients`), mappability (share of the element's mutations outside GIAB low mappability above `--postfilter_min_mappable_fraction`) and maximum sample fraction (`--postfilter_max_sample_fraction`), and `postfilter_status`. With `--postfilter_mode pcawg`, `q_postfilter`: Benjamini-Hochberg after failing elements are set to p = 1; `consensus_q` is never changed.
 - `evidence/`
-  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values (combined callers and callers reported alongside; with `--run_oncodriveclustl` also `oncodriveclustl_n_clusters` and `oncodriveclustl_clustered_mutations` from its native table, `not_tested` for elements below its mutation cutoff), the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`). When a caller is reported alongside, one cohort-level row per caller records its role (`caller_role_<caller>`: value `1`, status `combined`, or value `0`, status `reported_alongside`); with every caller combined (the default) these rows are not written. `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
+  - `<cohort>.driver_evidence.tsv`: long form, one row per cohort x element x evidence item, with `value`, `unit`, `status`, `threshold`, `source`, `source_version` and `native_or_lifted` (layout: `assets/schema_driver_evidence.json`; sources and versions: `assets/evidence_sources.tsv`). Items: the consensus and per-caller p- and q-values (combined callers and callers reported alongside; with `--run_oncodriveclustl` also `oncodriveclustl_n_clusters` and `oncodriveclustl_clustered_mutations` from its native table, `not_tested` for elements below its mutation cutoff), the element flags (mask fractions are `flagged` above 0.5), the post-filter flags and, with `--run_null_calibration`, one cohort-level row per method (`element_id` `.`, `null_lambda_<method>`; for OncodriveCLUSTL `null_fpr_oncodriveclustl` instead, the share of its tested null elements at p <= 0.05 over the replicates, threshold `0.05`). When a caller is reported alongside, one cohort-level row per caller records its role (`caller_role_<caller>`: value `1`, status `combined`, or value `0`, status `reported_alongside`); with every caller combined (the default) these rows are not written. `--evidence_scope nominal` (default) writes the elements with any p < 0.01 or `consensus_q` < 0.25; `all` writes every element.
+  - Layer summaries: for each written element with `is_consensus` `True` and each annotation or context layer that is on, a fixed set of element-level items read from that layer's own table (no per-variant or per-link rows; written after the element's other items). A significant element missing from a layer's table gets that layer's items with value `NA`, status `not_applied`. With every layer off (the default) no such row is written and the table is unchanged. None of these items filters or re-ranks an element.
+
+    | Layer (option)                            | Items                                                                                                                                                                                                                                                                                          | Read from                                          |
+    | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+    | AlphaGenome AVI (`--run_alphagenome_avi`) | `avi_max_phred` (unit `score`; `NA`, `not_applied` when no candidate variant is scored), `avi_n_scored`, `avi_n_unscored` (candidate variants with and without an AVI score)                                                                                                                   | `candidates/avi/<cohort>.avi.element_summary.tsv`  |
+    | OpenCRAVAT (`--run_opencravat`)           | `opencravat_n_ccre_screen`, `opencravat_n_repeat`, `opencravat_n_clinvar`: candidate variants of the element with at least one non-NA column of that annotator                                                                                                                                 | `opencravat/<cohort>.opencravat.tsv`               |
+    | COSMIC (`--run_cosmic_context`)           | counts only: `cosmic_n_matched_mutations` (distinct candidate mutations with an exact COSMIC match), `cosmic_n_samples` (COSMIC samples carrying one), `cosmic_n_sample_name_overlaps`; `source_version` `COSMIC <release>`; no COSMIC identifier or record                                    | `cosmic/<cohort>.cosmic.element_summary.tsv`       |
+    | Cancer gene list (`--cancer_gene_list`)   | `cancer_gene_nearest_in_list`, `cancer_gene_nearest_pc_in_list` (value `1`, status `in_list`, or `0`, `not_in_list`; `NA`, `not_applied` without a gene), `cancer_gene_re2g_targets_in_list` (count; `NA` without ENCODE-rE2G); `source_version` names the list and its MD5                    | `cancer_genes/<cohort>.cancer_gene_context.tsv`    |
+    | ENCODE-rE2G (`--run_enhancer_gene_links`) | `re2g_n_distal_targets` (distinct distal target genes over the requested tissues), `re2g_top_distal_target` (unit `label`: the gene with the highest distal score over those tissues; status `top_is_nearest`, `nearest_in_targets`, `nearest_not_in_targets`, `no_link` or `no_nearest_gene`) | `enhancer_gene/<cohort>.enhancer_gene_summary.tsv` |
+    | SCREEN V4 (`--run_ccre_overlay`)          | `ccre_v4_dominant_class` (unit `label`; `none` without a cCRE), `ccre_v4_covered_fraction`                                                                                                                                                                                                     | `ccre/<cohort>.ccre_v4_summary.tsv`                |
+
+    Items computed from the candidate mutations (AVI, OpenCRAVAT, COSMIC) carry the cohort's coordinate provenance; the element-level overlaps (cancer gene list, ENCODE-rE2G, SCREEN V4) are `native`. Only the two label items carry a name in `value`; the schema keeps every other value numeric or `NA`.
 
 </details>
 
@@ -115,12 +127,10 @@ positive under the null. A method is `excluded_for_inflation` when a null replic
 above the upper bound of `--null_lambda_band`; a `lambda` below the lower bound is reported as
 `conservative` (less power, no false positives). ActiveDriverWGS, and the EBM and ACAT combinations
 that include it, have a null `lambda` near 0.5 by construction (one-sided count test; see
-`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) is listed like the other
-callers, but it tests only elements with an observed cluster: its `lambda` rests on the few such
-elements in the ActiveDriverWGS element set (none or one per run on SYNTH-NC), and its band status
-(`excluded_for_inflation` on SYNTH-NC) is not a calibration verdict. Read its null runs' q-values
-instead; `docs/validation.md` records the statistic used for OncodriveCLUSTL (the null
-false-positive rate over the elements it analysed).
+`docs/validation.md`). OncodriveCLUSTL (`--run_oncodriveclustl`) tests only elements with an
+observed cluster, a data-dependent subset, so the median-p `lambda` is not defined for it: it has no
+row in `null_calibration.tsv` and no QQ points. It gets a false-positive-rate check per null
+replicate instead (`null_fpr.tsv`, below).
 
 <details markdown="1">
 <summary>Output files</summary>
@@ -128,6 +138,7 @@ false-positive rate over the elements it analysed).
 - `null_calibration/`
   - `<cohort>.null_calibration.tsv`: per run (`observed`, `null1` ... `null<n>`) and method (each combined caller, `ebm`, `acat`): the element set (ActiveDriverWGS expected count >= 1), median p, inflation factor `lambda` (median chi-squared quantile / 0.4549) and the number of elements with q < `--fdr_threshold`; the `null_summary` rows give the median, minimum and maximum null `lambda` and the band status (`within_band`, `excluded_for_inflation` above `--null_lambda_band`, `conservative` below it).
   - `<cohort>.null_qq.tsv`: expected and observed -log10 p per run and method (all points with observed -log10 p >= 2 and up to 500 evenly spaced ranks).
+  - `<cohort>.null_fpr.tsv` (with `--run_oncodriveclustl`): OncodriveCLUSTL's false-positive-rate check per run (`observed`, `null1` ... `null<n>`): `n_analysed` (elements in its native table, at least `--oncodriveclustl_element_mutations` SNVs), `n_tested` (elements with a p-value), `min_p`, `n_p_le_0.05`, `n_p_le_0.01`, `n_q_lt_fdr` and `fpr_p_le_0.05` (= `n_p_le_0.05` / `n_tested`). The `null_summary` row sums the counts over the replicates (pooled `fpr_p_le_0.05`), keeps the smallest p and the largest per-replicate `n_q_lt_fdr`, and is `pass` when no null replicate has more than one element at q < `--fdr_threshold`, otherwise `fail`.
   - `simulation/<cohort>.null<r>.null_summary.tsv`: rows carried, non-SNV rows not carried, SNVs dropped (REF mismatch, undefined context) and duplicates collapsed per replicate.
 
 </details>
@@ -167,8 +178,8 @@ filters or re-ranks an element.
 
 Each layer is off by default and writes only its own folder, for cohorts with at least one
 significant element. None of them filters, re-ranks or weights an element; the tables have stable
-column names, one row per element (or per element and tissue) for the summaries, so that they can
-be summarised in `driver_evidence.tsv` later.
+column names, one row per element (or per element and tissue) for the summaries, and each layer's
+summary is also written to `driver_evidence.tsv` (see [the evidence table](#post-filter-flags-and-evidence-table)).
 
 <details markdown="1">
 <summary>Output files</summary>

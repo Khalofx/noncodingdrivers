@@ -1,0 +1,5 @@
+cohort	cosmic_release	element_id	consensus_rank	chrom	start	end	consensus_q	n_candidate_sample_events	n_distinct_candidate_mutations	n_cosmic_matched_mutations	n_confirmed_somatic_mutations	n_cosmic_samples	n_exact_sample_name_overlaps	cosmic_match
+test	v999	promoter_A	1	chr5	100	150	2e-08	4	3	2	2	150	1	yes
+test	v999	enhancer_B	2	chr5	200	250	3e-05	3	2	0	0	0	0	no
+test	v999	enhancer_C	3	chr5	300	350	0.002	2	2	0	0	0	0	no
+test	v999	promoter_E	4	chr5	500	550	0.012	1	1	0	0	0	0	no

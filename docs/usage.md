@@ -63,7 +63,11 @@ GRCh37/hg19 rows stop the run with `ASSEMBLY_NOT_ENABLED` unless `--allow_hg19_l
 set; they then need the hg19 FASTA (`HG19_FASTA_MISSING` otherwise) and the chain (see
 [references](references.md)). Rejected liftover records are published under
 `harmonisation/liftover_rejects/`. Lifted rows are labelled as such in the evidence table
-(`native_or_lifted`).
+(`native_or_lifted`). The UCSC chain (`hg19ToHg38.over.chain.gz`, `--liftover_chain`) is staged by
+you and is not open data: UCSC makes chain files free for non-commercial use by independent
+researchers and nonprofit organisations only; commercial use needs a UCSC licence, and a copy you
+redistribute must carry UCSC's liftOver README (see [references](references.md#liftover-chain)).
+The chain fixture of the test-datasets repository is a real UCSC-derived file under the same terms.
 
 ```csv title="samplesheet.csv"
 sample,entry,cohort,cancer_type,assembly,mutations,vcf,index,maf,vcf_tumour_id
@@ -151,42 +155,43 @@ covariance set (elements tested by every combined caller) and therefore every co
 
 ### Software licences
 
-| Software                                              | Licence                                                       |
-| ----------------------------------------------------- | ------------------------------------------------------------- |
-| ActiveDriverWGS                                       | GPL-3.0-only                                                  |
-| OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)       |
-| OncodriveCLUSTL                                       | AGPL-3.0-or-later                                             |
-| CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence   |
-| MutEnricher                                           | MIT                                                           |
-| EmpiricalBrownsMethod                                 | MIT                                                           |
-| ACAT                                                  | GPL-3.0-only                                                  |
-| RobustRankAggreg                                      | GPL-2.0-only                                                  |
-| motifbreakR                                           | GPL-2.0-only                                                  |
-| universalmotif                                        | GPL-3.0-only                                                  |
-| JASPAR 2026 CORE vertebrates (bundled motifs)         | CC BY 4.0                                                     |
-| bcftools, htslib                                      | MIT                                                           |
-| bedtools                                              | MIT                                                           |
-| csvtk                                                 | MIT                                                           |
-| echtvar                                               | MIT                                                           |
-| GNU Awk                                               | GPL-3.0-or-later                                              |
-| Picard                                                | MIT                                                           |
-| vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                    |
-| EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                    |
-| Ensembl VEP                                           | Apache-2.0                                                    |
-| VEP AVI plugin (`AVI.pm`, in the VEP image)           | Apache-2.0                                                    |
-| AlphaGenome AVI SNV scores (user-downloaded)          | permissive-use download: commercial and non-commercial use    |
-| OpenCRAVAT 3.2.4 and its modules' code                | MIT                                                           |
-| OpenCRAVAT module data (ccre_screen, repeat, clinvar) | ENCODE, UCSC table and NCBI terms: unrestricted use           |
-| MultiQC                                               | GPL-3.0-or-later                                              |
-| SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                  |
-| gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                               |
-| ENCODE Blacklist v2                                   | GPL-3.0 (repository licence)                                  |
-| GIAB v3.6 stratifications                             | U.S. Government work (NIST)                                   |
-| Umap k100                                             | GPL                                                           |
-| COSMIC data (user-supplied, `--cosmic_ncv`)           | restricted: COSMIC licence (registration; commercial: QIAGEN) |
-| ENCODE data (ENCODE-rE2G links, SCREEN V4 cCREs)      | unrestricted (ENCODE data use policy)                         |
-| ENCODE-rE2G code (predictions only, not run)          | MIT                                                           |
-| Pipeline code (`bin/`, local modules)                 | MIT                                                           |
+| Software                                              | Licence                                                                                                                                           |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ActiveDriverWGS                                       | GPL-3.0-only                                                                                                                                      |
+| OncodriveFML                                          | AGPL-3.0-or-later, with a non-commercial notice (above)                                                                                           |
+| OncodriveCLUSTL                                       | AGPL-3.0-or-later                                                                                                                                 |
+| CADD v1.7 scores (user-supplied)                      | free for non-commercial use; commercial use needs a licence                                                                                       |
+| UCSC hg19ToHg38 liftover chain (user-staged)          | UCSC Chain Files: non-commercial use by independent researchers and nonprofits; other use needs a UCSC licence; redistribution with UCSC's README |
+| MutEnricher                                           | MIT                                                                                                                                               |
+| EmpiricalBrownsMethod                                 | MIT                                                                                                                                               |
+| ACAT                                                  | GPL-3.0-only                                                                                                                                      |
+| RobustRankAggreg                                      | GPL-2.0-only                                                                                                                                      |
+| motifbreakR                                           | GPL-2.0-only                                                                                                                                      |
+| universalmotif                                        | GPL-3.0-only                                                                                                                                      |
+| JASPAR 2026 CORE vertebrates (bundled motifs)         | CC BY 4.0                                                                                                                                         |
+| bcftools, htslib                                      | MIT                                                                                                                                               |
+| bedtools                                              | MIT                                                                                                                                               |
+| csvtk                                                 | MIT                                                                                                                                               |
+| echtvar                                               | MIT                                                                                                                                               |
+| GNU Awk                                               | GPL-3.0-or-later                                                                                                                                  |
+| Picard                                                | MIT                                                                                                                                               |
+| vcf2maf (maf2vcf.pl)                                  | Apache-2.0                                                                                                                                        |
+| EBI vcf-validator (vcf_assembly_checker)              | Apache-2.0                                                                                                                                        |
+| Ensembl VEP                                           | Apache-2.0                                                                                                                                        |
+| VEP AVI plugin (`AVI.pm`, in the VEP image)           | Apache-2.0                                                                                                                                        |
+| AlphaGenome AVI SNV scores (user-downloaded)          | permissive-use download: commercial and non-commercial use                                                                                        |
+| OpenCRAVAT 3.2.4 and its modules' code                | MIT                                                                                                                                               |
+| OpenCRAVAT module data (ccre_screen, repeat, clinvar) | ENCODE, UCSC table and NCBI terms: unrestricted use                                                                                               |
+| MultiQC                                               | GPL-3.0-or-later                                                                                                                                  |
+| SigProfilerExtractor, SigProfilerMatrixGenerator (QC) | BSD-2-Clause                                                                                                                                      |
+| gnomAD v4.1 data                                      | CC0 1.0 (attribution requested)                                                                                                                   |
+| ENCODE Blacklist v2                                   | GPL-3.0 (repository licence)                                                                                                                      |
+| GIAB v3.6 stratifications                             | U.S. Government work (NIST)                                                                                                                       |
+| Umap k100                                             | GPL                                                                                                                                               |
+| COSMIC data (user-supplied, `--cosmic_ncv`)           | restricted: COSMIC licence (registration; commercial: QIAGEN)                                                                                     |
+| ENCODE data (ENCODE-rE2G links, SCREEN V4 cCREs)      | unrestricted (ENCODE data use policy)                                                                                                             |
+| ENCODE-rE2G code (predictions only, not run)          | MIT                                                                                                                                               |
+| Pipeline code (`bin/`, local modules)                 | MIT                                                                                                                                               |
 
 ## Flags, evidence and null calibration
 
@@ -200,12 +205,17 @@ None of these options filters a mutation or changes a p- or q-value; they add fi
   needs none of this sets `--run_variant_flags false`.
 - **Post-filter flags and the evidence table** (`--run_driver_evidence`, default `true`).
   `--postfilter_mode pcawg` adds `q_postfilter` beside the unchanged q-values; `--evidence_scope all`
-  writes every element instead of the nominal ones. Evidence tiers are assigned downstream from
+  writes every element instead of the nominal ones. Each annotation or context layer that is on
+  (AlphaGenome AVI, OpenCRAVAT, COSMIC, cancer gene list, ENCODE-rE2G, SCREEN V4) adds a few
+  element-level summary items per significant element (`avi_*`, `opencravat_*`, `cosmic_*` counts
+  only, `cancer_gene_*`, `re2g_*`, `ccre_v4_*`; [output](output.md#post-filter-flags-and-evidence-table));
+  with every layer off the table is unchanged. Evidence tiers are assigned downstream from
   `driver_evidence.tsv`.
 - **Null calibration** (`--run_null_calibration`, default `false`) re-runs the callers on
   `--null_replicates` neutral copies of each cohort (seed `--seed` + replicate), each costing about
   as much as the observed run, and reports the inflation factor of every caller and combination
-  against `--null_lambda_band`.
+  against `--null_lambda_band`. OncodriveCLUSTL, which tests only clustered elements, gets a
+  false-positive-rate check per null replicate instead (`null_fpr.tsv`).
 
 ## Annotation layers
 

@@ -1,4 +1,23 @@
 {
+    "observed and two null replicates - OncodriveCLUSTL false-positive-rate check": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.null_fpr.tsv:md5,4b3dd942c49b1f0abad7d237bf46168c"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-06T14:24:47.154461706",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    },
     "observed and two null replicates": {
         "content": [
             [

@@ -1,0 +1,5 @@
+element_id	n_candidate_variants	n_snv	n_scored	max_avi_phred	top_variant	n_phred_ge_20
+CTCF_D	1	1	1	12.5	chr5:420:C:T	0
+enhancer_B	2	2	0	NA	NA	0
+promoter_A	3	3	2	31.2	chr5:120:G:A	2
+promoter_E	1	0	0	NA	NA	0

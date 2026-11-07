@@ -10,6 +10,17 @@ process ONCODRIVEFML {
     // The rights-holder image docker.io/bbglab/oncodrivefml:2.5.0 has no `ps` (checked 2026-10-21).
     // ghcr.io/khalofx/noncodingdrivers-oncodrivefml:2.5.0, pinned by digest. The image is not public (OncodriveFML may not be redistributed
     // without a licence): build containers/oncodrivefml/ and set the container in a config (docs/usage.md).
+    //
+    // Coordinates (S7A.14, S7A.42; decision D39). The element adapter in the script writes the
+    // regions table with START = BED start and END = BED end (no +1). OncodriveFML 2.5.0 reads these
+    // regions with two conventions: it maps mutations to an element as a 1-based inclusive interval
+    // [START, END], so each element fragment also takes the base 5' of the BED interval (1-based
+    // position = BED start); it queries the CADD score track (tabix) over [START, END) as 0-based
+    // half-open, which is exactly the BED interval. The extra 5' base is therefore mapped but has no
+    // score, and its SNVs are dropped (43 of 231,472 SYNTH-NC SNVs). START = BED start + 1 would
+    // instead drop the first base of every fragment from the scored background. The adapter is kept
+    // and no output changes (docs/validation.md). This note sits outside the script section so that
+    // it cannot change the task hash: a shell comment inside the command string would re-run the task.
     container 'ghcr.io/khalofx/noncodingdrivers-oncodrivefml@sha256:5a113bf33516c42a07c3c557732e157807f2a95508d80b77245140d43f64f2d2'
     // The image's entrypoint starts OncodriveFML; Docker must run Nextflow's task shell instead.
     containerOptions { workflow.containerEngine == 'docker' ? '--entrypoint ""' : '' }

@@ -300,6 +300,10 @@
                 "type": "string",
                 "meta": ["ccre_celltype_dir"]
             },
+            "liftover_chain_licence": {
+                "type": "string",
+                "meta": ["liftover_chain_licence"]
+            },
             "encode_licence": {
                 "type": "string",
                 "meta": ["encode_licence"]

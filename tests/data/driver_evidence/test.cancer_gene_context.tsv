@@ -1,0 +1,5 @@
+element_id	nearest_gene	nearest_gene_ensembl_id	nearest_gene_type	nearest_in_list	nearest_match_by	nearest_list_tier	nearest_list_role	nearest_protein_coding_gene	nearest_protein_coding_gene_ensembl_id	nearest_protein_coding_distance	nearest_pc_in_list	nearest_pc_match_by	nearest_pc_list_tier	nearest_pc_list_role	re2g_targets_in_list	re2g_distal_targets_in_list	list_name	list_md5	list_genes
+promoter_A	GENEA	ENSG00000000001.1	protein_coding	yes	symbol			GENEA	ENSG00000000001.1	10	yes	symbol			GENEA		synthetic list	0123456789abcdef0123456789abcdef	3
+enhancer_B	GENEX	ENSG00000000002.1	protein_coding	no				GENEX	ENSG00000000002.1	500	no						synthetic list	0123456789abcdef0123456789abcdef	3
+enhancer_C				NA				GENEQ	ENSG00000000003.1	9000	no						synthetic list	0123456789abcdef0123456789abcdef	3
+promoter_E	LNC1	ENSG00000000004.1	lncRNA	no				GENEB	ENSG00000000005.1	80	yes	symbol			GENEB,GENEC	GENEC	synthetic list	0123456789abcdef0123456789abcdef	3

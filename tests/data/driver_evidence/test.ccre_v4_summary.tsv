@@ -1,0 +1,5 @@
+element_id	element_bp	n_ccre	covered_bp	covered_frac	dominant_class	ccre_v4_classes_bp
+enhancer_B	50	0	0	0.0000	none	
+enhancer_C	50	1	20	0.4000	dELS	dELS:20
+promoter_A	50	2	40	0.8000	PLS	PLS:30,pELS:10
+promoter_E	50	1	50	1.0000	CA-H3K4me3	CA-H3K4me3:50

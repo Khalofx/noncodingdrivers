@@ -22,11 +22,16 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   rejected records published; hg19 rows without the opt-in stop with `ASSEMBLY_NOT_ENABLED`.
 - Reference datasheet `assets/references/GRCh38.yml` (schema `assets/schema_references.json`): the
   validated GRCh38 reference set with checksums, paths relative to `--reference_base`; explicit
-  parameters take precedence. Asset recipes in `docs/references.md`.
+  parameters take precedence. Asset recipes in `docs/references.md`. `datasheet_version` 1.1.0
+  (Step 7A keys); licence keys for CADD, COSMIC, ENCODE data, AlphaGenome AVI and the user-staged
+  UCSC hg19ToHg38 liftover chain (`liftover_chain_licence`: non-commercial use by independent
+  researchers and nonprofits, redistribution with UCSC's README), summarised in `licence_summary`.
 - Driver discovery (`DRIVER_DISCOVERY`) on a CDS-excluded Ensembl Regulatory Build catalogue:
   ActiveDriverWGS 1.2.1 (sharded, FDR over all shards) and OncodriveFML 2.5.0 with CADD v1.7
   (licence-gated: `--accept_oncodrivefml_licence`); MutEnricher 1.3.3 as a QC-only caller
-  (`--run_mutenricher`). Element coordinates as fragment spans with `n_fragments`.
+  (`--run_mutenricher`). Element coordinates as fragment spans with `n_fragments`. OncodriveFML's
+  two coordinate conventions (elements mapped 1-based inclusive, CADD scored over exactly the BED
+  interval) are documented in its module and `docs/validation.md`; the adapter is unchanged.
 - P-value combination (`COMBINEPVALUES`): the empirical Brown's method (default) or ACAT sets
   `consensus_q` (Benjamini–Hochberg, `--fdr_threshold`); ACAT, robust rank aggregation and caller
   votes are published as sensitivity columns; `--skip_acat` where the ACAT package is unavailable.
@@ -54,10 +59,17 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   fraction; `--postfilter_mode pcawg` adds `q_postfilter`) and the long-form evidence table
   (`WRITEDRIVEREVIDENCE`, `evidence/<cohort>.driver_evidence.tsv`, layout
   `assets/schema_driver_evidence.json`). Evidence tiers are assigned downstream from this table.
+  Each annotation or context layer that is on adds element-level summary items per significant
+  element (`avi_*`, `opencravat_*`, `cosmic_*` counts only, `cancer_gene_*`, `re2g_*`, `ccre_v4_*`;
+  read from the layer's own table, never filtering or re-ranking); with every layer off the table is
+  unchanged.
 - Null calibration (`NULL_CALIBRATION`, `--run_null_calibration`, off by default): neutral copies
   of each cohort (each SNV moved within +/- 50 kb to the same trinucleotide, same patient) re-run
   through the callers; inflation factor, null discoveries and QQ points per caller and
-  combination, with a one-sided `--null_lambda_band` gate. Reported only.
+  combination, with a one-sided `--null_lambda_band` gate. Reported only. OncodriveCLUSTL, which
+  tests only clustered elements, gets a false-positive-rate check per null replicate instead of the
+  median-p lambda (`null_calibration/<cohort>.null_fpr.tsv`: analysed and tested null elements,
+  counts at p <= 0.05, p <= 0.01 and q < FDR; `null_fpr_oncodriveclustl` in the evidence table).
 - Annotation layers of the significant elements (`EXPLAIN`; none filters or re-ranks): candidate
   mutations per patient on the element fragments (nf-core `bedtools/intersect`), nearest GENCODE
   gene TSS with a strand-aware signed distance (nf-core `bedtools/closest`), ENCODE regulatory
@@ -83,7 +95,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   no `hg19` annotator and no UCSC chain file, so `encode_tfbs` is not included.
 - Optional cohort-level signature QC (`--run_sigprofiler`; nf-core `sigprofiler`).
 - MultiQC 1.35 report with a per-cohort run summary (`RUNSUMMARYMQC`).
-- Pipeline-owned images `ghcr.io/khalofx/noncodingdrivers-{utils,activedriverwgs,mutenricher,combinepvalues,motifbreakr,opencravat}`,
+- Pipeline-owned images `ghcr.io/khalofx/noncodingdrivers-{utils,activedriverwgs,mutenricher,combinepvalues,motifbreakr,oncodriveclustl,opencravat}`,
   built from `containers/` by `.github/workflows/build-containers.yml` and pinned by digest; the
   OncodriveFML image is built locally from `containers/oncodrivefml/`.
 - Profiles `test` (synthetic TERT-window cohort), `test_full` (SYNTH-NC, synthetic genome-wide
@@ -110,8 +122,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 - SCREEN Registry V4 cCRE overlay (`--run_ccre_overlay`, optional `--ccre_celltype_tissues`): V4
   classes, covered fraction and dominant class per element (`ccre/`). Datasheet keys
   `enhancer_gene_dir`, `ccre_v4_bed` (ENCFF420VPZ, MD5 checked at start), `ccre_v4_md5`,
-  `ccre_v4_rows`, `ccre_v4_source`, `ccre_celltype_dir`, `encode_licence`, `cosmic_licence`;
-  staging recipe in `docs/references.md`.
+  `ccre_v4_rows`, `ccre_v4_source`, `ccre_celltype_dir`; staging recipe in `docs/references.md`.
 
 ### `Dependencies`
 
@@ -119,6 +130,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 | --------------------- | ------- |
 | ActiveDriverWGS       | 1.2.1   |
 | OncodriveFML          | 2.5.0   |
+| OncodriveCLUSTL       | 1.2.0   |
 | MutEnricher           | 1.3.3   |
 | EmpiricalBrownsMethod | 1.34.0  |
 | ACAT                  | 0.91    |

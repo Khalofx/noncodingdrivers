@@ -73,6 +73,12 @@ output:
         QQ points per run and method
         Structure: [ val(meta), path(null_qq.tsv) ]
       pattern: "*.null_qq.tsv"
+  - fpr:
+      type: file
+      description: |
+        OncodriveCLUSTL false-positive-rate check per run and its null summary (only when OncodriveCLUSTL runs)
+        Structure: [ val(meta), path(null_fpr.tsv) ]
+      pattern: "*.null_fpr.tsv"
   - summary:
       type: file
       description: |

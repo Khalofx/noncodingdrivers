@@ -12,6 +12,16 @@ QQ points: expected and observed -log10 p over the same element set, all points 
 Null summary per method: lambda over the replicates against --band. A method with a replicate
 above the band is excluded_for_inflation; one with a replicate below it (and none above) is
 conservative; otherwise within_band. Reported only: no p- or q-value is changed.
+
+OncodriveCLUSTL (S7A.41) tests only the elements with an observed cluster, a data-dependent subset,
+so the median-p lambda is not defined for it: it gets no lambda row and no QQ points. Instead, when
+its p_/q_ columns are present, --fpr receives a false-positive-rate check per run (observed and
+every null replicate): n_analysed (elements in its native table, --observed-oncodriveclustl /
+--null-oncodriveclustl), n_tested (elements with a p-value), min_p, n_p_le_0.05, n_p_le_0.01 and
+n_q_lt_fdr, with fpr_p_le_0.05 = n_p_le_0.05 / n_tested. Its null_summary row sums the counts over
+the replicates (fpr pooled), keeps the minimum p and the largest per-replicate n_q_lt_fdr, and is
+pass when no null replicate has more than one element at q < --fdr (docs/validation.md), else fail.
+The other methods' rows are unchanged.
 """
 import argparse
 import math
@@ -22,6 +32,10 @@ from statistics import NormalDist
 import pandas as pd
 
 CHI2_MEDIAN_1DF = 0.454936423119572
+# Callers that test only a data-dependent subset of the elements: FPR check instead of lambda
+FPR_METHODS = ("oncodriveclustl",)
+FPR_COLUMNS = ["cohort", "run", "replicate", "method", "element_set", "n_analysed", "n_tested", "min_p", "n_p_le_0.05",
+               "n_p_le_0.01", "n_q_lt_fdr", "fdr", "fpr_p_le_0.05", "status"]
 
 
 def chi2_isf_1df(p):
@@ -55,6 +69,42 @@ def methods(cons):
     for name in ("ebm", "acat"):
         if f"{name}_p" in cons.columns and f"{name}_q" in cons.columns:
             out.append((name, f"{name}_p", f"{name}_q"))
+    return out
+
+
+def n_analysed(native):
+    if native is None:
+        return None
+    return int(pd.read_csv(native, sep="\t", usecols=["ENSID"], dtype=str)["ENSID"].nunique())
+
+
+def fpr_row(cohort, run, rep, method, cons, analysed, fdr):
+    p = pd.to_numeric(cons[f"p_{method}"], errors="coerce")
+    q = pd.to_numeric(cons[f"q_{method}"], errors="coerce")
+    tested = p.dropna()
+    n_p05 = int((tested <= 0.05).sum())
+    return {"cohort": cohort, "run": run, "replicate": "NA" if rep is None else rep, "method": method,
+            "element_set": f"{method}_analysed", "n_analysed": "NA" if analysed is None else analysed,
+            "n_tested": int(tested.size), "min_p": float(tested.min()) if tested.size else float("nan"),
+            "n_p_le_0.05": n_p05, "n_p_le_0.01": int((tested <= 0.01).sum()), "n_q_lt_fdr": int((q < fdr).sum()),
+            "fdr": fdr, "fpr_p_le_0.05": n_p05 / tested.size if tested.size else float("nan"), "status": "NA"}
+
+
+def fpr_summary(rows, fdr):
+    out = []
+    nulls = [r for r in rows if r["run"] != "observed"]
+    for method in dict.fromkeys(r["method"] for r in nulls):
+        grp = [r for r in nulls if r["method"] == method]
+        tested = sum(r["n_tested"] for r in grp)
+        n_p05 = sum(r["n_p_le_0.05"] for r in grp)
+        mins = [r["min_p"] for r in grp if not math.isnan(r["min_p"])]
+        analysed = [r["n_analysed"] for r in grp]
+        out.append({"cohort": grp[0]["cohort"], "run": "null_summary", "replicate": len(grp), "method": method,
+                    "element_set": grp[0]["element_set"], "n_analysed": "NA" if "NA" in analysed else sum(analysed),
+                    "n_tested": tested, "min_p": min(mins) if mins else float("nan"), "n_p_le_0.05": n_p05,
+                    "n_p_le_0.01": sum(r["n_p_le_0.01"] for r in grp), "n_q_lt_fdr": max(r["n_q_lt_fdr"] for r in grp),
+                    "fdr": fdr, "fpr_p_le_0.05": n_p05 / tested if tested else float("nan"),
+                    "status": "pass" if max(r["n_q_lt_fdr"] for r in grp) <= 1 else "fail"})
     return out
 
 
@@ -92,6 +142,9 @@ def main():
     ap.add_argument("--min-expected", type=float, default=1.0)
     ap.add_argument("--calibration", required=True)
     ap.add_argument("--qq", required=True)
+    ap.add_argument("--observed-oncodriveclustl", help="native OncodriveCLUSTL table of the observed run (analysed elements)")
+    ap.add_argument("--null-oncodriveclustl", nargs="*", default=[], help="<cohort>.null<r>.oncodriveclustl.tsv files")
+    ap.add_argument("--fpr", help="output: false-positive-rate check of the FPR_METHODS (written when one is present)")
     args = ap.parse_args()
     lo, hi = (float(x) for x in args.band.split(","))
 
@@ -103,15 +156,22 @@ def main():
 
     runs = [("observed", None, args.observed_consensus, args.observed_adwgs)]
     adwgs_by_rep = {replicate(f, "activedriverwgs"): f for f in args.null_adwgs}
+    clustl_by_rep = {replicate(f, "oncodriveclustl"): f for f in args.null_oncodriveclustl}
     for f in sorted(args.null_consensus, key=lambda x: replicate(x, "consensus")):
         r = replicate(f, "consensus")
         runs.append((f"null{r}", r, f, adwgs_by_rep.get(r)))
 
-    cal, qq = [], []
+    cal, qq, fpr = [], [], []
     for run, rep, cons_path, adwgs in runs:
         cons = pd.read_csv(cons_path, sep="\t")
         keep, set_name = element_set(cons, adwgs, args.min_expected)
+        for method in FPR_METHODS:
+            if f"p_{method}" in cons.columns and f"q_{method}" in cons.columns:
+                native = args.observed_oncodriveclustl if rep is None else clustl_by_rep.get(rep)
+                fpr.append(fpr_row(args.cohort, run, rep, method, cons, n_analysed(native), args.fdr))
         for method, pcol, qcol in methods(cons):
+            if method in FPR_METHODS:
+                continue
             p = pd.to_numeric(cons[pcol], errors="coerce")
             q = pd.to_numeric(cons[qcol], errors="coerce")
             sel = p.notna() & (cons["element_id"].isin(keep) if keep is not None else True)
@@ -154,6 +214,17 @@ def main():
     pd.DataFrame(qq, columns=["cohort", "run", "method", "expected_mlog10p", "observed_mlog10p"]).to_csv(args.qq, sep="\t", index=False)
     for row in summary:
         print(f"CALIBRATECALLERS {args.cohort} {row['method']}: null lambda {row['lambda']:.4g} ({row['status']}), max q<{args.fdr} {row['n_q_lt_fdr']}", file=sys.stderr)
+    if fpr:
+        if not args.fpr:
+            sys.exit("CALIBRATECALLERS: OncodriveCLUSTL columns present but no --fpr output given")
+        fsum = fpr_summary(fpr, args.fdr)
+        f = pd.DataFrame(fpr + fsum, columns=FPR_COLUMNS)
+        for col in ("min_p", "fpr_p_le_0.05"):
+            f[col] = f[col].map(lambda v: "NA" if pd.isna(v) else f"{v:.6g}")
+        f.to_csv(args.fpr, sep="\t", index=False)
+        for row in fsum:
+            print(f"CALIBRATECALLERS {args.cohort} {row['method']}: null FPR {row['n_p_le_0.05']}/{row['n_tested']} tested at p<=0.05, "
+                  f"max q<{args.fdr} {row['n_q_lt_fdr']} ({row['status']})", file=sys.stderr)
 
 
 if __name__ == "__main__":

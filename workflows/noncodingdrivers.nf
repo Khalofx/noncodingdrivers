@@ -207,6 +207,7 @@ workflow NONCODINGDRIVERS {
     // each cohort; reported only
     //
     def ch_null_calibration = channel.empty()
+    def ch_null_fpr         = channel.empty()
     if (params.run_null_calibration) {
         NULL_CALIBRATION(
             ch_mutations,
@@ -222,12 +223,14 @@ workflow NONCODINGDRIVERS {
             params.seed
         )
         ch_null_calibration = NULL_CALIBRATION.out.calibration
+        ch_null_fpr         = NULL_CALIBRATION.out.fpr
     }
     //
     // Post-filter flags and the long-form evidence table (D33). Added files only: the consensus
     // is not filtered or re-ranked; tiers are assigned downstream.
     //
     def ch_evidence = channel.empty()
+    def ch_evidence_inputs = channel.empty()
     if (params.run_driver_evidence) {
         // coordinate provenance of each cohort's mutations: GRCh37/hg19 rows are lifted
         def ch_coordinates = ch_samplesheet
@@ -247,23 +250,17 @@ workflow NONCODINGDRIVERS {
                 .filter { _id, meta, _consensus, _flags -> meta != null }
                 .map { _id, meta, consensus, flags -> [ meta, consensus, flags ?: [] ] }
         )
-        WRITEDRIVEREVIDENCE(
-            ch_cons_by_id
-                .join(ch_flags_by_id, remainder: true)
-                .filter { _id, meta, _consensus, _flags -> meta != null }
-                .join(POSTFILTERFLAGS.out.postfilter.map { meta, postfilter -> [ meta.id, postfilter ] })
-                .join(ch_null_calibration.map { meta, calibration -> [ meta.id, calibration ] }, remainder: true)
-                .filter { _id, meta, _consensus, _flags, _postfilter, _calibration -> meta != null }
-                .join(ch_clustl_by_id, remainder: true)
-                .filter { _id, meta, _consensus, _flags, _postfilter, _calibration, _clustl -> meta != null }
-                .join(ch_coordinates)
-                .map { _id, meta, consensus, flags, postfilter, calibration, clustl, coordinates ->
-                    [ meta, consensus, flags ?: [], postfilter, calibration ?: [], coordinates, clustl ?: [] ]
-                },
-            file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true),
-            workflow.manifest.version
-        )
-        ch_evidence = WRITEDRIVEREVIDENCE.out.evidence
+        // WRITEDRIVEREVIDENCE runs after the annotation and context layers (below), whose summary
+        // tables it reads when a layer is on
+        ch_evidence_inputs = ch_cons_by_id
+            .join(ch_flags_by_id, remainder: true)
+            .filter { _id, meta, _consensus, _flags -> meta != null }
+            .join(POSTFILTERFLAGS.out.postfilter.map { meta, postfilter -> [ meta.id, postfilter ] })
+            .join(ch_null_calibration.map { meta, calibration -> [ meta.id, calibration ] }, remainder: true)
+            .filter { _id, meta, _consensus, _flags, _postfilter, _calibration -> meta != null }
+            .join(ch_clustl_by_id, remainder: true)
+            .filter { _id, meta, _consensus, _flags, _postfilter, _calibration, _clustl -> meta != null }
+            .join(ch_coordinates)
     }
     RUNSUMMARYMQC(
         DRIVER_DISCOVERY.out.consensus
@@ -332,6 +329,7 @@ workflow NONCODINGDRIVERS {
     // SUBWORKFLOW: context layers (COSMIC, cancer gene list, ENCODE-rE2G, SCREEN V4). Each is off
     // by default; with all of them off this block creates no process. Annotation only.
     //
+    def ch_context_tables = channel.empty()
     if (params.run_cosmic_context || params.cancer_gene_list || params.run_enhancer_gene_links || params.run_ccre_overlay) {
         def re2g     = params.run_enhancer_gene_links ? enhancerGeneFiles(refs) : [ tissues: [], files: [], n_files: '' ]
         def celltype = params.run_ccre_overlay && params.ccre_celltype_tissues ? ccreCelltypeFiles(refs) : [ files: [] ]
@@ -352,6 +350,32 @@ workflow NONCODINGDRIVERS {
               re2g: params.run_enhancer_gene_links, re2g_tissues: re2g.tissues.join(','), re2g_n_files: re2g.n_files,
               ccre: params.run_ccre_overlay, ccre_celltype: celltype.files.size() > 0, gene_list_name: params.cancer_gene_list_name ?: '' ]
         )
+        ch_context_tables = CONTEXT_LAYERS.out.cosmic_elements
+            .mix(CONTEXT_LAYERS.out.cancer_genes, CONTEXT_LAYERS.out.re2g_summary, CONTEXT_LAYERS.out.ccre_summary)
+    }
+
+    //
+    // MODULE: long-form evidence table (D33). With a layer on, one set of summary items per
+    // significant element from that layer's table (S7A.33); with every layer off the tables list is
+    // empty and the table is unchanged. Evidence never filters or re-ranks.
+    //
+    if (params.run_driver_evidence) {
+        def ch_layer_tables = EXPLAIN.out.avi_summary
+            .mix(EXPLAIN.out.opencravat, ch_context_tables, ch_null_fpr)
+            .map { meta, table -> [ meta.id, table ] }
+            .groupTuple()
+            .map { id, tables -> [ id, tables.sort { table -> table.name } ] }
+        WRITEDRIVEREVIDENCE(
+            ch_evidence_inputs
+                .join(ch_layer_tables, remainder: true)
+                .filter { _id, meta, _consensus, _flags, _postfilter, _calibration, _clustl, _coordinates, _tables -> meta != null }
+                .map { _id, meta, consensus, flags, postfilter, calibration, clustl, coordinates, tables ->
+                    [ meta, consensus, flags ?: [], postfilter, calibration ?: [], coordinates, clustl ?: [], tables ?: [] ]
+                },
+            file("${projectDir}/assets/evidence_sources.tsv", checkIfExists: true),
+            workflow.manifest.version
+        )
+        ch_evidence = WRITEDRIVEREVIDENCE.out.evidence
     }
 
     //

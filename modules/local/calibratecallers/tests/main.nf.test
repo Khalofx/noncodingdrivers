@@ -21,7 +21,9 @@ nextflow_process {
                     file("\${d}/test.consensus.tsv", checkIfExists: true),
                     file("\${d}/test.activedriverwgs.tsv", checkIfExists: true),
                     [ file("\${d}/test.null2.consensus.tsv", checkIfExists: true), file("\${d}/test.null1.consensus.tsv", checkIfExists: true) ],
-                    [ file("\${d}/test.null1.activedriverwgs.tsv", checkIfExists: true), file("\${d}/test.null2.activedriverwgs.tsv", checkIfExists: true) ]
+                    [ file("\${d}/test.null1.activedriverwgs.tsv", checkIfExists: true), file("\${d}/test.null2.activedriverwgs.tsv", checkIfExists: true) ],
+                    [],
+                    []
                 ]
                 """
             }
@@ -37,6 +39,44 @@ nextflow_process {
                 { assert cal.findAll { r -> r.run == 'null_summary' }.every { r -> r.status in [ 'within_band', 'conservative', 'excluded_for_inflation' ] } },
                 { assert cal.every { r -> r.element_set == 'activedriverwgs_expected_ge_1' } },
                 { assert snapshot(process.out.calibration, process.out.qq).match() }
+            )
+        }
+    }
+
+    // OncodriveCLUSTL columns added to the same fixtures (tests/data/calibratecallers/clustl): no
+    // lambda and no QQ points for it, the other methods' files keep the snapshot of the test above,
+    // and its false-positive-rate check per replicate is written (S7A.41)
+    test("observed and two null replicates - OncodriveCLUSTL false-positive-rate check") {
+
+        when {
+            process {
+                """
+                def d = "${projectDir}/tests/data/calibratecallers"
+                input[0] = [
+                    [ id:'test', cohort:'test', assembly:'GRCh38' ],
+                    file("\${d}/clustl/test.consensus.tsv", checkIfExists: true),
+                    file("\${d}/test.activedriverwgs.tsv", checkIfExists: true),
+                    [ file("\${d}/clustl/test.null2.consensus.tsv", checkIfExists: true), file("\${d}/clustl/test.null1.consensus.tsv", checkIfExists: true) ],
+                    [ file("\${d}/test.null1.activedriverwgs.tsv", checkIfExists: true), file("\${d}/test.null2.activedriverwgs.tsv", checkIfExists: true) ],
+                    file("\${d}/clustl/test.oncodriveclustl.tsv", checkIfExists: true),
+                    [ file("\${d}/clustl/test.null2.oncodriveclustl.tsv", checkIfExists: true), file("\${d}/clustl/test.null1.oncodriveclustl.tsv", checkIfExists: true) ]
+                ]
+                """
+            }
+        }
+
+        then {
+            def table = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def cal = table(process.out.calibration[0][1])
+            def fpr = table(process.out.fpr[0][1]).collectEntries { r -> [ r.run, r ] }
+            assert process.success
+            assertAll(
+                { assert !cal.any { r -> r.method == 'oncodriveclustl' } },
+                { assert path(process.out.calibration[0][1]).md5 == 'a9c1b42a1796ce5c0cce094e83b055a7' },   // = the test above
+                { assert path(process.out.qq[0][1]).md5 == '02c55d3ebe726b3d9f84f6bfc4bcada8' },
+                { assert fpr.keySet() == [ 'observed', 'null1', 'null2', 'null_summary' ] as Set },
+                { assert [ fpr.null_summary.n_analysed, fpr.null_summary.n_tested, fpr.null_summary['n_p_le_0.05'], fpr.null_summary.n_q_lt_fdr, fpr.null_summary.status ] == [ '73', '18', '1', '0', 'pass' ] },
+                { assert snapshot(process.out.fpr).match() }
             )
         }
     }

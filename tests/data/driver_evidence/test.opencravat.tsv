@@ -1,0 +1,5 @@
+variant_id	chrom	pos	ref	alt	vtype	element_ids	n_samples	oc_status	ccre_screen__ccre_accession_id	ccre_screen__classification	clinvar__clinical_significance	clinvar__clinvar_id	repeat__repeat_class	repeat__repeat_family
+chr5:120:G:A	chr5	120	G	A	SNP	promoter_A	2	annotated	EH38E0000001	PLS	NA	NA	NA	NA
+chr5:149:C:T	chr5	149	C	T	SNP	promoter_A,enhancer_B	1	annotated	EH38E0000002	dELS	Pathogenic	1001	SINE	Alu
+chr5:210:A:G	chr5	210	A	G	SNP	enhancer_B	1	not_in_report	NA	NA	NA	NA	NA	NA
+chr5:510:AT:A	chr5	510	AT	A	DEL	promoter_E	1	annotated	NA	NA	NA	NA	NA	NA

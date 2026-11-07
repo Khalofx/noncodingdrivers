@@ -34,6 +34,8 @@ nextflow_pipeline {
             def genes = table("$outputDir/cancer_genes/SYNTH-TERT.cancer_gene_context.tsv").collectEntries { r -> [ r.element_id, r ] }
             def summ  = table("$outputDir/enhancer_gene/SYNTH-TERT.enhancer_gene_summary.tsv").collectEntries { r -> [ r.element_id, r ] }
             def prov  = path("$outputDir/cosmic/SYNTH-TERT.cosmic.provenance.json").json
+            def ev    = table("$outputDir/evidence/SYNTH-TERT.driver_evidence.tsv")
+                .findAll { r -> r.element_id == 'TERT_promoter_fixture' }.collectEntries { r -> [ r.evidence_item, r ] }
             assert workflow.success
             assertAll(
                 { assert [ 'cosmic/SYNTH-TERT.cosmic.mutation_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.element_summary.tsv',
@@ -46,6 +48,12 @@ nextflow_pipeline {
                 { assert genes.TERT_promoter_fixture.nearest_protein_coding_gene == 'TERT' },
                 { assert summ.TERT_promoter_fixture.self_promoter_genes == 'TERT' },
                 { assert file("${metaDir}/nextflow.log").text.contains("used as staged") },
+                // driver_evidence.tsv: one set of summary items per context layer for the significant element (S7A.33)
+                { assert [ 'cosmic_n_matched_mutations', 'cosmic_n_samples', 'cosmic_n_sample_name_overlaps', 'cancer_gene_nearest_in_list',
+                           'cancer_gene_nearest_pc_in_list', 'cancer_gene_re2g_targets_in_list', 're2g_n_distal_targets', 're2g_top_distal_target',
+                           'ccre_v4_dominant_class', 'ccre_v4_covered_fraction' ].every { i -> ev.containsKey(i) } },
+                { assert !ev.keySet().any { i -> i.startsWith('avi_') || i.startsWith('opencravat_') } },   // those layers are off
+                { assert ev.cancer_gene_nearest_pc_in_list.status == 'in_list' && ev.cosmic_n_samples.source_version == 'COSMIC v999' },
                 { assert snapshot(
                     // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
                     removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml"),
@@ -53,7 +61,8 @@ nextflow_pipeline {
                     [ 'cosmic/SYNTH-TERT.cosmic.mutation_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.element_summary.tsv', 'cosmic/SYNTH-TERT.cosmic.provenance.json',
                       'cosmic/restricted/SYNTH-TERT.cosmic.exact_matches.tsv', 'cosmic/restricted/NOTICE.txt', 'cancer_genes/SYNTH-TERT.cancer_gene_context.tsv',
                       'enhancer_gene/SYNTH-TERT.enhancer_gene_links.tsv', 'enhancer_gene/SYNTH-TERT.enhancer_gene_summary.tsv',
-                      'ccre/SYNTH-TERT.ccre_v4.tsv', 'ccre/SYNTH-TERT.ccre_v4_summary.tsv', 'ccre/SYNTH-TERT.ccre_v4_celltype.tsv' ].collect { f -> path("$outputDir/${f}") }
+                      'ccre/SYNTH-TERT.ccre_v4.tsv', 'ccre/SYNTH-TERT.ccre_v4_summary.tsv', 'ccre/SYNTH-TERT.ccre_v4_celltype.tsv',
+                      'evidence/SYNTH-TERT.driver_evidence.tsv' ].collect { f -> path("$outputDir/${f}") }
                 ).match() }
             )
         }
