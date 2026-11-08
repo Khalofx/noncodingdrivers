@@ -256,14 +256,15 @@ The score file is not bundled and the pipeline never downloads it. To stage it:
    accept the terms and download "AVI SNV scores" (`avi_scores_snvs_tabix.zip`, 88.5 GB) in your
    own browser session. Do not share the sign-in. It is listed as a permissive-use download
    (commercial and non-commercial use); read the terms on sharing outputs when you download.
-2. Put the archive in `<reference_base>/alphagenome/`, unzip it (allow about 180 GB free while
-   unpacking; that the archive is stored uncompressed is a third-party report, not checked here)
-   and list its contents. The score file must be bgzip-compressed TSV with
+2. Put the archive in `<reference_base>/alphagenome/` and unpack it there (allow about 180 GB
+   free: the archive stores `alphagenome_variant_impact_score_snvs.tsv.gz` and its `.tbi` uncompressed;
+   `python3 -m zipfile -e avi_scores_snvs_tabix.zip .` works where `unzip` is not installed). The score file must be bgzip-compressed TSV with
    the columns chrom, pos, ref, alt, raw, phred (the order the plugin reads) and have a tabix
    `.tbi` index beside it: the plugin does not accept a `.csi`.
-3. Record the MD5 of the archive, the score file and the `.tbi` and the download date. With the
-   datasheet, set `alphagenome_avi` (file name) and the three `alphagenome_avi*_md5` keys in
-   `assets/references/GRCh38.yml`; otherwise pass `--alphagenome_avi <file>`.
+3. Compare the MD5s of the archive, the score file and the `.tbi` with the datasheet
+   (`assets/references/GRCh38.yml`, download of 2026-11-07; `docs/references.md`). If AlphaGenome
+   has published a different file since, record its name, MD5s and download date there, or pass
+   `--alphagenome_avi <file>`.
 
 The run stops before any task when `--run_alphagenome_avi` is set without `--run_vep`, without a
 score file or without its `.tbi` (`AVI_NEEDS_VEP`, `AVI_FILE_MISSING`, `AVI_INDEX_MISSING`),

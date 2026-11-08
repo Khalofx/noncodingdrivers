@@ -21,9 +21,6 @@ SHEET = os.path.join(ROOT, "assets", "references", "GRCh38.yml")
 SCHEMA = os.path.join(ROOT, "assets", "schema_references.json")
 PROVENANCE = os.path.join(ROOT, "tests", "regression", "PROVENANCE.md")
 PLACEHOLDER = "${reference_base}"
-# Checksums of a user-downloaded asset that has not been inspected yet (AlphaGenome AVI, to-do S7A.15)
-PENDING = "pending-user-download"
-PENDING_ALLOWED = {"alphagenome_avi_md5", "alphagenome_avi_tbi_md5", "alphagenome_avi_archive_md5"}
 MANIFEST = os.path.join(ROOT, "assets", "references", "encode_re2g.GRCh38.tsv")
 
 
@@ -69,15 +66,15 @@ def test_paths_are_relative_to_reference_base_or_the_pipeline():
 def test_checksums_are_recorded_in_provenance():
     recorded = set(re.findall(r"\b[0-9a-f]{32}\b", open(PROVENANCE).read()))
     e = _entry()
-    missing = {k: v for k, v in e.items() if k.endswith("_md5") and v not in recorded and v != PENDING}
+    missing = {k: v for k, v in e.items() if k.endswith("_md5") and v not in recorded}
     assert not missing, f"datasheet checksums not in PROVENANCE.md: {missing}"
 
 
-def test_pending_checksums_are_only_the_user_downloaded_avi_file():
-    """A placeholder checksum is allowed for the AlphaGenome AVI download only, never for an asset the pipeline validated."""
+def test_avi_download_is_recorded_and_never_bundled():
+    """The user-downloaded AlphaGenome AVI file has its three checksums and stays out of the repository."""
     e = _entry()
-    pending = {k for k, v in e.items() if v == PENDING}
-    assert pending <= PENDING_ALLOWED, f"placeholder checksums outside the AVI keys: {sorted(pending - PENDING_ALLOWED)}"
+    keys = ("alphagenome_avi_md5", "alphagenome_avi_tbi_md5", "alphagenome_avi_archive_md5")
+    assert all(re.fullmatch(r"[0-9a-f]{32}", e[k]) for k in keys)
     assert "never bundled" in e["alphagenome_avi_licence"] and "permissive-use" in e["alphagenome_avi_licence"]
 
 
@@ -105,16 +102,16 @@ def test_staged_references_match_the_datasheet():
              "element_catalogue": "element_catalogue_md5", "gtf": "gtf_md5", "liftover_chain_from_hg19": "liftover_chain_md5",
              "liftover_source_fasta": "liftover_source_fasta_md5", "liftover_source_fasta_fai": "liftover_source_fasta_fai_md5",
              "blacklist_bed": "blacklist_md5", "segdup_bed": "segdup_md5", "low_mappability_bed": "low_mappability_md5",
-             "umap_bed": "umap_md5", "gnomad_echtvar": "gnomad_echtvar_md5", "ccre_v4_bed": "ccre_v4_md5"}
-    # the AVI file once its checksums are recorded (placeholders until the user's download, S7A.15)
-    for path_key, md5_key in (("alphagenome_avi", "alphagenome_avi_md5"),):
-        if e[md5_key] != PENDING:
-            pairs[path_key] = md5_key
+             "umap_bed": "umap_md5", "gnomad_echtvar": "gnomad_echtvar_md5", "ccre_v4_bed": "ccre_v4_md5",
+             "alphagenome_avi": "alphagenome_avi_md5"}
     bad = {}
     for path_key, md5_key in pairs.items():
         path = e[path_key].replace(PLACEHOLDER, base)
         if _md5(path) != e[md5_key]:
             bad[path_key] = path
+    avi_tbi = e["alphagenome_avi"].replace(PLACEHOLDER, base) + ".tbi"
+    if _md5(avi_tbi) != e["alphagenome_avi_tbi_md5"]:
+        bad["alphagenome_avi_tbi"] = avi_tbi
     assert not bad, f"checksum differs: {bad}"
     rows = sum(1 for _ in open(e["element_catalogue"].replace(PLACEHOLDER, base)))
     assert rows == e["element_catalogue_rows"]

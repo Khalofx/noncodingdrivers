@@ -9,7 +9,7 @@
 # Asset recipes for every derived file: docs/references.md.
 - genome: GRCh38
   assembly: GRCh38
-  datasheet_version: "1.1.0"
+  datasheet_version: "1.2.0"
   species: homo_sapiens
   chr_style: ucsc
   native: true
@@ -73,14 +73,12 @@
   gnomad_echtvar_md5: 7bc89a78568a424d7694e2d351617bcd
   gnomad_echtvar_source: "gnomAD v4.1 genomes sites VCFs, 24 chromosomes streamed and checked against the published MD5s; INFO AC, AN, AF, nhomalt, fafmax_faf95_max and FILTER encoded with echtvar 0.2.4 (759,336,320 variants; field configuration MD5 06f2ebddcf38deebfbd8873ed5e40986); CC0 1.0"
   # AlphaGenome AVI SNV scores for --run_alphagenome_avi: the user downloads them (Google sign-in;
-  # docs/usage.md); never bundled. PENDING (to-do S7A.15): the file name inside the zip, the three
-  # MD5s and the download date are placeholders until the user's download has been inspected; the
-  # value pending-user-download is accepted for these three keys only (tests/test_references_datasheet.py).
-  alphagenome_avi: ${reference_base}/alphagenome/avi_scores_snvs.tsv.gz
-  alphagenome_avi_md5: pending-user-download
-  alphagenome_avi_tbi_md5: pending-user-download
-  alphagenome_avi_archive_md5: pending-user-download
-  alphagenome_avi_source: "AlphaGenome Atlas downloads: 'AVI SNV scores - AVI scores and Phred-scaled scores in Tabix format' (avi_scores_snvs_tabix.zip, 88.5 GB), https://deepmind.google.com/science/alphagenome/downloads; download date pending"
+  # docs/usage.md); never bundled. File name and MD5s of the download of 2026-11-07.
+  alphagenome_avi: ${reference_base}/alphagenome/alphagenome_variant_impact_score_snvs.tsv.gz
+  alphagenome_avi_md5: d7753d6a3aba87a0b90ecb9df3b789e3
+  alphagenome_avi_tbi_md5: 911ee04b6e8fba1882465221b5a14f2c
+  alphagenome_avi_archive_md5: 1f897f5a230965101c98beb904322d10
+  alphagenome_avi_source: "AlphaGenome Atlas downloads: 'AVI SNV scores - AVI scores and Phred-scaled scores in Tabix format' (avi_scores_snvs_tabix.zip, 88,473,344,811 bytes, holding alphagenome_variant_impact_score_snvs.tsv.gz and its .tbi uncompressed), https://deepmind.google.com/science/alphagenome/downloads; downloaded 2026-11-07"
   alphagenome_avi_licence: "AlphaGenome permissive-use download (commercial and non-commercial); user-downloaded, never bundled"
   enhancer_gene_dir: ${reference_base}/encode_re2g
   enhancer_gene_note: "ENCODE-rE2G thresholded element-gene links (DNaseOnly model, released 2024-06-06), <tissue>/<biosample>.<accession>.bed.gz; 407 files for 12 tissues (liver: the 11-file D-E1 set; other tissues: their normal tissue samples) as selected in assets/references/encode_re2g.GRCh38.tsv; per-file checksums in encode_re2g/PROVENANCE.tsv"
