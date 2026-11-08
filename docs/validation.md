@@ -113,8 +113,9 @@ the AlphaGenome download had not been staged.
 | C                                                     | `opencravat/SYNTH-NC.opencravat.network.tsv`, `.telemetry.tsv`                                                    | connection attempts only to 127.0.0.1:9 (3 connect, 3 lookup calls), 0 non-local targets; 1 metrics payload kept locally by OpenCRAVAT and deleted by the task                                             |
 | C                                                     | other published files against run D                                                                               | byte-identical                                                                                                                                                                                             |
 
-The Liver-HCC-public check with the real AVI file (at most 201 of its 213 candidate variants can be
-scored; 12 are indels) is pending the user's download (to-do S7A.15).
+The real AVI file was staged on 2026-11-08 (download of 2026-11-07; datasheet 1.2.0). The
+Liver-HCC-public check with it (at most 201 of its 213 candidate variants can be scored; 12 are
+indels) is part of the release runs.
 
 ## Input tiers and hg19 liftover (Liver-HCC-public, 261 donors)
 

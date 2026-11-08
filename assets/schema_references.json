@@ -248,17 +248,17 @@
             },
             "alphagenome_avi_md5": {
                 "type": "string",
-                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "pattern": "^[0-9a-f]{32}$",
                 "meta": ["alphagenome_avi_md5"]
             },
             "alphagenome_avi_tbi_md5": {
                 "type": "string",
-                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "pattern": "^[0-9a-f]{32}$",
                 "meta": ["alphagenome_avi_tbi_md5"]
             },
             "alphagenome_avi_archive_md5": {
                 "type": "string",
-                "pattern": "^([0-9a-f]{32}|pending-user-download)$",
+                "pattern": "^[0-9a-f]{32}$",
                 "meta": ["alphagenome_avi_archive_md5"]
             },
             "alphagenome_avi_source": {

@@ -10,7 +10,8 @@ datasheet records every file with its checksum and source; the same checksums ar
 
 `datasheet_version` records changes of the datasheet: `1.0.0` is the Step 5-6 reference set;
 `1.1.0` adds the Step 7A keys (OncodriveFML/OncodriveCLUSTL bgdata genome manifest, AlphaGenome AVI,
-ENCODE-rE2G and SCREEN V4 keys, and the licence keys including `liftover_chain_licence`).
+ENCODE-rE2G and SCREEN V4 keys, and the licence keys including `liftover_chain_licence`);
+`1.2.0` adds the AlphaGenome AVI file name, its three MD5s and the download date (download of 2026-11-07).
 `tests/test_references_datasheet.py` checks that the version in the datasheet is the last one listed here.
 
 - Paths that start with `${reference_base}` are completed with `--reference_base <dir>`. Without
@@ -31,9 +32,8 @@ either: they are licensed, user-supplied at run time and only the current releas
 ([usage](usage.md#cosmic)); the datasheet records only `cosmic_licence`.
 
 The AlphaGenome AVI SNV scores (`alphagenome_avi`) are in the datasheet but are downloaded by the
-user (Google sign-in; `docs/usage.md`) and never bundled. Until that download has been inspected,
-the file name, the three `alphagenome_avi*_md5` keys and the download date are placeholders: the
-MD5 keys hold `pending-user-download`, which the datasheet test accepts for these keys only.
+user (Google sign-in; `docs/usage.md`) and never bundled. The datasheet records the file name and the
+MD5s of the archive, the score file and its index from the download of 2026-11-07.
 
 | Datasheet key                                        | File under `reference_base`                                                                                                                    | Checksum (MD5)                                                         | Used by                                |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
@@ -51,7 +51,7 @@ MD5 keys hold `pending-user-download`, which the datasheet test accepts for thes
 | `low_mappability_bed`                                | `masks/GRCh38_lowmappabilityall.bed.gz` (GIAB v3.6, 673,815 regions)                                                                           | `8a78766bb99abf1d25a5b307d49a0324`                                     | variant flags, mappability post-filter |
 | `umap_bed`                                           | `masks/k100.umap.bed.gz` (Umap k100 single-read)                                                                                               | `1ef87107f449ccaf7e537de9740692fb`                                     | variant flags, callable territory      |
 | `gnomad_echtvar`                                     | `gnomad/gnomad.v4.1.genomes.echtvar.zip` (gnomAD v4.1 genomes, echtvar 0.2.4)                                                                  | `7bc89a78568a424d7694e2d351617bcd`                                     | germline flag                          |
-| `alphagenome_avi`                                    | `alphagenome/avi_scores_snvs.tsv.gz` (user-downloaded; name pending)                                                                           | pending the download (S7A.15)                                          | `--run_alphagenome_avi`                |
+| `alphagenome_avi`                                    | `alphagenome/alphagenome_variant_impact_score_snvs.tsv.gz` (user-downloaded 2026-11-07; `.tbi` MD5 `911ee04b6e8fba1882465221b5a14f2c`)         | `d7753d6a3aba87a0b90ecb9df3b789e3`                                     | `--run_alphagenome_avi`                |
 | `enhancer_gene_dir`                                  | `encode_re2g` (407 ENCODE-rE2G files, 12 tissues; per-file MD5 in `encode_re2g/PROVENANCE.tsv` and `assets/references/encode_re2g.GRCh38.tsv`) |                                                                        | `--run_enhancer_gene_links`            |
 | `ccre_v4_bed`                                        | `screen_v4/GRCh38-cCREs.V4.ENCFF420VPZ.bed.gz` (SCREEN Registry V4 agnostic cCREs, 2,348,854 rows)                                             | `ea1820bd71581ba01c94fc600fbf794d`                                     | `--run_ccre_overlay`                   |
 | `ccre_celltype_dir`                                  | `screen_v4/celltype` (V4 biosample cCREs; MD5 in `screen_v4/PROVENANCE.tsv`)                                                                   |                                                                        | `--ccre_celltype_tissues`              |
@@ -219,8 +219,13 @@ into `alphagenome/`; the score file must be bgzip TSV with the columns chrom, po
 phred (the order `AVI.pm` reads) and a tabix `.tbi` (the plugin does not accept `.csi`). No
 versioned release identifier exists for the scores, so provenance is the download date and the
 MD5s of the archive, the score file and the index (`alphagenome_avi_archive_md5`,
-`alphagenome_avi_md5`, `alphagenome_avi_tbi_md5`). Pending (to-do S7A.15): none of these has been
-recorded yet. The plugin itself (`AVI.pm`, MD5 `798aff5678f249fdb2f8b32c76e4733b`, Apache-2.0) is
+`alphagenome_avi_md5`, `alphagenome_avi_tbi_md5`). The download of 2026-11-07: archive
+`avi_scores_snvs_tabix.zip` (88,473,344,811 bytes, MD5 `1f897f5a230965101c98beb904322d10`) holding, uncompressed,
+`alphagenome_variant_impact_score_snvs.tsv.gz` (88,470,182,310 bytes, MD5 `d7753d6a3aba87a0b90ecb9df3b789e3`) and its
+`.tbi` (3,161,911 bytes, MD5 `911ee04b6e8fba1882465221b5a14f2c`). The score file has the header line
+`#CHROM POS REF ALT raw_score PHRED` and UCSC contig names `chr1`-`chr22`, `chrX`, `chrY` (no `chrM`:
+mitochondrial variants are never scored); for example TERT C228T `chr5 1295113 G A` has raw 0.6464,
+PHRED 21.2107. The plugin itself (`AVI.pm`, MD5 `798aff5678f249fdb2f8b32c76e4733b`, Apache-2.0) is
 part of the pinned ensembl-vep 116.3 image.
 
 For tests a synthetic file in the same layout, with invented scores, is written by

@@ -22,7 +22,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   rejected records published; hg19 rows without the opt-in stop with `ASSEMBLY_NOT_ENABLED`.
 - Reference datasheet `assets/references/GRCh38.yml` (schema `assets/schema_references.json`): the
   validated GRCh38 reference set with checksums, paths relative to `--reference_base`; explicit
-  parameters take precedence. Asset recipes in `docs/references.md`. `datasheet_version` 1.1.0
+  parameters take precedence. Asset recipes in `docs/references.md`. `datasheet_version` 1.2.0
   (Step 7A keys); licence keys for CADD, COSMIC, ENCODE data, AlphaGenome AVI and the user-staged
   UCSC hg19ToHg38 liftover chain (`liftover_chain_licence`: non-commercial use by independent
   researchers and nonprofits, redistribution with UCSC's README), summarised in `licence_summary`.
@@ -81,8 +81,8 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   default, needs `--run_vep`): the Ensembl VEP AVI plugin of the ensembl-vep 116.3 image adds
   `AVI_PHRED` and `AVI_RAW` to the VEP table; gawk adapters write `candidates/avi/<cohort>.avi.tsv`
   (one row per candidate variant with `avi_status`) and `<cohort>.avi.element_summary.tsv`. The
-  user-downloaded score file (`--alphagenome_avi`, datasheet key `alphagenome_avi`, checksums
-  pending the download) is checked with its `.tbi` before any task (`AVI_NEEDS_VEP`,
+  user-downloaded score file (`--alphagenome_avi`, datasheet key `alphagenome_avi` with the file
+  name and MD5s of the download of 2026-11-07) is checked with its `.tbi` before any task (`AVI_NEEDS_VEP`,
   `AVI_FILE_MISSING`, `AVI_INDEX_MISSING`), and `AVI_TABLE` fails when the plugin did not load.
   Annotation only; with the layer off the VEP command is unchanged.
 - OpenCRAVAT 3.2.4 on the candidate mutations (`--run_opencravat`, off by default; local
