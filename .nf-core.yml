@@ -1,22 +1,4 @@
-repository_type: pipeline
-
-nf_core_version: 4.1.0
-
 lint:
-  files_unchanged:
-    - CODE_OF_CONDUCT.md
-    - assets/nf-core-noncodingdrivers_logo_light.png
-    - docs/images/nf-core-noncodingdrivers_logo_light.png
-    - docs/images/nf-core-noncodingdrivers_logo_dark.png
-    - .github/ISSUE_TEMPLATE/bug_report.yml
-    - .github/PULL_REQUEST_TEMPLATE.md
-    - assets/email_template.txt
-    - docs/README.md
-  nextflow_config:
-    - manifest.name
-    - manifest.homePage
-  multiqc_config:
-    - report_comment
   files_exist:
     - conf/igenomes.config
     - conf/igenomes_ignored.config
@@ -27,18 +9,38 @@ lint:
     - .github/ISSUE_TEMPLATE/config.yml
     - .github/workflows/awstest.yml
     - .github/workflows/awsfulltest.yml
-
+  files_unchanged:
+    - LICENSE
+    - CODE_OF_CONDUCT.md
+    - assets/nf-core-noncodingdrivers_logo_light.png
+    - docs/images/nf-core-noncodingdrivers_logo_light.png
+    - docs/images/nf-core-noncodingdrivers_logo_dark.png
+    - .github/ISSUE_TEMPLATE/bug_report.yml
+    - .github/PULL_REQUEST_TEMPLATE.md
+    - assets/email_template.txt
+    - docs/README.md
+  multiqc_config:
+    - report_comment
+  nextflow_config:
+    - manifest.name
+    - manifest.homePage
+  nf_test_content:
+    - tests/assembly_mismatch.nf.test
+    - tests/variant_layers.nf.test
+    - tests/vep_ext_args.nf.test
+nf_core_version: 4.2.2
+repository_type: pipeline
 template:
-  org: khalofx
-  name: noncodingdrivers
+  author: Khalifa Juma
   description: Cohort-level discovery and explanation of candidate non-coding regulatory
     driver elements from pre-called somatic variants
-  author: Khalifa Juma
-  version: 1.0.0dev
   force: false
+  is_nfcore: false
+  name: noncodingdrivers
+  org: khalofx
   outdir: .
   skip_features:
     - fastqc
     - igenomes
     - gpu
-  is_nfcore: false
+  version: 1.0.0dev
