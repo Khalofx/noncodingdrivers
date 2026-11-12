@@ -340,6 +340,86 @@ adapter's START = BED start (unchanged), the scored positions are exactly the BE
 base per fragment is mapped, but it has no score and is dropped (43 of 231,472 SYNTH-NC SNVs). START + 1
 would drop the first base of every fragment from the background. The adapter is kept.
 
+## Published-cohort validation (D42)
+
+Pipeline commit `d6346d1`, default configuration (ActiveDriverWGS and OncodriveFML combined by EBM, the
+annotation layers, `--allow_hg19_liftover`); all layers on for MELA-AU and ESAD-UK. Input: the PCAWG open
+consensus MAF (GRCh37), one tumour per donor. Five cohorts were run; LIRI-JP and PACA-CA are older runs
+(Step 6 and Step 3.14) scored the same way. The pass criteria were fixed before any run (D42). Truth sets:
+the Rheinbay et al. 2020 (doi:10.1038/s41586-020-1965-x) Table 5 rows of each tissue and the headline
+elements of the original ICGC papers, lifted to GRCh38 and matched to catalogue elements by overlap. An
+element is powered with at least 3 input donors inside the published element.
+
+| Cohort  | Donors | Reference papers               | Gate                                           | Result                                                        |
+| ------- | ------ | ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------- |
+| MELA-AU | 70     | Hayward 2017; Rheinbay 2020    | TERT promoter                                  | PASS: rank 1, consensus q 3.5e-6, 26 donors (54 published)    |
+| ESAD-UK | 98     | Frankell 2019; Rheinbay 2020   | TP53TG1 enhancer                               | PASS: rank 28, q 9.9e-3, 9 donors (9 published)               |
+| CLLE-ES | 95     | Puente 2015; Rheinbay 2020     | WDR74 5' UTR                                   | PASS: rank 4, q 1.2e-5, 6 donors (6 published)                |
+| MALY-DE | 98     | Hübschmann 2021; Rheinbay 2020 | hsa-mir-142                                    | PASS: rank 24, q 1.5e-10, 13 donors (15 published)            |
+| PRAD-CA | 116    | Fraser 2017; Rheinbay 2020     | negative control: ≤ 5 consensus, none q < 1e-6 | FAIL: 6 consensus, minimum q 5.8e-25 (input artefacts, below) |
+| LIRI-JP | 261    | Fujimoto 2016; Rheinbay 2020   | none (recall only)                             | WDR74 and MED16 recovered, RMRP missed                        |
+| PACA-CA | 147    | Feigin 2017; Rheinbay 2020     | none (recall only)                             | 1 consensus element; Rheinbay found none                      |
+
+**Recall.** Of the 13 powered Rheinbay elements in the five new cohorts, 7 are recovered (consensus q < 0.1),
+2 are nominal and 4 missed (ZSWIM6 and RMRP promoters in MELA-AU, SDCCAG8 in ESAD-UK, RP5-997D16.2 in
+PRAD-CA); with LIRI-JP, 8 of 17 are recovered, 1 is significant for one caller, 3 are nominal and 5 missed.
+The WDR74 promoter element is consensus in five cohorts.
+
+**Negative control.** Three of the six PRAD-CA consensus elements are a single position with one allele in
+8–16 donors (chr2:123,542,446 A>T, chrX:84,712,544 T>G, chrY:16,918,840 T>A). In the PRAD-CA input at least
+12 positions are called in 12–16 donors each, with variant allele fractions mostly 0.05–0.25 and support
+from 2–3 of the 4 PCAWG callers: a project-specific calling artefact. Of these calls, only one chrX call occurs in another cohort (PACA-CA).
+The pipeline has no evidence item that shows this pattern yet.
+
+**Interpretation.** In MELA-AU 96 of 110 consensus elements are driven by OncodriveFML alone, mostly UV
+promoter hotspots; ActiveDriverWGS removed 29 of the 70 donors as hypermutated, and its TERT promoter
+count is 12 patients against 27 with a mutation in the element. In CLLE-ES and MALY-DE the top consensus
+elements include somatic-hypermutation targets (CLLE-ES: IGH, BCL6, CXCR4; MALY-DE: BCL6 rank 1, BCL2 rank 12). These hits need interpretation before
+being called drivers.
+
+**Run integrity.** Evidence tables have 0 schema errors in every run. The fraction of tested elements with
+p < 0.05 is 1.50–1.85% for ActiveDriverWGS and 4.46–6.12% for OncodriveFML (release Liver-HCC-public run:
+1.86% and 4.80%). All-on consensus tables equal the default ones without the two OncodriveCLUSTL columns. The
+MALY-DE run did not finish: MOTIFBREAKR (11,245 candidate SNVs) reached the 24 h limit twice; every discovery
+and evidence output was published.
+
+**Caveats.** The open subsets are smaller than the published cohorts (70 of Hayward's 183 melanomas, 98
+PCAWG donors against Frankell's 551), so low-frequency elements are underpowered. Puente 2015 is closed
+access (the PAX5 enhancer was tested as a locus window), and only a corrigendum of Fujimoto 2016 was
+read. Regulatory Build elements can be larger than the published ones.
+
+## Component checks against independent re-implementations
+
+Each component checked against something computed independently of the pipeline (2026-11-12, `d6346d1`).
+The multiple-testing and intersection checks cover the five validation cohorts above (531,038–542,134
+tested elements each); the motif check uses MELA-AU.
+
+| Component                           | Independent reference                                                                                                                                                | Result                                                                                                                                                                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ActiveDriverWGS wrapper             | The package README example (ATM, MYD88, NOTCH1; hg19), run through `bin/run_activedriverwgs.R` (`benchmarks/activedriverwgs_readme.R`)                               | The authors' direct call and the wrapper at shard sizes 5000 and 1 reproduce every printed value (ATM p 0.002092488, MYD88 0.003309630, NOTCH1 0.004964277; observed 2/1/2; FDR 0.004964277); the wrapper tables equal the direct call |
+| ActiveDriverWGS module on real data | A direct `ActiveDriverWGS()` call on inputs prepared in R from the CLLE-ES mutation table and the catalogue (27 element ids, including WDR74 and both PAX5 elements) | p-value, observed and expected counts equal for all 27                                                                                                                                                                                 |
+| Multiple testing                    | Benjamini–Hochberg recomputed from the p-values of each consensus table                                                                                              | `q_activedriverwgs`, `ebm_q`, `acat_q` within relative 1e-12; `consensus_q` = `ebm_q`; `is_consensus` = `consensus_q` < 0.1; 0 decisions change                                                                                        |
+| Element–mutation intersection       | SNVs per element counted from the mutation table                                                                                                                     | OncodriveFML's SNV count equals the bedtools count `(start, end]` for every element; ActiveDriverWGS's `element_muts_obs` equals distinct patients in `[start, end]` after its hypermutator filter for every element                   |
+| Motif disruption                    | TERT C228T and C250T create an ETS site                                                                                                                              | Both are `gain` for ETS factors (C228T: ELK4, fold 43.7; C250T: ELF4, ELK4, ELF2); GABPA is not among the called factors at this threshold                                                                                             |
+
+The nf-tests `tests/activedriverwgs_shards.nf.test` (shard size and element boundary on the fixture) and
+the recomputed Benjamini–Hochberg assertions of `modules/local/combinepvalues/tests/main.nf.test` keep these
+checks.
+
+**ActiveDriverWGS behaviours found by these checks.**
+
+- **Hypermutated samples.** ActiveDriverWGS drops samples with more than 3,000 × `filter_hyper_MB` (30)
+  mutations before testing: 29 of 70 MELA-AU donors (its SNVs fall from 7,767,405 to 1,270,852), 2 of 98
+  ESAD-UK, 1 of 98 MALY-DE, none in CLLE-ES and PRAD-CA. EBM therefore combines p-values computed on
+  different donor sets in such cohorts.
+- **Coordinates.** The module passes the BED start unchanged, and ActiveDriverWGS builds closed 1-based
+  ranges (`IRanges(start, end)`), so the base 5' of each BED fragment is counted: 46–386 elements per cohort
+  count more patients than with bedtools semantics. The package's own `prepare_elements_from_BED4` does the same.
+  OncodriveFML (above) counts exactly the BED interval.
+- **SNVs only.** The module passes SNVs; the package also accepts indels in its own notation. On the
+  README example, SNV-only input moves NOTCH1 from p 0.005 to 1 (its two mutations are indels) and ATM from
+  0.002 to 0.047.
+
 ## Recorded differences from the baseline
 
 - **Candidate rows** come from every fragment of a significant element; the baseline located them by

@@ -5,10 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v1.0.0 - [unreleased]
 
-Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://nf-co.re/) template.
+Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://nf-co.re/) template (nf-core/tools 4.2.2).
 
 ### `Added`
 
+- Published-cohort validation and component checks against independent re-implementations in
+  `docs/validation.md`; nf-test `tests/activedriverwgs_shards.nf.test` (shard size and element
+  boundary of the ACTIVEDRIVERWGS module); recomputed Benjamini–Hochberg assertions in the
+  COMBINEPVALUES test; `benchmarks/activedriverwgs_readme.R` (the ActiveDriverWGS README example
+  through the module's script).
 - Entry tiers `vcf`, `sarek` and `maf` (`assets/schema_input.json`) through the
   `INPUT_HARMONISATION` subworkflow: contig renaming (nf-core `bcftools/annotate`), MAF split per
   tumour and conversion with maf2vcf.pl (local `MAF2VCF`, vcf2maf 1.6.22), sorting, normalisation,
