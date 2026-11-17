@@ -86,6 +86,32 @@ each file explicitly; an explicit parameter wins over its datasheet value. See
 [references](references.md) for the checksums and the recipes that build each asset. CADD is never
 in the datasheet: it is supplied by the user (`--oncodrivefml_score`).
 
+## Hypermutator filter
+
+Hypermutated samples are removed once, from the cohort table, before any caller runs; every caller,
+the null calibration, the variant flags and the signatures then read the same samples.
+
+- `--hypermutator_filter intogen` (default): a sample is removed when it has more than
+  `--hypermutator_min_mutations` (10,000) mutations **and** more than Q3 + `--hypermutator_iqr_factor`
+  (1.5) x IQR of the per-sample counts of its cohort. This is IntOGen's preprocessing rule for
+  whole genomes. The count condition keeps cohorts where every sample is heavily mutated (most
+  melanomas exceed 10,000), and the IQR condition removes only the cohort's outliers.
+- `--hypermutator_filter cap`: removes every sample with more than `--hypermutator_min_mutations`.
+- `--hypermutator_filter none`: keeps every sample.
+
+A sample's count is its number of rows in the cohort table (SNVs, MNVs and indels). Removed samples,
+their counts and the cohort thresholds are written to `mutations/<cohort>.sample_filter.tsv`, their rows
+to `mutations/<cohort>.removed_mutations.tsv`, and the MultiQC report lists them per cohort. The run
+stops if the rule would remove every sample of a cohort.
+
+ActiveDriverWGS has its own hypermutator cut (`filter_hyper_MB`, more than 3,000 x the value in mutations
+per sample). It is off by default (`--adwgs_filter_hyper_mb` not set), so it does not re-filter the
+already filtered cohort; `--adwgs_filter_hyper_mb 30` reproduces runs made before this option existed.
+
+On the published validation cohorts the intogen rule removes 5 of 70 MELA-AU donors, 5 of 98
+ESAD-UK, 8 of 98 MALY-DE, 2 of 116 PRAD-CA and none of 95 CLLE-ES; a plain 10,000 cap would remove 54 of
+70 MELA-AU and 88 of 98 ESAD-UK donors.
+
 ## Callers and licences
 
 The validated configuration combines ActiveDriverWGS and OncodriveFML (the default

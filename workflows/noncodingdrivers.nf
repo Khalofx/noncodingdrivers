@@ -10,6 +10,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_noncodingdrivers_pipeline'
 include { CSVTK_CONCAT as COHORT_CONCAT     } from '../modules/nf-core/csvtk/concat/main'
 include { GAWK as COHORT_DEDUP              } from '../modules/nf-core/gawk/main'
+include { COHORT_FILTER                     } from '../modules/local/cohortfilter'
 include { UNTAR as UNTAR_ONCODRIVEFML_GENOME } from '../modules/nf-core/untar/main'
 include { DRIVER_DISCOVERY                  } from '../subworkflows/local/driver_discovery'
 include { RUNSUMMARYMQC                     } from '../modules/local/runsummarymqc'
@@ -66,7 +67,7 @@ workflow NONCODINGDRIVERS {
     // Each row first passes the assembly check against the FASTA of its declared build.
     //
     def ch_harmonised  = channel.empty()
-    def ch_cohort_vcfs = channel.empty()
+    def ch_sample_vcfs = channel.empty()
     if (refs.fasta) {
         def ch_fasta = channel.value([ [ id: 'GRCh38' ], file(refs.fasta, checkIfExists: true), file(refs.fasta_fai, checkIfExists: true) ])
         def ch_dict  = channel.value(params.allow_hg19_liftover
@@ -89,11 +90,8 @@ workflow NONCODINGDRIVERS {
             params.assembly_min_records
         )
         ch_harmonised = INPUT_HARMONISATION.out.mutations
-        // MutEnricher (QC-only) reads the per-sample PASS VCFs of each cohort
-        ch_cohort_vcfs = INPUT_HARMONISATION.out.vcf
-            .map { meta, vcf, tbi -> [ meta.cohort, vcf, tbi ] }
-            .groupTuple()
-            .map { cohort, vcfs, tbis -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], vcfs, tbis ] }
+        // Per-sample PASS VCFs (MutEnricher); grouped per cohort after the hypermutator filter below
+        ch_sample_vcfs = INPUT_HARMONISATION.out.vcf
     }
 
     //
@@ -109,7 +107,31 @@ workflow NONCODINGDRIVERS {
         .map { cohort, tables -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], tables.sort { table -> [ table.name, table.toString() ].join('\t') } ] }
     COHORT_CONCAT(ch_cohort_tables, 'tsv', 'tsv')
     COHORT_DEDUP(COHORT_CONCAT.out.csv.map { meta, tsv -> [ meta, tsv, 'mutations.tsv' ] }, [], false)
-    def ch_mutations = COHORT_DEDUP.out.output
+
+    //
+    // Hypermutator filter, applied once (D2): every caller, the null calibration, the flags and
+    // the signatures read the same samples. --hypermutator_filter intogen (default): more than
+    // --hypermutator_min_mutations rows and above Q3 + --hypermutator_iqr_factor x IQR of the
+    // cohort; cap; or none. Removed samples and their rows are published under mutations/.
+    //
+    COHORT_FILTER(COHORT_DEDUP.out.output)
+    def ch_mutations = COHORT_FILTER.out.mutations
+    ch_multiqc_files = ch_multiqc_files.mix(COHORT_FILTER.out.mqc.map { _meta, mqc -> mqc })
+
+    // MutEnricher (QC-only) reads the per-sample PASS VCFs of each cohort, without the samples
+    // removed by the hypermutator filter
+    def ch_removed_samples = COHORT_FILTER.out.sample_filter
+        .map { meta, table ->
+            def removed = table.readLines().drop(1).collect { line -> line.split('\t', -1) }.findAll { f -> f[2] == 'false' }.collect { f -> f[0] }
+            [ meta.cohort, removed ]
+        }
+    def ch_cohort_vcfs = ch_sample_vcfs
+        .map { meta, vcf, tbi -> [ meta.cohort, meta.sample ?: meta.id, vcf, tbi ] }
+        .combine(ch_removed_samples, by: 0)
+        .filter { _cohort, sample, _vcf, _tbi, removed -> !(sample in removed) }
+        .map { cohort, _sample, vcf, tbi, _removed -> [ cohort, vcf, tbi ] }
+        .groupTuple()
+        .map { cohort, vcfs, tbis -> [ [ id: cohort, cohort: cohort, assembly: 'GRCh38' ], vcfs, tbis ] }
 
     //
     // References for the callers

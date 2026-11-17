@@ -15,15 +15,16 @@
 # Usage:
 #   run_activedriverwgs.R --mutations <mutations.tsv> --elements <elements.bed> --out <out.tsv>
 #                         [--ref-genome hg38] [--cores N] [--shard-size N] [--rlib DIR]
+#                         [--filter-hyper-mb X]   (package default 30; Inf = off)
 #
 # mutations.tsv : chr,pos1,pos2,ref,alt,patient (header)
 # elements.bed  : BED (>=4 cols: chr,start,end,id), no header
 args <- commandArgs(trailingOnly = TRUE)
 usage <- paste("usage: run_activedriverwgs.R --mutations F --elements F --out F",
-               "[--ref-genome hg38] [--cores N] [--shard-size N] [--rlib DIR]")
+               "[--ref-genome hg38] [--cores N] [--shard-size N] [--rlib DIR] [--filter-hyper-mb X]")
 if (length(args) == 0L || length(args) %% 2L != 0L || !all(startsWith(args[c(TRUE, FALSE)], "--"))) stop(usage)
 opt <- setNames(as.list(args[c(FALSE, TRUE)]), sub("^--", "", args[c(TRUE, FALSE)]))
-known <- c("mutations", "elements", "out", "ref-genome", "cores", "shard-size", "rlib")
+known <- c("mutations", "elements", "out", "ref-genome", "cores", "shard-size", "rlib", "filter-hyper-mb")
 if (length(setdiff(names(opt), known))) stop("unknown option(s): ", paste(setdiff(names(opt), known), collapse = ", "), "\n", usage)
 if (is.null(opt$mutations) || is.null(opt$elements) || is.null(opt$out)) stop(usage)
 mut_path  <- opt$mutations
@@ -33,9 +34,14 @@ out_path  <- opt$out
 mc_cores  <- max(1L, as.integer(if (is.null(opt$cores)) 1L else opt$cores))
 shard_sz  <- max(1L, as.integer(if (is.null(opt[["shard-size"]])) 5000L else opt[["shard-size"]]))
 rlib      <- if (is.null(opt$rlib)) "" else opt$rlib
+# ActiveDriverWGS removes samples with more than 3,000 x filter_hyper_MB mutations (package default 30).
+# The pipeline passes Inf: its cohort filter has already removed hypermutators (A5).
+hyper_mb  <- if (is.null(opt[["filter-hyper-mb"]])) 30 else suppressWarnings(as.numeric(opt[["filter-hyper-mb"]]))
+if (is.na(hyper_mb) || hyper_mb <= 0) stop("--filter-hyper-mb must be a positive number or Inf")
 
 if (nzchar(rlib)) .libPaths(c(rlib, .libPaths()))
 suppressMessages(library(ActiveDriverWGS))
+message(sprintf("ADWGS: filter_hyper_MB = %s (the package removes samples with more than %s mutations)", format(hyper_mb), format(3000 * hyper_mb)))
 
 muts <- read.delim(mut_path, stringsAsFactors = FALSE)
 # ActiveDriverWGS rejects exact-duplicate (chr,pos1,pos2,ref,alt,patient) rows;
@@ -192,7 +198,7 @@ MIN_BATCH <- 32L
 
 run_set <- function(el_sub, depth = 0L) {
   r <- tryCatch(
-    ActiveDriverWGS(mutations = muts, elements = el_sub,
+    ActiveDriverWGS(mutations = muts, elements = el_sub, filter_hyper_MB = hyper_mb,
                     ref_genome = ref_gen, mc.cores = mc_cores),
     error = function(e) structure(list(msg = conditionMessage(e)), class = "adwgs_err"))
   if (!inherits(r, "adwgs_err")) return(list(r))
@@ -206,7 +212,7 @@ run_set <- function(el_sub, depth = 0L) {
     for (this_id in ids) {
       one <- el_sub[el_sub$id == this_id, , drop = FALSE]
       r1 <- tryCatch(
-        ActiveDriverWGS(mutations = muts, elements = one,
+        ActiveDriverWGS(mutations = muts, elements = one, filter_hyper_MB = hyper_mb,
                         ref_genome = ref_gen, mc.cores = mc_cores),
         error = function(e) structure(list(msg = conditionMessage(e)), class = "adwgs_err"))
       if (inherits(r1, "adwgs_err")) {

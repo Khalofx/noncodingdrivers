@@ -15,6 +15,7 @@
 - OncodriveCLUSTL — Arnedo-Pac C, et al. Bioinformatics 2019;35(22):4788-4790. doi:10.1093/bioinformatics/btz501; erratum Bioinformatics 2019;35(24):5396. doi:10.1093/bioinformatics/btz588
 - CADD v1.7 (functional-impact scores for OncodriveFML; non-commercial terms, supplied by the user) — Schubach M, et al. Nucleic Acids Res 2024. doi:10.1093/nar/gkad989
 - MutEnricher — Soltis AR, et al. BMC Bioinformatics 2020. doi:10.1186/s12859-020-03695-z
+- IntOGen (hypermutator rule of the cohort filter) — Martínez-Jiménez F, et al. Nat Rev Cancer 2020. doi:10.1038/s41568-020-0290-x
 - Empirical Brown's method — Poole W, et al. Bioinformatics 2016. doi:10.1093/bioinformatics/btw438; Brown MB. Biometrics 1975. doi:10.2307/2529826
 - ACAT — Liu Y, et al. Am J Hum Genet 2019. doi:10.1016/j.ajhg.2019.01.002; Liu Y, Xie J. J Am Stat Assoc 2020. doi:10.1080/01621459.2018.1554485
 - RobustRankAggreg — Kolde R, et al. Bioinformatics 2012. doi:10.1093/bioinformatics/btr709

@@ -419,6 +419,8 @@ checks.
   mutations before testing: 29 of 70 MELA-AU donors (its SNVs fall from 7,767,405 to 1,270,852), 2 of 98
   ESAD-UK, 1 of 98 MALY-DE, none in CLLE-ES and PRAD-CA. EBM therefore combines p-values computed on
   different donor sets in such cohorts.
+  Since the cohort filter (`--hypermutator_filter`, applied once before every caller), this filter is off by
+  default (`--adwgs_filter_hyper_mb`); the figures above describe the validation commit d6346d1.
 - **Coordinates.** The module passes the BED start unchanged, and ActiveDriverWGS builds closed 1-based
   ranges (`IRanges(start, end)`), so the base 5' of each BED fragment is counted: 46–386 elements per cohort
   count more patients than with bedtools semantics. The package's own `prepare_elements_from_BED4` does the same.

@@ -9,6 +9,13 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- Hypermutator filter applied once to each cohort table, before every caller (local
+  `COHORT_FILTER`, `bin/filter_hypermutators.py`): `--hypermutator_filter intogen` (default; more
+  than `--hypermutator_min_mutations` 10,000 mutations and above Q3 + `--hypermutator_iqr_factor`
+  1.5 x IQR of the cohort), `cap` or `none`. Removed samples and rows are published under
+  `mutations/` and listed in the MultiQC report; MutEnricher's per-sample VCFs of removed samples
+  are dropped too. ActiveDriverWGS's own filter is off by default (`--adwgs_filter_hyper_mb`; the
+  package default 30 had removed 29 of 70 MELA-AU donors from ActiveDriverWGS only).
 - Published-cohort validation and component checks against independent re-implementations in
   `docs/validation.md`; nf-test `tests/activedriverwgs_shards.nf.test` (shard size and element
   boundary of the ACTIVEDRIVERWGS module); recomputed Benjamini–Hochberg assertions in the
