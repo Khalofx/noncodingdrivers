@@ -141,6 +141,13 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   `enhancer_gene_dir`, `ccre_v4_bed` (ENCFF420VPZ, MD5 checked at start), `ccre_v4_md5`,
   `ccre_v4_rows`, `ccre_v4_source`, `ccre_celltype_dir`; staging recipe in `docs/references.md`.
 
+### `Fixed`
+
+- ActiveDriverWGS element boundaries: the module passes BED start + 1 (ActiveDriverWGS reads closed
+  1-based ranges), so it tests the same bases as the other callers; before, the base 5' of each
+  fragment was counted too (46-386 elements per validation cohort counted more patients). The
+  wrapper keeps one-base elements (start == end).
+
 ### `Dependencies`
 
 | Tool                  | Version |

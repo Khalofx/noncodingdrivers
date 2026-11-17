@@ -45,16 +45,17 @@ process ACTIVEDRIVERWGS {
          }' \\
         ${mutations} > adwgs_input.tsv
 
-    # Element catalogue -> BED4 (chrom, start, end, id) on the 24 primary chromosomes; rows with
+    # Element catalogue -> (chrom, start, end, id) on the 24 primary chromosomes; rows with
     # non-numeric or empty coordinates or ids are dropped, and an empty result fails the task.
-    # Same output as the headerless-BED branch of the earlier adapter script (md5 checked on the
-    # GRCh38 catalogue, tests/regression/PROVENANCE.md).
+    # ActiveDriverWGS reads elements as closed 1-based ranges (IRanges(start, end)), so the BED start
+    # is passed as start + 1: it then tests the bases of the half-open BED interval, as the other
+    # callers do (C5). Passed unchanged, the base 5' of every fragment was counted as well.
     awk 'BEGIN{FS=OFS="\\t"; for(i=1;i<=22;i++) p[i ""]=1; p["X"]=p["Y"]=1}
          {
            chrom=\$1; sub(/^chr/, "", chrom);
            if(!(chrom in p)) next;
            if(\$2 !~ /^[0-9]+\$/ || \$3 !~ /^[0-9]+\$/ || \$3+0 <= \$2+0 || \$4 == "") next;
-           print "chr" chrom, \$2, \$3, \$4; n++
+           print "chr" chrom, \$2 + 1, \$3, \$4; n++
          }
          END{ if(n == 0){ print "ERROR: no valid primary-chromosome elements" > "/dev/stderr"; exit 2 } }' \\
         ${elements} > adwgs_elements.bed

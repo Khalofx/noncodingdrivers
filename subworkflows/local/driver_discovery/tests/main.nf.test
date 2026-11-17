@@ -177,8 +177,9 @@ nextflow_workflow {
             def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
                            'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
                            'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
-            def adwgs  = [ TERT_promoter_fixture: 1.242e-6d, elem_split: 0.3306d, elem_E: 0.6320d, elem_D: 0.6602d,
-                           elem_C: 0.9011d, elem_B: 0.9726d, elem_A: 0.9798d, elem_empty: 1.0d ]
+            // reference values with BED start + 1 passed to ActiveDriverWGS (C5)
+            def adwgs  = [ TERT_promoter_fixture: 1.216e-6d, elem_split: 0.3282d, elem_E: 0.6300d, elem_D: 0.6585d,
+                           elem_C: 0.9027d, elem_B: 0.9712d, elem_A: 0.9791d, elem_empty: 1.0d ]
             def same_as_adwgs_alone = [
                 { assert rows.collect { row -> v(row, 'element_id') } == adwgs.keySet() as List },
                 { assert rows.every { row -> close(v(row, 'p_activedriverwgs') as double, adwgs[v(row, 'element_id')], 1e-3) } },
@@ -253,8 +254,9 @@ nextflow_workflow {
             def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
                            'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
                            'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
-            def adwgs  = [ TERT_promoter_fixture: 1.242e-6d, elem_split: 0.3306d, elem_E: 0.6320d, elem_D: 0.6602d,
-                           elem_C: 0.9011d, elem_B: 0.9726d, elem_A: 0.9798d, elem_empty: 1.0d ]
+            // reference values with BED start + 1 passed to ActiveDriverWGS (C5)
+            def adwgs  = [ TERT_promoter_fixture: 1.216e-6d, elem_split: 0.3282d, elem_E: 0.6300d, elem_D: 0.6585d,
+                           elem_C: 0.9027d, elem_B: 0.9712d, elem_A: 0.9791d, elem_empty: 1.0d ]
             def same_as_adwgs_alone = [
                 { assert rows.collect { row -> v(row, 'element_id') } == adwgs.keySet() as List },
                 { assert rows.every { row -> close(v(row, 'p_activedriverwgs') as double, adwgs[v(row, 'element_id')], 1e-3) } },

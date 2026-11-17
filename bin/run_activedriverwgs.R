@@ -18,7 +18,9 @@
 #                         [--filter-hyper-mb X]   (package default 30; Inf = off)
 #
 # mutations.tsv : chr,pos1,pos2,ref,alt,patient (header)
-# elements.bed  : BED (>=4 cols: chr,start,end,id), no header
+# elements.bed  : >=4 cols (chr,start,end,id), no header, read as closed 1-based ranges as
+#                 ActiveDriverWGS does; the module passes BED start + 1. A BED passed unchanged also
+#                 counts the base 5' of each fragment, as the package's prepare_elements_from_BED4 does.
 args <- commandArgs(trailingOnly = TRUE)
 usage <- paste("usage: run_activedriverwgs.R --mutations F --elements F --out F",
                "[--ref-genome hg38] [--cores N] [--shard-size N] [--rlib DIR] [--filter-hyper-mb X]")
@@ -82,8 +84,8 @@ if (nrow(muts) == 0L) stop("ADWGS: no mutations remain on primary contigs")
 
 elements <- read.delim(el_path, stringsAsFactors = FALSE, header = FALSE)[, 1:4]
 colnames(elements) <- c("chr", "start", "end", "id")
-# drop degenerate elements (zero/negative width, NA coords, duplicate ids)
-keep <- with(elements, !is.na(start) & !is.na(end) & end > start)
+# drop degenerate elements (negative width, NA coords); ranges are closed, so start == end is one base
+keep <- with(elements, !is.na(start) & !is.na(end) & end >= start)
 elements <- elements[keep, ]
 # DO NOT de-duplicate on id. After CDS subtraction an element is legitimately
 # represented by SEVERAL rows (its non-coding fragments), all sharing one id:

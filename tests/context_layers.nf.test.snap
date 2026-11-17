@@ -177,7 +177,7 @@
             },
             [
                 "SYNTH-TERT.cosmic.mutation_summary.tsv:md5,7d5191b3489f6e980c18b112cc2b999c",
-                "SYNTH-TERT.cosmic.element_summary.tsv:md5,6cad8393b66e21c96e899f510e781f09",
+                "SYNTH-TERT.cosmic.element_summary.tsv:md5,676f7165c327bdc2a077b55ea20552a0",
                 "SYNTH-TERT.cosmic.provenance.json:md5,632c9440e8f72eb6f7881b910f2875ed",
                 "SYNTH-TERT.cosmic.exact_matches.tsv:md5,a672ebe54234149d16205b10a0dbcbbc",
                 "NOTICE.txt:md5,e3590514552a9d022d6f43b31731129e",
@@ -187,10 +187,10 @@
                 "SYNTH-TERT.ccre_v4.tsv:md5,8e453c9472b8c98655ddd224f9293371",
                 "SYNTH-TERT.ccre_v4_summary.tsv:md5,262918ab8f8052255bf57b733838c727",
                 "SYNTH-TERT.ccre_v4_celltype.tsv:md5,acd3e9654626fde88f53a8ced035ba34",
-                "SYNTH-TERT.driver_evidence.tsv:md5,c197244b8d3a4837e3f474cf9bf22da6"
+                "SYNTH-TERT.driver_evidence.tsv:md5,2584048856561e16d59c0c2853e8f8cc"
             ]
         ],
-        "timestamp": "2026-11-17T16:21:08.097287504",
+        "timestamp": "2026-11-17T20:49:44.298309102",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"
