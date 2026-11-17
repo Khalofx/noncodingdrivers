@@ -51,9 +51,29 @@ nextflow_process {
             def lines = path(process.out.consensus[0][1]).readLines()
             def cols  = lines[0].tokenize('\t')
             assert process.success
+            // Benjamini-Hochberg written out here, independent of p.adjust in bin/combine_pvalues.R
+            def rows    = lines.drop(1).collect { l -> l.split('\t', -1) as List }
+            def col     = { r, name -> r[cols.indexOf(name)] }
+            def num     = { s -> (s in [ '', 'NA' ]) ? null : (s as double) }
+            def bh      = { List p ->
+                def n = p.size()
+                def q = new Double[n]
+                double run = 1.0d
+                (0..<n).toList().sort { a, b -> p[b] <=> p[a] }.eachWithIndex { i, r -> run = Math.min(run, p[i] * n / (n - r)); q[i] = run }
+                q as List
+            }
+            def bhMatch = { pcol, qcol ->
+                def sel = rows.findAll { r -> num(col(r, pcol)) != null }
+                def q   = bh(sel.collect { r -> num(col(r, pcol)) })
+                !sel.isEmpty() && [ sel, q ].transpose().every { r, qq -> Math.abs(num(col(r, qcol)) - qq) <= 1e-9 * Math.abs(qq) }
+            }
             assertAll(
                 { assert [ 'ebm_q', 'acat_q', 'rra_q', 'vote_count', 'consensus_q', 'is_consensus' ].every { c -> c in cols } },
                 { assert lines.size() == 6 },
+                { assert bhMatch('ebm_p', 'ebm_q') },
+                { assert bhMatch('acat_p', 'acat_q') },
+                { assert rows.every { r -> col(r, 'consensus_q') == col(r, 'ebm_q') } },   // --method ebm
+                { assert rows.every { r -> (col(r, 'is_consensus').toLowerCase() == 'true') == (num(col(r, 'consensus_q')) < 0.1) } },
                 { assert snapshot(process.out.consensus).match() }   // deterministic: md5 is stable
             )
         }

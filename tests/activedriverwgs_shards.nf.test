@@ -1,0 +1,51 @@
+nextflow_workflow {
+
+    name "ACTIVEDRIVERWGS: element results do not depend on the shard size; element boundary convention"
+    script "./probes/activedriverwgs_shards.nf"
+    workflow "ADWGS_SHARDS"
+    config "./probes/activedriverwgs_shards.config"
+
+    tag "activedriverwgs"
+    tag "activedriverwgs_shards"
+
+    // Real runs: needs the ActiveDriverWGS image (R + BSgenome hg38), like the module's real-run test.
+    // The boundary assertion records the current convention (docs/validation.md, component checks): the
+    // module passes the BED start unchanged and ActiveDriverWGS reads elements as closed 1-based ranges,
+    // so the base 5' of each BED interval is counted and the base after its end is not.
+    test("fixture: shard size 1 gives the one-shard table; BED start base counted, end + 1 not") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [ id:'test' ], file("${projectDir}/tests/data/activedriverwgs/mutations.tsv", checkIfExists: true) ])
+                input[1] = channel.of([ [ id:'boundary' ], file("${projectDir}/tests/data/activedriverwgs/mutations_boundary.tsv", checkIfExists: true) ])
+                input[2] = channel.value([ [ id:'elements' ], file("${projectDir}/tests/data/activedriverwgs/elements.bed", checkIfExists: true) ])
+                """
+            }
+        }
+
+        then {
+            def table = { p ->
+                def lines = path(p).readLines()
+                def cols  = lines[0].split('\t', -1) as List
+                lines.drop(1).collectEntries { l ->
+                    def row = [ cols, l.split('\t', -1) as List ].transpose().collectEntries()
+                    [ (row.id): row ]
+                }
+            }
+            def one   = table(workflow.out.one_shard[0][1])
+            def perId = table(workflow.out.shard_per_id[0][1])
+            def bound = table(workflow.out.boundary[0][1])
+            def keys  = [ 'pp_element', 'element_muts_obs', 'element_muts_exp', 'fdr_element' ]
+            def obs   = { t, id -> (t[id]?.element_muts_obs in [ null, '', 'NA' ]) ? 0 : (t[id].element_muts_obs as int) }
+            assert workflow.success
+            assertAll(
+                { assert one.containsKey('elem_A') && one.containsKey('TERT_promoter_fixture') },
+                { assert one.keySet() == perId.keySet() },
+                { assert one.every { id, row -> keys.every { k -> row[k] == perId[id][k] } } },
+                { assert obs(one, 'elem_A') == 1 },
+                { assert obs(bound, 'elem_A') == 2 }
+            )
+        }
+    }
+}

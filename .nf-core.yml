@@ -26,6 +26,8 @@ lint:
     - tests/variant_layers.nf.test
     # process test of the ENSEMBLVEP_VEP ext.args closure (a native probe process): no outdir, no versions.yml
     - tests/vep_ext_args.nf.test
+    # probe workflow comparing three ACTIVEDRIVERWGS tables (shard size, element boundary): no versions.yml
+    - tests/activedriverwgs_shards.nf.test
   files_exist:
     - conf/igenomes.config
     - conf/igenomes_ignored.config
