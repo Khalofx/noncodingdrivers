@@ -424,6 +424,8 @@ checks.
 - **Coordinates.** The module passes the BED start unchanged, and ActiveDriverWGS builds closed 1-based
   ranges (`IRanges(start, end)`), so the base 5' of each BED fragment is counted: 46–386 elements per cohort
   count more patients than with bedtools semantics. The package's own `prepare_elements_from_BED4` does the same.
+  Since C5 the module passes BED start + 1, so ActiveDriverWGS tests the BED interval; the counts above describe the
+  validation commit d6346d1.
   OncodriveFML (above) counts exactly the BED interval.
 - **SNVs only.** The module passes SNVs, and OncodriveFML's configuration excludes indels too (`[[indels]] include = False`), so no indel reaches either caller; ActiveDriverWGS itself accepts indels in its own notation. On the
   README example, SNV-only input moves NOTCH1 from p 0.005 to 1 (its two mutations are indels) and ATM from

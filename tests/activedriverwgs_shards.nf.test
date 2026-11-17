@@ -9,10 +9,10 @@ nextflow_workflow {
     tag "activedriverwgs_shards"
 
     // Real runs: needs the ActiveDriverWGS image (R + BSgenome hg38), like the module's real-run test.
-    // The boundary assertion records the current convention (docs/validation.md, component checks): the
-    // module passes the BED start unchanged and ActiveDriverWGS reads elements as closed 1-based ranges,
-    // so the base 5' of each BED interval is counted and the base after its end is not.
-    test("fixture: shard size 1 gives the one-shard table; BED start base counted, end + 1 not") {
+    // Boundary (C5): the module passes BED start + 1 and ActiveDriverWGS reads closed 1-based ranges, so
+    // elem_A (BED chr5:1220000-1220600) covers bases 1220001-1220600. mutations_boundary.tsv adds DB1 at
+    // 1220000 and DB2 at 1220601 (outside) and DB3 at 1220001 and DB4 at 1220600 (inside) to the fixture.
+    test("fixture: shard size 1 gives the one-shard table; first and last base counted, the bases outside not") {
 
         when {
             workflow {
@@ -44,7 +44,7 @@ nextflow_workflow {
                 { assert one.keySet() == perId.keySet() },
                 { assert one.every { id, row -> keys.every { k -> row[k] == perId[id][k] } } },
                 { assert obs(one, 'elem_A') == 1 },
-                { assert obs(bound, 'elem_A') == 2 }
+                { assert obs(bound, 'elem_A') == 3 }
             )
         }
     }
