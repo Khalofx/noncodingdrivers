@@ -368,6 +368,9 @@ WDR74 needs care: PCAWG removed its 5' UTR and promoter after manual review beca
 of the 7 recovered elements (CLLE-ES and MALY-DE) and 1 of the 8 with LIRI-JP; without it, 5 of 11 are
 recovered (5 of 14 with LIRI-JP). The WDR74 promoter element is consensus in five cohorts here, which fits a
 recurrent artefact rather than a driver; the CLLE-ES gate is to be revised before any rerun.
+PCAWG's external-evidence table (Supplementary Table 6) also lists conflicting evidence for two other gate
+elements, TP53TG1 (unknown mutational process) and hsa-mir-142 (AID mutagenesis), and for NEAT1 and MALAT1
+(transcription-associated mutagenesis); of its elements without conflicting evidence, only TERT is recovered here.
 
 **Negative control.** Three of the six PRAD-CA consensus elements are a single position with one allele in
 8–16 donors (chr2:123,542,446 A>T, chrX:84,712,544 T>G, chrY:16,918,840 T>A). In the PRAD-CA input at least
