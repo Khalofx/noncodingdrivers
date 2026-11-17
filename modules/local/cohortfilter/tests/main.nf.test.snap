@@ -1,0 +1,41 @@
+{
+    "intogen rule removes only the cohort outlier above the count": {
+        "content": [
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.mutations.tsv:md5,eefa7c526e1842a3059e8158c0537920"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.sample_filter.tsv:md5,637766f63292f275d1e601bfd90cb3f9"
+                ]
+            ],
+            [
+                [
+                    {
+                        "id": "test",
+                        "cohort": "test",
+                        "assembly": "GRCh38"
+                    },
+                    "test.removed_mutations.tsv:md5,bd15579069c87f86a95e6ccf51126799"
+                ]
+            ]
+        ],
+        "timestamp": "2026-11-17T16:15:54.487916808",
+        "meta": {
+            "nf-test": "0.9.4",
+            "nextflow": "25.10.4"
+        }
+    }
+}

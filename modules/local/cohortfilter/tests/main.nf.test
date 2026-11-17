@@ -1,0 +1,81 @@
+nextflow_process {
+
+    name "Test Process COHORT_FILTER"
+    script "../main.nf"
+    process "COHORT_FILTER"
+
+    tag "modules"
+    tag "modules_local"
+    tag "cohortfilter"
+
+    config "./nextflow.config"
+
+    // tests/data/cohort_filter: ten samples with 10, 12, ..., 26 and 120 rows (282 rows).
+    // Q1 14.5, Q3 23.5, Q3 + 1.5 x IQR = 37.0. With --hypermutator_min_mutations 15, s04-s09
+    // exceed the count but not the IQR threshold, s10 exceeds both.
+    def table = { f -> def l = new File(f.toString()).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+
+    test("intogen rule removes only the cohort outlier above the count") {
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+        then {
+            def sf = table(process.out.sample_filter[0][1])
+            assert process.success
+            assertAll(
+                { assert sf.findAll { r -> r.kept == 'false' }*.sample == [ 's10' ] },
+                { assert sf.every { r -> r.iqr_threshold == '37.0' && r.q1 == '14.5' && r.q3 == '23.5' } },
+                { assert path(process.out.mutations[0][1]).readLines().size() == 163 },
+                { assert path(process.out.removed[0][1]).readLines().size() == 121 },
+                { assert path(process.out.mutations[0][1]).readLines()[0] == 'sample\tchrom\tpos\tref\talt\tvtype' },
+                { assert snapshot(process.out.mutations, process.out.sample_filter, process.out.removed).match() }
+            )
+        }
+    }
+
+    test("cap rule removes every sample above the count") {
+        when {
+            params {
+                hypermutator_filter = 'cap'
+            }
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+        then {
+            def sf = table(process.out.sample_filter[0][1])
+            assert process.success
+            assertAll(
+                { assert sf.findAll { r -> r.kept == 'false' }*.sample.sort() == [ 's04', 's05', 's06', 's07', 's08', 's09', 's10' ] },
+                { assert path(process.out.mutations[0][1]).readLines().size() == 37 }
+            )
+        }
+    }
+
+    test("none keeps every sample") {
+        when {
+            params {
+                hypermutator_filter = 'none'
+            }
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                """
+            }
+        }
+        then {
+            assert process.success
+            assertAll(
+                { assert table(process.out.sample_filter[0][1]).every { r -> r.kept == 'true' } },
+                { assert path(process.out.mutations[0][1]).readLines().size() == 283 },
+                { assert path(process.out.removed[0][1]).readLines().size() == 1 }
+            )
+        }
+    }
+}

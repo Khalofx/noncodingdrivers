@@ -169,6 +169,36 @@
                 }
             }
         },
+        "cohort_filter_options": {
+            "title": "Cohort filter options",
+            "type": "object",
+            "fa_icon": "fas fa-filter",
+            "description": "Hypermutator filter applied once to the cohort table, before every caller.",
+            "properties": {
+                "hypermutator_filter": {
+                    "type": "string",
+                    "default": "intogen",
+                    "enum": ["intogen", "cap", "none"],
+                    "fa_icon": "fas fa-filter",
+                    "description": "Hypermutator rule applied once, before every caller.",
+                    "help_text": "`intogen` (default): remove a sample with more than `--hypermutator_min_mutations` mutations and more than Q3 + `--hypermutator_iqr_factor` x IQR of its cohort's per-sample counts (IntOGen preprocessing). `cap`: remove a sample with more than `--hypermutator_min_mutations` mutations. `none`: keep every sample. Removed samples and their rows are published under `mutations/`."
+                },
+                "hypermutator_min_mutations": {
+                    "type": "integer",
+                    "default": 10000,
+                    "minimum": 0,
+                    "fa_icon": "fas fa-hashtag",
+                    "description": "Mutation count above which a sample can be removed (intogen) or is removed (cap). 10,000 is IntOGen's WGS value."
+                },
+                "hypermutator_iqr_factor": {
+                    "type": "number",
+                    "default": 1.5,
+                    "minimum": 0,
+                    "fa_icon": "fas fa-ruler",
+                    "description": "IQR multiplier of the intogen rule: a sample must also exceed Q3 + factor x IQR of its cohort."
+                }
+            }
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -372,6 +402,13 @@
                     "fa_icon": "fas fa-layer-group",
                     "description": "Elements per ActiveDriverWGS shard.",
                     "help_text": "Elements are tested in shards so that a failing element loses only its shard; FDR is recomputed over all shards, so the value does not change p- or q-values."
+                },
+                "adwgs_filter_hyper_mb": {
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "fa_icon": "fas fa-filter",
+                    "description": "ActiveDriverWGS's own hypermutator cut in mutations per Mb (x 3,000 = mutations per sample). Not set: off, because the cohort filter (--hypermutator_filter) has already been applied.",
+                    "help_text": "The package default (30, i.e. more than 90,000 mutations) re-filtered the already filtered cohort; set 30 to reproduce runs before this option existed."
                 },
                 "run_oncodriveclustl": {
                     "type": "boolean",
@@ -822,6 +859,9 @@
         },
         {
             "$ref": "#/$defs/input_harmonisation_options"
+        },
+        {
+            "$ref": "#/$defs/cohort_filter_options"
         },
         {
             "$ref": "#/$defs/caller_options"
