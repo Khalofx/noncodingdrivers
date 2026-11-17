@@ -71,12 +71,12 @@ def test_outputs_partition_the_input(tmp_path):
     src, kept, rem = _rows(inp), _rows(prefix + ".mutations.tsv"), _rows(prefix + ".removed_mutations.tsv")
     assert kept[0] == rem[0] == src[0]
     assert len(kept) - 1 == 162 and len(rem) - 1 == 120
-    assert [l for l in src[1:] if not l.startswith("s10\t")] == kept[1:]
+    assert [row for row in src[1:] if not row.startswith("s10\t")] == kept[1:]
     sf = _rows(prefix + ".sample_filter.tsv")
     assert sf[0].split("\t")[:4] == ["sample", "n_mutations", "kept", "reason"]
     assert sf[1].split("\t")[:3] == ["s10", "120", "false"]
     mqc = _rows(prefix + ".sample_filter_mqc.tsv")
-    assert any(l.startswith("# plot_type: 'table'") for l in mqc)
+    assert any(row.startswith("# plot_type: 'table'") for row in mqc)
     assert mqc[-1].split("\t")[:3] == ["C1", "10", "1"]
 
 

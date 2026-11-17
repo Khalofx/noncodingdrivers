@@ -75,14 +75,17 @@ def main(argv=None):
     n_kept_rows = n_removed_rows = 0
     with open(a.input) as fh, open(f"{a.prefix}.mutations.tsv", "w") as keep, open(f"{a.prefix}.removed_mutations.tsv", "w") as drop:
         fh.readline()
-        keep.write(header + "\n"); drop.write(header + "\n")
+        keep.write(header + "\n")
+        drop.write(header + "\n")
         for line in fh:
             if not line.strip():
                 continue
             if line.split("\t", si + 1)[si] in removed:
-                drop.write(line); n_removed_rows += 1
+                drop.write(line)
+                n_removed_rows += 1
             else:
-                keep.write(line); n_kept_rows += 1
+                keep.write(line)
+                n_kept_rows += 1
 
     with open(f"{a.prefix}.sample_filter.tsv", "w") as out:
         out.write("sample\tn_mutations\tkept\treason\trule\tmin_mutations\tiqr_factor\tq1\tq3\tiqr_threshold\n")
