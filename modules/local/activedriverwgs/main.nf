@@ -31,9 +31,9 @@ process ACTIVEDRIVERWGS {
     Rscript -e "cat(paste(R.version\\\$major, R.version\\\$minor, sep='.'))" > r.version.txt
 
     # Canonical table -> ActiveDriverWGS input (chr, pos1, pos2, ref, alt, patient), pos1 == pos2.
-    # format_muts accepts only single-base A/C/G/T or '-' alleles and one bad row kills a whole
-    # shard, so only SNVs (single-base ACGT on both sides) on the 24 standard chromosomes are
-    # passed. Indels and MNVs are still scored by OncodriveFML.
+    # Only SNVs (single-base ACGT on both sides) on the 24 standard chromosomes are passed: indels
+    # would need the package's '-' notation, and one malformed row fails a whole shard. OncodriveFML's
+    # configuration excludes indels too ([[indels]] include = False), so no caller tests indels.
     awk 'BEGIN{FS=OFS="\\t"; print "chr","pos1","pos2","ref","alt","patient";
               for(i=1;i<=22;i++) ok["chr"i]=1; ok["chrX"]=1; ok["chrY"]=1}
          NR==1{for(i=1;i<=NF;i++)c[\$i]=i; next}

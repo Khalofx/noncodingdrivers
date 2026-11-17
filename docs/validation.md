@@ -350,20 +350,24 @@ the Rheinbay et al. 2020 (doi:10.1038/s41586-020-1965-x) Table 5 rows of each ti
 elements of the original ICGC papers, lifted to GRCh38 and matched to catalogue elements by overlap. An
 element is powered with at least 3 input donors inside the published element.
 
-| Cohort  | Donors | Reference papers               | Gate                                           | Result                                                        |
-| ------- | ------ | ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------- |
-| MELA-AU | 70     | Hayward 2017; Rheinbay 2020    | TERT promoter                                  | PASS: rank 1, consensus q 3.5e-6, 26 donors (54 published)    |
-| ESAD-UK | 98     | Frankell 2019; Rheinbay 2020   | TP53TG1 enhancer                               | PASS: rank 28, q 9.9e-3, 9 donors (9 published)               |
-| CLLE-ES | 95     | Puente 2015; Rheinbay 2020     | WDR74 5' UTR                                   | PASS: rank 4, q 1.2e-5, 6 donors (6 published)                |
-| MALY-DE | 98     | Hübschmann 2021; Rheinbay 2020 | hsa-mir-142                                    | PASS: rank 24, q 1.5e-10, 13 donors (15 published)            |
-| PRAD-CA | 116    | Fraser 2017; Rheinbay 2020     | negative control: ≤ 5 consensus, none q < 1e-6 | FAIL: 6 consensus, minimum q 5.8e-25 (input artefacts, below) |
-| LIRI-JP | 261    | Fujimoto 2016; Rheinbay 2020   | none (recall only)                             | WDR74 and MED16 recovered, RMRP missed                        |
-| PACA-CA | 147    | Feigin 2017; Rheinbay 2020     | none (recall only)                             | 1 consensus element; Rheinbay found none                      |
+| Cohort  | Donors | Reference papers               | Gate                                           | Result                                                                                                  |
+| ------- | ------ | ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| MELA-AU | 70     | Hayward 2017; Rheinbay 2020    | TERT promoter                                  | PASS: rank 1, consensus q 3.5e-6, 26 donors (54 published)                                              |
+| ESAD-UK | 98     | Frankell 2019; Rheinbay 2020   | TP53TG1 enhancer                               | PASS: rank 28, q 9.9e-3, 9 donors (9 published)                                                         |
+| CLLE-ES | 95     | Puente 2015; Rheinbay 2020     | WDR74 5' UTR                                   | PASS as fixed (rank 4, q 1.2e-5, 6 donors), but uninformative: PCAWG removed WDR74 for mapping problems |
+| MALY-DE | 98     | Hübschmann 2021; Rheinbay 2020 | hsa-mir-142                                    | PASS: rank 24, q 1.5e-10, 13 donors (15 published)                                                      |
+| PRAD-CA | 116    | Fraser 2017; Rheinbay 2020     | negative control: ≤ 5 consensus, none q < 1e-6 | FAIL: 6 consensus, minimum q 5.8e-25 (input artefacts, below)                                           |
+| LIRI-JP | 261    | Fujimoto 2016; Rheinbay 2020   | none (recall only)                             | WDR74 and MED16 recovered, RMRP missed                                                                  |
+| PACA-CA | 147    | Feigin 2017; Rheinbay 2020     | none (recall only)                             | 1 consensus element; Rheinbay found none                                                                |
 
 **Recall.** Of the 13 powered Rheinbay elements in the five new cohorts, 7 are recovered (consensus q < 0.1),
 2 are nominal and 4 missed (ZSWIM6 and RMRP promoters in MELA-AU, SDCCAG8 in ESAD-UK, RP5-997D16.2 in
 PRAD-CA); with LIRI-JP, 8 of 17 are recovered, 1 is significant for one caller, 3 are nominal and 5 missed.
-The WDR74 promoter element is consensus in five cohorts.
+WDR74 needs care: PCAWG removed its 5' UTR and promoter after manual review because of mapping problems
+(Rheinbay et al. 2020, main text), although the judgement column of Table 5 keeps the 5' UTR. It accounts for 2
+of the 7 recovered elements (CLLE-ES and MALY-DE) and 1 of the 8 with LIRI-JP; without it, 5 of 11 are
+recovered (5 of 14 with LIRI-JP). The WDR74 promoter element is consensus in five cohorts here, which fits a
+recurrent artefact rather than a driver; the CLLE-ES gate is to be revised before any rerun.
 
 **Negative control.** Three of the six PRAD-CA consensus elements are a single position with one allele in
 8–16 donors (chr2:123,542,446 A>T, chrX:84,712,544 T>G, chrY:16,918,840 T>A). In the PRAD-CA input at least
@@ -416,7 +420,7 @@ checks.
   ranges (`IRanges(start, end)`), so the base 5' of each BED fragment is counted: 46–386 elements per cohort
   count more patients than with bedtools semantics. The package's own `prepare_elements_from_BED4` does the same.
   OncodriveFML (above) counts exactly the BED interval.
-- **SNVs only.** The module passes SNVs; the package also accepts indels in its own notation. On the
+- **SNVs only.** The module passes SNVs, and OncodriveFML's configuration excludes indels too (`[[indels]] include = False`), so no indel reaches either caller; ActiveDriverWGS itself accepts indels in its own notation. On the
   README example, SNV-only input moves NOTCH1 from p 0.005 to 1 (its two mutations are indels) and ATM from
   0.002 to 0.047.
 
