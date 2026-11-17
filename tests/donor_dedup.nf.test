@@ -1,0 +1,54 @@
+nextflow_pipeline {
+
+    name "Test pipeline: one sample per donor"
+    script "../main.nf"
+    tag "pipeline"
+
+    // D01 and D02 (vcf rows) share donor P1; D03 (sarek) has no donor and stays its own donor.
+    // With donor information one sample per donor is kept: the first in alphabetical order (D01).
+    test("-profile test - samplesheet donor column keeps one sample per donor") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = "${projectDir}/tests/data/samplesheets/samplesheet_donor.csv"
+                fasta  = 'https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/GRCh38.chr5_1-1400000.fa'
+            }
+        }
+
+        then {
+            def table   = { f -> def l = path(f).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
+            def sf      = table("$outputDir/mutations/SYNTH-DONOR.sample_filter.tsv").collectEntries { r -> [ r.sample, r ] }
+            def samples = path("$outputDir/mutations/SYNTH-DONOR.mutations.tsv").readLines().drop(1).collect { line -> line.tokenize('\t')[0] }.unique().sort()
+            def removed = path("$outputDir/mutations/SYNTH-DONOR.removed_mutations.tsv").readLines().drop(1)
+            assert workflow.success
+            assertAll(
+                { assert sf.D02.kept == 'false' && sf.D02.removed_by == 'donor' && sf.D02.reason.contains('(D01)') },
+                { assert sf.D01.kept == 'true' && sf.D01.donor == 'P1' && sf.D03.kept == 'true' && sf.D03.donor == '' },
+                { assert samples == [ 'D01', 'D03' ] },
+                { assert removed.size() > 0 && removed.every { line -> line.startsWith('D02\t') } },
+                // software versions (versions.yml of the run, Nextflow version removed)
+                { assert snapshot(removeNextflowVersion("$outputDir/pipeline_info/noncodingdrivers_software_mqc_versions.yml")).match() }
+            )
+        }
+    }
+
+    // A maf row can hold several samples: its donors come from --donor_map, not the donor column
+    test("-profile test - donor on a maf row stops before any task") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = "${projectDir}/tests/data/samplesheets/samplesheet_donor_maf.csv"
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert (workflow.stdout + workflow.stderr).any { line -> line.contains('DONOR_COLUMN_MULTISAMPLE') } }
+            )
+        }
+    }
+}

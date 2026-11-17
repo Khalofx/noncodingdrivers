@@ -37,8 +37,8 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - `harmonisation/vcf/`
   - `<sample>.pass.vcf.gz` (+ `.tbi`): per-sample VCF on GRCh38 after normalisation, PASS (or missing FILTER) records on chr1-22, X and Y; the input of MutEnricher.
 - `mutations/`
-  - `<cohort>.mutations.tsv`: the cohort mutation table (`sample chrom pos ref alt vtype`) that every caller, the null calibration, the variant flags and the signatures read: the mutations rows as given plus the harmonised vcf, sarek and maf rows, after exact duplicates and the samples removed by the hypermutator filter (`--hypermutator_filter`) are dropped.
-  - `<cohort>.sample_filter.tsv`: one row per sample: `n_mutations` (rows in the table, all variant types), `kept` (`true`/`false`), `reason`, and the cohort values of the rule (`rule`, `min_mutations`, `iqr_factor`, `q1`, `q3`, `iqr_threshold`; quartiles by linear interpolation). The MultiQC report lists the removed samples per cohort.
+  - `<cohort>.mutations.tsv`: the cohort mutation table (`sample chrom pos ref alt vtype`) that every caller, the null calibration, the variant flags and the signatures read: the mutations rows as given plus the harmonised vcf, sarek and maf rows, after exact duplicates and the samples removed by the sample filters (one sample per donor with donor information, then `--hypermutator_filter`) are dropped.
+  - `<cohort>.sample_filter.tsv`: one row per sample: `donor` (empty without donor information), `n_mutations` (rows in the table, all variant types), `kept` (`true`/`false`), `removed_by` (`donor` or `hypermutator`), `reason`, and the cohort values of the hypermutator rule (`rule`, `min_mutations`, `iqr_factor`, `q1`, `q3`, `iqr_threshold`; quartiles by linear interpolation). The MultiQC report lists the removed samples per cohort.
   - `<cohort>.removed_mutations.tsv`: the rows of the removed samples (header only when none was removed). MutEnricher's per-sample VCFs of these samples are not passed either.
 
 </details>

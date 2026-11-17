@@ -173,8 +173,18 @@
             "title": "Cohort filter options",
             "type": "object",
             "fa_icon": "fas fa-filter",
-            "description": "Hypermutator filter applied once to the cohort table, before every caller.",
+            "description": "Sample filters applied once to the cohort table, before every caller: one sample per donor (with donor information), then the hypermutator rule.",
             "properties": {
+                "donor_map": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.tsv$",
+                    "mimetype": "text/tab-separated-values",
+                    "fa_icon": "fas fa-user",
+                    "description": "TSV with columns sample and donor: with donor information, one sample per donor is kept.",
+                    "help_text": "For maf and mutations rows, which can hold several samples. vcf and sarek rows can use the samplesheet donor column instead. Samples of one donor: the first in alphabetical order is kept (IntOGen); samples without a donor are their own donor. Applied before the hypermutator rule."
+                },
                 "hypermutator_filter": {
                     "type": "string",
                     "default": "intogen",

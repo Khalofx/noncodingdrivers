@@ -18,7 +18,7 @@
                         "cohort": "test",
                         "assembly": "GRCh38"
                     },
-                    "test.sample_filter.tsv:md5,637766f63292f275d1e601bfd90cb3f9"
+                    "test.sample_filter.tsv:md5,4efb1e6be7801d130b85f9540fd6cdb9"
                 ]
             ],
             [
@@ -32,7 +32,7 @@
                 ]
             ]
         ],
-        "timestamp": "2026-11-17T16:15:54.487916808",
+        "timestamp": "2026-11-17T19:54:19.671837397",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

@@ -198,6 +198,10 @@ def validateInputRows(rows, refs) {
         if (meta.entry == 'sarek' && !meta.vcf_tumour_id) {
             error("VCF_TUMOUR_ID_MISSING: samplesheet row '${meta.id}' (entry sarek): set vcf_tumour_id to the tumour column of the tumour/normal VCF.")
         }
+        if (meta.donor && meta.entry in [ 'mutations', 'maf' ]) {
+            error("DONOR_COLUMN_MULTISAMPLE: samplesheet row '${meta.id}' (entry ${meta.entry}) sets donor, but a ${meta.entry} row can hold several samples. " +
+                  "Leave donor empty and give the donor of each sample with --donor_map (TSV with columns sample and donor).")
+        }
         if (meta.entry == 'vcf' && !meta.vcf_tumour_id) {
             def samples = vcfSampleNames(row[2])
             if (samples.size() > 1) {

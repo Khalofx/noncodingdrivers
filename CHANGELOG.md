@@ -9,6 +9,11 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- One sample per donor when donor information is given (`COHORT_FILTER`, before the hypermutator
+  rule): the samplesheet column `donor` (vcf and sarek rows) and `--donor_map` (TSV sample, donor; for
+  maf and mutations rows). Of the samples of one donor the first in alphabetical order is kept
+  (IntOGen); `sample_filter.tsv` gains `donor` and `removed_by`. Without donor information nothing
+  changes.
 - Hypermutator filter applied once to each cohort table, before every caller (local
   `COHORT_FILTER`, `bin/filter_hypermutators.py`): `--hypermutator_filter intogen` (default; more
   than `--hypermutator_min_mutations` 10,000 mutations and above Q3 + `--hypermutator_iqr_factor`

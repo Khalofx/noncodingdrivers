@@ -12,14 +12,15 @@ nextflow_process {
 
     // tests/data/cohort_filter: ten samples with 10, 12, ..., 26 and 120 rows (282 rows).
     // Q1 14.5, Q3 23.5, Q3 + 1.5 x IQR = 37.0. With --hypermutator_min_mutations 15, s04-s09
-    // exceed the count but not the IQR threshold, s10 exceeds both.
+    // exceed the count but not the IQR threshold, s10 exceeds both. No donor information unless given.
     def table = { f -> def l = new File(f.toString()).readLines(); def c = l[0].tokenize('\t'); l.drop(1).collect { r -> [ c, r.split('\t', -1).toList() ].transpose().collectEntries() } }
 
     test("intogen rule removes only the cohort outlier above the count") {
         when {
             process {
                 """
-                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true), [] ]
+                input[1] = []
                 """
             }
         }
@@ -44,7 +45,8 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true), [] ]
+                input[1] = []
                 """
             }
         }
@@ -65,7 +67,8 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true) ]
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true), [] ]
+                input[1] = []
                 """
             }
         }
@@ -75,6 +78,29 @@ nextflow_process {
                 { assert table(process.out.sample_filter[0][1]).every { r -> r.kept == 'true' } },
                 { assert path(process.out.mutations[0][1]).readLines().size() == 283 },
                 { assert path(process.out.removed[0][1]).readLines().size() == 1 }
+            )
+        }
+    }
+
+    // Donor information (D1): s01 and s02 share donorA, so s02 is removed (s01 sorts first); the
+    // hypermutator rule then runs on the nine samples left (Q3 + 1.5 x IQR = 36.0) and removes s10.
+    test("two samples of one donor: the first in alphabetical order is kept") {
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', cohort:'test', assembly:'GRCh38' ], file("${projectDir}/tests/data/cohort_filter/test.mutations.tsv", checkIfExists: true), file("${projectDir}/tests/data/cohort_filter/donor_map.tsv", checkIfExists: true) ]
+                input[1] = []
+                """
+            }
+        }
+        then {
+            def sf = table(process.out.sample_filter[0][1]).collectEntries { r -> [ r.sample, r ] }
+            assert process.success
+            assertAll(
+                { assert sf.s02.kept == 'false' && sf.s02.removed_by == 'donor' && sf.s02.donor == 'donorA' },
+                { assert sf.s01.kept == 'true' && sf.s01.donor == 'donorA' },
+                { assert sf.s10.removed_by == 'hypermutator' && sf.s01.iqr_threshold == '36.0' },
+                { assert sf.findAll { k, r -> r.kept == 'true' }.size() == 8 }
             )
         }
     }

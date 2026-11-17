@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
 name: "cohort_filter"
-description: Remove hypermutated samples from the cohort mutation table once, before every caller (IntOGen rule by default; cap or none), and publish the removed samples and rows
+description: Sample filters applied once to the cohort mutation table, before every caller - one sample per donor when donor information is given, then hypermutated samples (IntOGen rule by default; cap or none) - with the removed samples and rows published
 keywords:
   - hypermutator
   - cohort
@@ -23,6 +23,16 @@ input:
         description: Deduplicated cohort mutation table (sample chrom pos ref alt vtype)
         pattern: "*.tsv"
         ontologies: []
+    - sheet_donors:
+        type: file
+        description: Donors of the cohort's samplesheet rows (TSV sample, donor), or []
+        pattern: "*.tsv"
+        ontologies: []
+  - donor_map:
+      type: file
+      description: Donor map of --donor_map (TSV sample, donor), or []
+      pattern: "*.tsv"
+      ontologies: []
 
 output:
   mutations:
@@ -40,7 +50,7 @@ output:
           description: Cohort meta map
       - ${prefix}.sample_filter.tsv:
           type: file
-          description: One row per sample with its mutation count, kept (true/false), the reason and the cohort thresholds (Q1, Q3, IQR threshold)
+          description: One row per sample with its donor, mutation count, kept (true/false), removed_by (donor or hypermutator), the reason and the cohort thresholds (Q1, Q3, IQR threshold)
           pattern: "*.sample_filter.tsv"
           ontologies: []
   removed:

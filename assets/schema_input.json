@@ -25,6 +25,12 @@
                 "errorMessage": "cohort may contain only letters, digits, '.', '_' and '-'; empty means the row is its own cohort",
                 "meta": ["cohort"]
             },
+            "donor": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9._-]+$",
+                "errorMessage": "donor may contain only letters, digits, '.', '_' and '-'; it applies to vcf and sarek rows (give the donors of maf and mutations rows with --donor_map)",
+                "meta": ["donor"]
+            },
             "cancer_type": {
                 "type": "string",
                 "pattern": "^[A-Za-z0-9._-]+$",

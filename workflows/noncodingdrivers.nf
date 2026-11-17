@@ -109,12 +109,24 @@ workflow NONCODINGDRIVERS {
     COHORT_DEDUP(COHORT_CONCAT.out.csv.map { meta, tsv -> [ meta, tsv, 'mutations.tsv' ] }, [], false)
 
     //
-    // Hypermutator filter, applied once (D2): every caller, the null calibration, the flags and
+    // Sample filters, applied once (D1, D2): every caller, the null calibration, the flags and
     // the signatures read the same samples. --hypermutator_filter intogen (default): more than
     // --hypermutator_min_mutations rows and above Q3 + --hypermutator_iqr_factor x IQR of the
     // cohort; cap; or none. Removed samples and their rows are published under mutations/.
     //
-    COHORT_FILTER(COHORT_DEDUP.out.output)
+    // Donors (D1): the samplesheet donor column (vcf and sarek rows, one sample each) and
+    // --donor_map; with donor information, one sample per donor is kept (the first in alphabetical
+    // order) before the hypermutator rule. Samples without a donor are their own donor.
+    def ch_sheet_donors = ch_samplesheet
+        .filter { meta, _mutations, _vcf, _index, _maf -> meta.donor }
+        .map { meta, _mutations, _vcf, _index, _maf -> [ meta.cohort, "${meta.id}\t${meta.donor}" ] }
+        .collectFile(seed: "sample\tdonor\n", newLine: true, sort: true) { item -> [ "${item[0]}.samplesheet_donors.tsv", item[1] ] }
+        .map { table -> [ table.name.replace('.samplesheet_donors.tsv', ''), table ] }
+    def ch_filter_input = COHORT_DEDUP.out.output
+        .map { meta, table -> [ meta.cohort, meta, table ] }
+        .join(ch_sheet_donors, remainder: true)
+        .map { _cohort, meta, table, donors -> [ meta, table, donors ?: [] ] }
+    COHORT_FILTER(ch_filter_input, params.donor_map ? file(params.donor_map, checkIfExists: true) : [])
     def ch_mutations = COHORT_FILTER.out.mutations
     ch_multiqc_files = ch_multiqc_files.mix(COHORT_FILTER.out.mqc.map { _meta, mqc -> mqc })
 
@@ -122,7 +134,11 @@ workflow NONCODINGDRIVERS {
     // removed by the hypermutator filter
     def ch_removed_samples = COHORT_FILTER.out.sample_filter
         .map { meta, table ->
-            def removed = table.readLines().drop(1).collect { line -> line.split('\t', -1) }.findAll { f -> f[2] == 'false' }.collect { f -> f[0] }
+            def lines   = table.readLines()
+            def cols    = lines[0].split('\t', -1).toList()
+            def removed = lines.drop(1).collect { line -> line.split('\t', -1) }
+                .findAll { f -> f[cols.indexOf('kept')] == 'false' }
+                .collect { f -> f[cols.indexOf('sample')] }
             [ meta.cohort, removed ]
         }
     def ch_cohort_vcfs = ch_sample_vcfs
