@@ -21,17 +21,18 @@ run.
 --input '[path to samplesheet file]'
 ```
 
-| Column          | Description                                                                                                                             |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                           |
-| `entry`         | `vcf`, `sarek` or `maf` (below).                                                                                                        |
-| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                          |
-| `cancer_type`   | Optional label.                                                                                                                         |
-| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (with `--allow_hg19_liftover`).                              |
-| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                            |
-| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                             |
-| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                         |
-| `mutations`     | Internal: the canonical-table tier used by the test profile and the regression gates. It is not supported for analyses; leave it empty. |
+| Column          | Description                                                                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sample`        | Row identifier (`[A-Za-z0-9._-]`). For `vcf` and `sarek` rows it is also the sample name in the cohort table.                                                   |
+| `entry`         | `vcf`, `sarek` or `maf` (below).                                                                                                                                |
+| `cohort`        | Cohort the row belongs to; empty makes the row its own cohort.                                                                                                  |
+| `donor`         | Optional, `vcf` and `sarek` rows: the donor (patient) of the sample; one sample per donor is kept ([sample filters](#sample-filters-donors-and-hypermutators)). |
+| `cancer_type`   | Optional label.                                                                                                                                                 |
+| `assembly`      | `GRCh38` (default) or `hg38`; `GRCh37` or `hg19` for rows lifted to GRCh38 (with `--allow_hg19_liftover`).                                                      |
+| `vcf`, `index`  | `vcf` and `sarek` rows: bgzipped VCF (`.vcf.gz`) and optional `.tbi`/`.csi`.                                                                                    |
+| `maf`           | `maf` rows: MAF (`.maf` or `.maf.gz`), one or many tumours.                                                                                                     |
+| `vcf_tumour_id` | Tumour column of a multi-sample VCF; required for `sarek` rows.                                                                                                 |
+| `mutations`     | Internal: the canonical-table tier used by the test profile and the regression gates. It is not supported for analyses; leave it empty.                         |
 
 ### Entry tiers
 
@@ -86,10 +87,28 @@ each file explicitly; an explicit parameter wins over its datasheet value. See
 [references](references.md) for the checksums and the recipes that build each asset. CADD is never
 in the datasheet: it is supplied by the user (`--oncodrivefml_score`).
 
-## Hypermutator filter
+## Sample filters: donors and hypermutators
 
-Hypermutated samples are removed once, from the cohort table, before any caller runs; every caller,
-the null calibration, the variant flags and the signatures then read the same samples.
+Two filters are applied once, to the cohort table, before any caller runs; every caller, the null
+calibration, the variant flags and the signatures then read the same samples.
+
+### One sample per donor
+
+Driver tests count how many patients carry a mutation in an element, so each sample should come
+from a different patient. When donor information is given, one sample per donor is kept: of the
+samples of one donor, the first in alphabetical order (IntOGen). Without donor information every
+sample is its own donor and nothing is removed.
+
+- `vcf` and `sarek` rows (one sample each): the samplesheet column `donor`.
+- `maf` and `mutations` rows (which can hold several samples): `--donor_map`, a TSV with the columns
+  `sample` (the tumour sample name, e.g. the MAF `Tumor_Sample_Barcode`) and `donor`. A `donor`
+  value on such a row stops the run (`DONOR_COLUMN_MULTISAMPLE`).
+
+Both sources can be combined; a sample given two different donors stops the run, and map rows for
+samples that are not in the cohort are ignored. Donor duplicates are removed before the hypermutator
+rule, so its quartiles are computed over one sample per donor.
+
+### Hypermutator filter
 
 - `--hypermutator_filter intogen` (default): a sample is removed when it has more than
   `--hypermutator_min_mutations` (10,000) mutations **and** more than Q3 + `--hypermutator_iqr_factor`
@@ -99,10 +118,11 @@ the null calibration, the variant flags and the signatures then read the same sa
 - `--hypermutator_filter cap`: removes every sample with more than `--hypermutator_min_mutations`.
 - `--hypermutator_filter none`: keeps every sample.
 
-A sample's count is its number of rows in the cohort table (SNVs, MNVs and indels). Removed samples,
-their counts and the cohort thresholds are written to `mutations/<cohort>.sample_filter.tsv`, their rows
-to `mutations/<cohort>.removed_mutations.tsv`, and the MultiQC report lists them per cohort. The run
-stops if the rule would remove every sample of a cohort.
+A sample's count is its number of rows in the cohort table (SNVs, MNVs and indels). Removed samples
+(by either filter, with `removed_by` `donor` or `hypermutator`), their counts and the cohort thresholds
+are written to `mutations/<cohort>.sample_filter.tsv`, their rows to
+`mutations/<cohort>.removed_mutations.tsv`, and the MultiQC report lists them per cohort. The run stops
+if the rule would remove every sample of a cohort.
 
 ActiveDriverWGS has its own hypermutator cut (`filter_hyper_MB`, more than 3,000 x the value in mutations
 per sample). It is off by default (`--adwgs_filter_hyper_mb` not set), so it does not re-filter the

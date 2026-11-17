@@ -1,0 +1,2 @@
+sample,entry,cohort,donor,assembly,maf
+synth_tert_maf,maf,SYNTH-TERT,P1,GRCh38,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/synth_tert_tiers.hg19.maf

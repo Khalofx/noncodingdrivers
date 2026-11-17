@@ -1,0 +1,4 @@
+sample,entry,cohort,donor,assembly,vcf,index,vcf_tumour_id
+D01,vcf,SYNTH-DONOR,P1,GRCh38,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D01.vcf.gz,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D01.vcf.gz.tbi,
+D02,vcf,SYNTH-DONOR,P1,GRCh38,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D02.ensembl.vcf.gz,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D02.ensembl.vcf.gz.tbi,
+D03,sarek,SYNTH-DONOR,,GRCh38,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D03.sarek.vcf.gz,https://raw.githubusercontent.com/Khalofx/noncodingdrivers-test-datasets/main/data/synthetic_tert/harmonisation/vcf/D03.sarek.vcf.gz.tbi,D03_T
