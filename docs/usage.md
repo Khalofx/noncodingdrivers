@@ -88,6 +88,11 @@ in the datasheet: it is supplied by the user (`--oncodrivefml_score`).
 
 ## Callers and licences
 
+The validated configuration combines ActiveDriverWGS and OncodriveFML (the default
+`--consensus_callers`). OncodriveFML is opt-in, so a run with the defaults is a one-caller analysis whose
+consensus rests on ActiveDriverWGS alone; enable OncodriveFML (below) to reproduce the validated
+configuration. In this release both callers test SNVs only.
+
 - **ActiveDriverWGS** (`--run_activedriverwgs`, default `true`): SNVs only, against a +/- 50 kb
   background with trinucleotide context. Elements are run in shards of `--adwgs_shard_size` (5,000)
   and the FDR is recomputed over all shards.

@@ -76,7 +76,9 @@ nextflow run khalofx/noncodingdrivers -r 1.0.0 \
 
 OncodriveFML runs only with `--run_oncodrivefml true --accept_oncodrivefml_licence true` and a
 CADD v1.7 score file (`--oncodrivefml_score`). Its licence and CADD's restrict commercial use, and
-its image must be built locally ([usage](docs/usage.md#callers-and-licences)). GRCh37/hg19 input
+its image must be built locally ([usage](docs/usage.md#callers-and-licences)). A run with the
+defaults therefore rests on ActiveDriverWGS alone, while the published-cohort validation
+([validation](docs/validation.md)) used both callers. In this release both callers test SNVs only. GRCh37/hg19 input
 (`--allow_hg19_liftover`) needs the UCSC hg19ToHg38 chain, which UCSC licenses for non-commercial use
 only; COSMIC files are licensed separately ([usage](docs/usage.md#software-licences)).
 
