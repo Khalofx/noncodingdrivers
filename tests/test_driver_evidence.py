@@ -194,3 +194,27 @@ def test_label_values_only_for_label_items(tmp_path):
     assert list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors([bad]))
     src = {r["evidence_item"]: r for r in csv.DictReader(open(SOURCES), delimiter="\t")}
     assert {i for i, r in src.items() if r["unit"] == "label"} == {"re2g_top_distal_target", "ccre_v4_dominant_class"}
+
+
+def test_caller_support_item_validates(tmp_path):
+    # D5: caller_support (value = combined callers with p < 0.05, status = the category) from the consensus table
+    cons = pd.read_csv(os.path.join(D, "test.consensus.tsv"), sep="\t", dtype=str)
+    cons["n_nominal_callers"] = "1"
+    cons["caller_support"] = "one_caller"
+    cons.loc[0, ["n_nominal_callers", "caller_support"]] = ["2", "all_callers"]
+    c = tmp_path / "support.consensus.tsv"
+    cons.to_csv(c, sep="\t", index=False)
+    ev = tmp_path / "support.driver_evidence.tsv"
+    subprocess.run([sys.executable, os.path.join(ROOT, "bin", "write_driver_evidence.py"), "--cohort", "test", "--consensus", str(c),
+                    "--sources", SOURCES, "--coordinates", "native", "--pipeline-version", "1.0.0dev", "--scope", "all",
+                    "--output", str(ev)], check=True)
+    rows = list(csv.DictReader(open(ev), delimiter="\t"))
+    errors = list(Draft202012Validator(json.load(open(SCHEMA))).iter_errors(rows))
+    assert not errors, errors[0].message
+    sup = {r["element_id"]: (r["value"], r["status"], r["threshold"]) for r in rows if r["evidence_item"] == "caller_support"}
+    assert set(sup) == set(cons.element_id)
+    assert sup[cons.element_id[0]] == ("2", "all_callers", "0.05")
+    assert sup[cons.element_id[1]] == ("1", "one_caller", "0.05")
+    assert not any(re.search(r"tier", r["evidence_item"]) or re.search(r"tier|driver", r["status"]) for r in rows)
+    _, ev_old = _run(tmp_path, scope="all")   # a table without the column gives no caller_support row
+    assert not any(r["evidence_item"] == "caller_support" for r in csv.DictReader(open(ev_old), delimiter="\t"))

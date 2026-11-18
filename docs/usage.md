@@ -184,6 +184,13 @@ one sets `consensus_q` and `is_consensus` (Benjamini–Hochberg, `--fdr_threshol
 aggregation and the caller votes are sensitivity columns. `--skip_acat true` leaves out ACAT where
 the package is unavailable.
 
+Next to `is_consensus`, `caller_support` records how many combined callers are nominally
+significant on their own (p < 0.05): `all_callers`, `some_callers` (with three or more combined
+callers), `one_caller` or `no_caller`. The combination can make an element significant from one
+very small p-value, so a consensus element with `one_caller` rests on a single caller and deserves
+a closer look before it is interpreted. The column is descriptive: it changes no q-value and no
+call.
+
 ### Combined and alongside callers
 
 `--consensus_callers` (default `activedriverwgs,oncodrivefml`) names the callers whose p-values are
@@ -191,7 +198,7 @@ combined. A default caller that does not run is simply left out (OncodriveFML is
 Every other enabled caller is **reported alongside**: it is harmonised and joined on `element_id`,
 its `p_<caller>` and `q_<caller>` columns are carried in the consensus table and the evidence
 table, and it runs on the null replicates, but it does not enter EBM, ACAT, RRA, `vote_count`,
-`n_tested_callers` or `consensus_q`. The rows of the consensus table are the elements tested by at
+`n_tested_callers`, `caller_support` or `consensus_q`. The rows of the consensus table are the elements tested by at
 least one combined caller, so turning on a caller reported alongside adds its two columns and
 changes nothing else.
 
