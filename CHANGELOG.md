@@ -141,6 +141,17 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   `enhancer_gene_dir`, `ccre_v4_bed` (ENCFF420VPZ, MD5 checked at start), `ccre_v4_md5`,
   `ccre_v4_rows`, `ccre_v4_source`, `ccre_celltype_dir`; staging recipe in `docs/references.md`.
 
+### `Changed`
+
+- OncodriveFML simulates with the cohort's trinucleotide signature
+  (`assets/oncodrivefml.CADD_GRCh38.conf`: `[signature] method = 'complement'`,
+  `normalize_by_sites = 'whole_genome'`; was `method = 'none'`), chosen by a pre-registered
+  null-calibration experiment on five cohorts (`docs/validation.md`): without a signature, null
+  data gave OncodriveFML q < 0.1 in ESAD-UK (7 elements) and PRAD-CA (2). Every OncodriveFML
+  p-value changes. The module no longer passes `--sequencing wgs`, which overrode the
+  configuration's `normalize_by_sites`; a configuration given with `--oncodrivefml_conf` is used
+  as written.
+
 ### `Fixed`
 
 - ActiveDriverWGS element boundaries: the module passes BED start + 1 (ActiveDriverWGS reads closed

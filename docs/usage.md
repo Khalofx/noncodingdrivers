@@ -158,6 +158,12 @@ configuration. In this release both callers test SNVs only.
   process { withName: 'ONCODRIVEFML' { container = 'oncodrivefml-local:2.5.0' } }
   ```
 
+  The bundled configuration (`assets/oncodrivefml.CADD_GRCh38.conf`, used unless
+  `--oncodrivefml_conf` names another) simulates with the cohort's trinucleotide signature
+  (`[signature] method = 'complement'`, normalised to whole-genome trinucleotide counts), the
+  setting chosen by the null-calibration experiment in `docs/validation.md`. A configuration given
+  with `--oncodrivefml_conf` is used as written, its `[signature]` section included.
+
 - **OncodriveCLUSTL** (`--run_oncodriveclustl`, default `false`): positional clustering of an
   element's SNVs against a local, trinucleotide-matched simulation (OncodriveCLUSTL 1.2.0,
   AGPL-3.0-or-later, no licence gate; public image). It is **reported alongside** the consensus
