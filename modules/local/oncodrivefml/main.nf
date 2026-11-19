@@ -84,11 +84,12 @@ process ONCODRIVEFML {
 
     # OncodriveFML can exit non-zero on a clean completion (for example when no element passes
     # correction), so success is judged by the result table; the exit code is kept as evidence.
+    # No --sequencing: in OncodriveFML 2.5 it overrides the configuration's [signature]
+    # normalize_by_sites (wgs = whole_genome), so the configuration file alone sets the signature.
     set +e
     oncodrivefml \\
         -i ofml_input.tsv \\
         -e ofml_elements.tsv \\
-        --sequencing wgs \\
         -c ${config} \\
         -o oncodrivefml_out \\
         ${args}

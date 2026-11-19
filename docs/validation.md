@@ -395,6 +395,37 @@ PCAWG donors against Frankell's 551), so low-frequency elements are underpowered
 access (the PAX5 enhancer was tested as a locus window), and only a corrigendum of Fujimoto 2016 was
 read. Regulatory Build elements can be larger than the published ones.
 
+## OncodriveFML signature (A1)
+
+The mutational signature OncodriveFML simulates with was chosen by a pre-registered experiment
+(2026-11-17/18), not in advance. The arms differed only in the `[signature]` section of the
+configuration: `none` (the earlier default); `complement` (the cohort's 96-channel signature,
+strand-collapsed) normalised to whole-genome trinucleotide counts; `complement` without
+normalisation; and `bysample` with normalisation. Each arm ran on MELA-AU, ESAD-UK, MALY-DE, PRAD-CA
+and SYNTH-NC with two null replicates (pipeline `5f7ce9c`; ActiveDriverWGS identical across arms).
+Criteria, in order: (1) OncodriveFML null λ within 0.8–1.2 in every cohort and at most one element at
+q < 0.1 per null replicate; (2) the planted SYNTH-NC elements and the MELA-AU TERT promoter at
+q < 0.1; (3) the nearest-neighbour negative elements and the three PRAD-CA artefact elements at
+q < 0.1; then the simpler arm.
+
+| Arm                                | Null λ: ESAD-UK, MALY-DE, MELA-AU, PRAD-CA, SYNTH-NC | Null elements at q < 0.1 (worst replicate) | (1)  |
+| ---------------------------------- | ---------------------------------------------------- | ------------------------------------------ | ---- |
+| `none`                             | 1.17, 1.01, 0.92, 1.01, 1.03                         | ESAD-UK 7, PRAD-CA 2                       | fail |
+| `complement`, normalised (default) | 0.96, 1.00, 0.98, 1.08, 0.96                         | 0                                          | pass |
+| `complement`, not normalised       | 0.84, 0.89, 0.89, 1.00, 0.86                         | ESAD-UK 2, PRAD-CA 1                       | fail |
+| `bysample`, normalised             | 0.96, 0.99, 0.98, 1.07, 0.97                         | 0                                          | pass |
+
+The two passing arms tie on (2) and (3). OncodriveFML alone recovers the planted E2 and E4 in every
+arm, and not the MELA-AU TERT promoter (q 0.91 and 0.89; the combined EBM q is 3.4e-8 and 2.9e-8). None
+of the 220 nearest-neighbour negatives reaches q < 0.1, and one of the three PRAD-CA artefacts does, in
+every arm. `complement` is the simpler of the two. OncodriveFML significant elements, `none` to
+`complement`: MELA-AU 241 to 110, ESAD-UK 25 to 20, MALY-DE 14 to 13, PRAD-CA 1 to 1.
+
+Until this experiment the module also passed `--sequencing wgs`, which in OncodriveFML 2.5 overrides
+`[signature] normalize_by_sites` with `whole_genome`; the module no longer passes it, and the
+configuration sets the normalisation. Rerunning the SYNTH-NC OncodriveFML task this way gives output
+byte-identical to the `complement` arm above.
+
 ## Component checks against independent re-implementations
 
 Each component checked against something computed independently of the pipeline (2026-11-12, `d6346d1`).
