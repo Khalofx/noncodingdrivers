@@ -68,19 +68,23 @@ nextflow_process {
                 !sel.isEmpty() && [ sel, q ].transpose().every { r, qq -> Math.abs(num(col(r, qcol)) - qq) <= 1e-9 * Math.abs(qq) }
             }
             assertAll(
-                { assert [ 'ebm_q', 'acat_q', 'rra_q', 'vote_count', 'consensus_q', 'is_consensus' ].every { c -> c in cols } },
+                { assert [ 'ebm_q', 'acat_q', 'rra_q', 'vote_count', 'consensus_q', 'is_consensus', 'n_nominal_callers', 'caller_support' ].every { c -> c in cols } },
                 { assert lines.size() == 6 },
                 { assert bhMatch('ebm_p', 'ebm_q') },
                 { assert bhMatch('acat_p', 'acat_q') },
                 { assert rows.every { r -> col(r, 'consensus_q') == col(r, 'ebm_q') } },   // --method ebm
                 { assert rows.every { r -> (col(r, 'is_consensus').toLowerCase() == 'true') == (num(col(r, 'consensus_q')) < 0.1) } },
+                // caller support: combined callers with p < 0.05 on their own, counted here independently
+                { assert rows.every { r -> (col(r, 'n_nominal_callers') as int) == [ 'p_activedriverwgs', 'p_oncodrivefml' ].count { c -> num(col(r, c)) != null && num(col(r, c)) < 0.05 } } },
+                { assert rows.collectEntries { r -> [ col(r, 'element_id'), col(r, 'caller_support') ] } ==
+                    [ 'promoter_ENSR00000746745': 'one_caller', 'el2': 'all_callers', 'el3': 'no_caller', 'el4': 'no_caller', 'el5': 'all_callers' ] },
                 { assert snapshot(process.out.consensus).match() }   // deterministic: md5 is stable
             )
         }
     }
 
     // --callers with the default set selects exactly the columns combined without it: same bytes as
-    // the snapshot of "synthetic matched table" (test.consensus.tsv md5 932f3f8aee2c65401bb3ddd1a423d4cf)
+    // the snapshot of "synthetic matched table" (test.consensus.tsv md5 aaee55e00d9fe0e8003bdfc56315c6b4)
     test("synthetic matched table - default callers") {
 
         when {
@@ -100,7 +104,7 @@ nextflow_process {
         then {
             assert process.success
             assertAll(
-                { assert path(process.out.consensus[0][1]).md5 == '932f3f8aee2c65401bb3ddd1a423d4cf' }
+                { assert path(process.out.consensus[0][1]).md5 == 'aaee55e00d9fe0e8003bdfc56315c6b4' }
             )
         }
     }
@@ -133,7 +137,7 @@ nextflow_process {
             assert process.success
             assertAll(
                 { assert 'p_oncodriveclustl' in header && 'q_oncodriveclustl' in header },
-                { assert md5 == '932f3f8aee2c65401bb3ddd1a423d4cf' },
+                { assert md5 == 'aaee55e00d9fe0e8003bdfc56315c6b4' },
                 { assert params_line.tokenize('\t')[0] == 'p_activedriverwgs,p_oncodrivefml' }
             )
         }
@@ -160,6 +164,7 @@ nextflow_process {
             def lines  = path(process.out.consensus[0][1]).readLines()
             def cols   = lines[0].tokenize('\t')
             def tested = lines.drop(1).collect { line -> line.split('\t', -1)[cols.indexOf('n_tested_callers')] as int }
+            def support = lines.drop(1).collectEntries { line -> def f = line.split('\t', -1); [ f[cols.indexOf('element_id')], f[cols.indexOf('caller_support')] ] }
             def ebm    = path(process.out.ebm_parameters[0][1]).readLines()
             def ecols  = ebm[0].tokenize('\t')
             def evals  = ebm[1].tokenize('\t')
@@ -167,7 +172,8 @@ nextflow_process {
             assertAll(
                 { assert tested.max() == 3 },
                 { assert evals[ecols.indexOf('callers')] == 'p_activedriverwgs,p_oncodriveclustl,p_oncodrivefml' },
-                { assert evals[ecols.indexOf('complete_elements')] == '4' }
+                { assert evals[ecols.indexOf('complete_elements')] == '4' },
+                { assert support == [ 'promoter_ENSR00000746745': 'some_callers', 'el2': 'all_callers', 'el3': 'no_caller', 'el4': 'no_caller', 'el5': 'some_callers' ] }
             )
         }
     }

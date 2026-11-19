@@ -19,7 +19,7 @@
             },
             "evidence_item": {
                 "type": "string",
-                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|p_oncodriveclustl|q_oncodriveclustl|oncodriveclustl_n_clusters|oncodriveclustl_clustered_mutations|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|avi_max_phred|avi_n_scored|avi_n_unscored|opencravat_n_ccre_screen|opencravat_n_repeat|opencravat_n_clinvar|cosmic_n_matched_mutations|cosmic_n_samples|cosmic_n_sample_name_overlaps|cancer_gene_nearest_in_list|cancer_gene_nearest_pc_in_list|cancer_gene_re2g_targets_in_list|re2g_n_distal_targets|re2g_top_distal_target|ccre_v4_dominant_class|ccre_v4_covered_fraction|null_lambda_[a-z0-9_]+|null_fpr_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
+                "pattern": "^(consensus_q|consensus_rank|p_activedriverwgs|q_activedriverwgs|p_oncodrivefml|q_oncodrivefml|p_oncodriveclustl|q_oncodriveclustl|oncodriveclustl_n_clusters|oncodriveclustl_clustered_mutations|ebm_p|ebm_q|acat_p|acat_q|n_tested_callers|vote_count|caller_support|n_mutations|n_patients|max_sample_fraction|frac_in_blacklist_v2|frac_in_segdup|frac_in_low_mappability|mean_umap_unique_fraction|frac_germline_pop_common|callable_fraction|postfilter_min_support|postfilter_mappability|postfilter_max_sample_fraction|postfilter_status|q_postfilter|avi_max_phred|avi_n_scored|avi_n_unscored|opencravat_n_ccre_screen|opencravat_n_repeat|opencravat_n_clinvar|cosmic_n_matched_mutations|cosmic_n_samples|cosmic_n_sample_name_overlaps|cancer_gene_nearest_in_list|cancer_gene_nearest_pc_in_list|cancer_gene_re2g_targets_in_list|re2g_n_distal_targets|re2g_top_distal_target|ccre_v4_dominant_class|ccre_v4_covered_fraction|null_lambda_[a-z0-9_]+|null_fpr_[a-z0-9_]+|caller_role_[a-z0-9_]+)$",
                 "description": "Evidence item (assets/evidence_sources.tsv)"
             },
             "value": {
@@ -54,7 +54,11 @@
                     "nearest_in_targets",
                     "nearest_not_in_targets",
                     "no_link",
-                    "no_nearest_gene"
+                    "no_nearest_gene",
+                    "all_callers",
+                    "some_callers",
+                    "one_caller",
+                    "no_caller"
                 ]
             },
             "threshold": {

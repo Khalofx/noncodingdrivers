@@ -193,10 +193,12 @@
                 "combination_method",
                 "consensus_q",
                 "consensus_rank",
-                "is_consensus"
+                "is_consensus",
+                "n_nominal_callers",
+                "caller_support"
             ]
         ],
-        "timestamp": "2026-10-23T15:32:22.885931618",
+        "timestamp": "2026-11-17T23:29:52.119462102",
         "meta": {
             "nf-test": "0.9.4",
             "nextflow": "25.10.4"

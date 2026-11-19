@@ -176,7 +176,8 @@ nextflow_workflow {
             // ActiveDriverWGS-only consensus: columns, and element ids in rank order with their p-values (3 significant digits)
             def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
                            'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
-                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
+                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus',
+                           'n_nominal_callers', 'caller_support' ]
             // reference values with BED start + 1 passed to ActiveDriverWGS (C5)
             def adwgs  = [ TERT_promoter_fixture: 1.216e-6d, elem_split: 0.3282d, elem_E: 0.6300d, elem_D: 0.6585d,
                            elem_C: 0.9027d, elem_B: 0.9712d, elem_A: 0.9791d, elem_empty: 1.0d ]
@@ -253,7 +254,8 @@ nextflow_workflow {
             // ActiveDriverWGS-only consensus: columns, and element ids in rank order with their p-values (3 significant digits)
             def header = [ 'element_id', 'p_activedriverwgs', 'q_activedriverwgs', 'chrom', 'start', 'end', 'n_fragments',
                            'n_tested_callers', 'ebm_p', 'ebm_q', 'acat_p', 'acat_q', 'rra_score', 'rra_q', 'vote_count',
-                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus' ]
+                           'combination_method', 'consensus_q', 'consensus_rank', 'is_consensus',
+                           'n_nominal_callers', 'caller_support' ]
             // reference values with BED start + 1 passed to ActiveDriverWGS (C5)
             def adwgs  = [ TERT_promoter_fixture: 1.216e-6d, elem_split: 0.3282d, elem_E: 0.6300d, elem_D: 0.6585d,
                            elem_C: 0.9027d, elem_B: 0.9712d, elem_A: 0.9791d, elem_empty: 1.0d ]
@@ -274,6 +276,7 @@ nextflow_workflow {
             assert workflow.success
             assertAll(
                 { assert cols == header },
+                { assert rows.every { row -> v(row, 'caller_support') in [ 'one_caller', 'no_caller' ] } },   // one combined caller
                 *same_as_adwgs_alone,
                 { assert workflow.out.harmonized.size() == 1 }
             )

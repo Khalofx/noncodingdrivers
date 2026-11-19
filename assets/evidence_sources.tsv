@@ -15,6 +15,7 @@ acat_p	p	ACAT	0.91	cohort
 acat_q	q	ACAT (Benjamini-Hochberg)	0.91	cohort
 n_tested_callers	count	COMBINEPVALUES	pipeline	cohort
 vote_count	count	COMBINEPVALUES	pipeline	cohort
+caller_support	count	COMBINEPVALUES: combined callers with p < 0.05 on their own (status all_callers, some_callers, one_caller or no_caller)	pipeline	cohort
 n_mutations	count	VARIANT_FLAGS: rows assigned to the element (point rule, bedtools intersect)	bedtools 2.31.1	cohort
 n_patients	count	VARIANT_FLAGS	bedtools 2.31.1	cohort
 max_sample_fraction	fraction	VARIANT_FLAGS: largest share of the element's mutations from one patient	bedtools 2.31.1	cohort

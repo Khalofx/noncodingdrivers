@@ -9,6 +9,11 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- Caller support next to `is_consensus` (`bin/combine_pvalues.R`): `n_nominal_callers` (combined
+  callers with p < 0.05 on their own) and `caller_support` (`all_callers`, `some_callers`,
+  `one_caller`, `no_caller`), carried into the driver evidence table (item `caller_support`) and
+  counted for the significant elements in the MultiQC run overview. Descriptive; no q-value or call
+  changes.
 - One sample per donor when donor information is given (`COHORT_FILTER`, before the hypermutator
   rule): the samplesheet column `donor` (vcf and sarek rows) and `--donor_map` (TSV sample, donor; for
   maf and mutations rows). Of the samples of one donor the first in alphabetical order is kept

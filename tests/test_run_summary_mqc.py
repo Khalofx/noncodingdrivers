@@ -86,6 +86,31 @@ def test_overview_counts_match_the_table(tmp_path):
     assert _val(ov, "callers_run") == "2"
 
 
+def test_overview_counts_caller_support_of_significant_elements(tmp_path):
+    hdr = HDR + ["caller_support"]
+    p = tmp_path / "s.tsv"
+    data = [("e1", 0.001, "all_callers"), ("e2", 0.05, "one_caller"), ("e3", 0.02, "one_caller"),
+            ("e4", 0.09, "no_caller"), ("e5", 0.5, "all_callers")]
+    with open(p, "w") as fh:
+        fh.write("\t".join(hdr) + "\n")
+        for eid, q, sup in data:
+            r = {"element_id": eid, "consensus_q": q, "vote_count": 1, "n_tested_callers": 2, "caller_support": sup}
+            fh.write("\t".join(str(r.get(h, "")) for h in hdr) + "\n")
+    proc, files = _run(tmp_path, str(p))
+    assert proc.returncode == 0, proc.stderr
+    ov = _sec(files, "overview")
+    assert _val(ov, "significant") == "4"
+    assert _val(ov, "significant_all_callers") == "1"   # e5 (all_callers) is not significant
+    assert _val(ov, "significant_one_caller") == "2"
+
+
+def test_overview_without_caller_support_has_no_support_columns(tmp_path):
+    rows = [{"element_id": "e1", "consensus_q": 0.001, "vote_count": 2, "n_tested_callers": 2}]
+    proc, files = _run(tmp_path, _consensus(tmp_path, rows))
+    assert proc.returncode == 0, proc.stderr
+    assert "significant_all_callers" not in _sec(files, "overview")
+
+
 def test_gzipped_consensus_is_read(tmp_path):
     rows = [{"element_id": "e1", "consensus_q": 0.01, "vote_count": 1, "n_tested_callers": 1}]
     proc, files = _run(tmp_path, _consensus(tmp_path, rows, gz=True))

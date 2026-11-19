@@ -11,7 +11,9 @@ Elements written (--scope): nominal = any caller or combination p < 0.01 or cons
 (the entry rule of the lowest downstream tier); all = every element of the consensus table.
 Statuses: significant | not_significant (consensus_q and caller q against --fdr), observed,
 not_tested (NA p), flagged | not_flagged (mask fractions above --mask-fraction, germline share
-above it), pass | fail | not_applied (post-filters), and the null-calibration band status. No
+above it), pass | fail | not_applied (post-filters), the null-calibration band status, and
+all_callers | some_callers | one_caller | no_caller (caller_support: value = the combined callers
+with p < 0.05 on their own, from the consensus table; absent in tables without the column). No
 evidence item is a tier: tiers are assigned downstream (reports repository).
 
 OncodriveCLUSTL (--oncodriveclustl, its native table): oncodriveclustl_n_clusters (CLUSTERS) and
@@ -55,6 +57,7 @@ CALLER_ORDER = ("activedriverwgs", "oncodrivefml", "oncodriveclustl")
 # Per-element counts from the native OncodriveCLUSTL table (--oncodriveclustl): item -> column
 CLUSTL_ITEMS = (("oncodriveclustl_n_clusters", "CLUSTERS"), ("oncodriveclustl_clustered_mutations", "CLUSTERED_MUT"))
 CONS_ITEMS = ("consensus_q", "consensus_rank", "ebm_p", "ebm_q", "acat_p", "acat_q", "n_tested_callers", "vote_count")
+SUPPORT_NOMINAL_P = 0.05   # caller_support threshold: nominal_p of bin/combine_pvalues.R
 FLAG_ITEMS = ("n_mutations", "n_patients", "max_sample_fraction", "frac_in_blacklist_v2", "frac_in_segdup",
               "frac_in_low_mappability", "mean_umap_unique_fraction", "frac_germline_pop_common", "callable_fraction")
 MASK_ITEMS = ("frac_in_blacklist_v2", "frac_in_segdup", "frac_in_low_mappability", "frac_germline_pop_common")
@@ -267,6 +270,10 @@ def main():
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
             else:
                 add(eid, item, v, "not_tested" if pd.isna(v) else "observed")
+        if "caller_support" in cons.columns:
+            # agreement of the combined callers (descriptive; COMBINEPVALUES writes both columns)
+            add(eid, "caller_support", pd.to_numeric(r["n_nominal_callers"], errors="coerce"), str(r["caller_support"]),
+                fmt(SUPPORT_NOMINAL_P))
         if cl is not None:
             # elements below OncodriveCLUSTL's mutation cutoff are not in its table: not tested
             cr = cl.loc[eid] if eid in cl.index else None

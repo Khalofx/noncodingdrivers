@@ -157,6 +157,17 @@ def main():
         "multi_caller_agreement": vote2,
         "callers_run": int(max(tested)) if tested else 0,
     }
+    support_headers = {}
+    if "caller_support" in rows[0]:
+        # caller support of the significant elements (COMBINEPVALUES; absent in older tables)
+        overview["significant_all_callers"] = sum(1 for r in sig if r.get("caller_support") == "all_callers")
+        overview["significant_one_caller"] = sum(1 for r in sig if r.get("caller_support") == "one_caller")
+        support_headers = {
+            "significant_all_callers": {"title": "Significant, all callers p<0.05", "format": "{:,.0f}",
+                                        "description": "significant elements at which every combined caller has p < 0.05 on its own"},
+            "significant_one_caller": {"title": "Significant, one caller p<0.05", "format": "{:,.0f}",
+                                       "description": "significant elements carried by a single combined caller (the others p >= 0.05 or not tested)"},
+        }
     p = os.path.join(a.outdir, "%s_noncodingdrivers_overview_mqc.yaml" % S)
     write_section(
         p, "noncodingdrivers_overview", "noncodingdrivers: run overview",
@@ -168,6 +179,7 @@ def main():
             "significant": {"title": "Significant (q<%g)" % a.fdr, "format": "{:,.0f}"},
             "multi_caller_agreement": {"title": "Multi-caller agreement", "format": "{:,.0f}"},
             "callers_run": {"title": "Callers run", "format": "{:,.0f}"},
+            **support_headers,
         })
     written.append(p)
 

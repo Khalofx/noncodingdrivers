@@ -10,6 +10,10 @@
 #   RRA  : RobustRankAggreg::rhoScores (Kolde et al. 2012) on per-caller normalised ranks.
 #   BH   : stats::p.adjust(method = "BH"), over all elements of the cohort.
 #   votes: number of callers with their own q <= --fdr (descriptive only).
+#   caller support: n_nominal_callers = combined callers with p < 0.05 on their own;
+#          caller_support = all_callers | some_callers | one_caller | no_caller (descriptive
+#          only, roadmap D5; read next to is_consensus: a consensus element with one_caller is
+#          carried by a single caller, one with no_caller by the combination alone).
 # The only in-house logic is argument parsing, column selection and output formatting.
 #
 # Usage: combine_pvalues.R --input matched.tsv --out consensus.tsv [--method ebm|acat]
@@ -21,7 +25,7 @@
 # Without it every p_<caller> column is combined. A named caller without a column did not run
 # and is skipped; p_/q_ columns of callers not named are carried through unchanged (callers
 # reported alongside). Every combined quantity (EBM, ACAT, RRA, BH, n_tested_callers,
-# vote_count) and the row set (elements tested by at least one combined caller) use the
+# vote_count, n_nominal_callers, caller_support) and the row set (elements tested by at least one combined caller) use the
 # combined callers only, in the column order of the input table.
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -107,6 +111,13 @@ rra_score <- apply(R, 1, function(r) rhoScores(r[!is.na(r)]))
 # --- BH, votes, selection ----------------------------------------------------------------
 qcols <- intersect(sub("^p_", "q_", pcols), names(d))
 votes <- if (length(qcols)) rowSums(as.matrix(d[, qcols, drop = FALSE]) <= fdr, na.rm = TRUE) else rep(0L, nrow(d))
+# caller support (descriptive): combined callers nominally significant on their own; an untested
+# caller (NA) is not nominal. With one combined caller the tiers are one_caller and no_caller.
+nominal_p <- 0.05
+n_nominal <- rowSums(P < nominal_p, na.rm = TRUE)
+support   <- ifelse(n_nominal == 0, "no_caller",
+             ifelse(n_nominal == 1, "one_caller",
+             ifelse(n_nominal == ncol(P), "all_callers", "some_callers")))
 out <- d
 out[["n_tested_callers"]] <- n_tested
 out[["ebm_p"]]     <- ebm_p
@@ -121,6 +132,8 @@ out[["combination_method"]] <- opt[["method"]]
 out[["consensus_q"]]    <- if (opt[["method"]] == "ebm") out[["ebm_q"]] else out[["acat_q"]]
 out[["consensus_rank"]] <- rank(sel_p, ties.method = "min")
 out[["is_consensus"]]   <- ifelse(out[["consensus_q"]] < fdr, "True", "False")
+out[["n_nominal_callers"]] <- n_nominal
+out[["caller_support"]]    <- support
 out <- out[order(out[["consensus_rank"]], out[["element_id"]]), , drop = FALSE]
 write.table(out, opt[["out"]], sep = "\t", quote = FALSE, row.names = FALSE, na = "NA")
 
