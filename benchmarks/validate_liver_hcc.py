@@ -7,9 +7,10 @@ TERT promoter element (promoter_ENSR00000746745): significant, consensus rank an
 Layer "full" adds the explanation-layer outputs: the candidate-mutation table (only significant
 elements; 11 TERT rows from 11 patients) and the MultiQC report.
 
-Expected values are those of the regression baseline (tests/regression/baseline.json): under ACAT,
-28 significant annotations at 23 loci with TERT at rank 5 (q 9.54e-06); under EBM, 31 significant
-with TERT at rank 5 (q 3.07e-05, recorded to three significant digits).
+Expected values are those of the post-Phase-2 reference (tests/regression/reference_phase2.json):
+under ACAT, 23 significant annotations at 19 loci with TERT at rank 3 (q 3.41e-06); under EBM,
+24 significant at 19 loci with TERT at rank 4 (q 9.91e-06, recorded to three significant digits).
+The frozen pre-v1 baseline (tests/regression/baseline.json) had ACAT 28 at 23 loci and EBM 31, TERT rank 5.
 """
 
 import argparse
@@ -20,8 +21,8 @@ from pathlib import Path
 
 TERT_ELEMENT = "promoter_ENSR00000746745"
 EXPECTED = {
-    "acat": {"significant": 28, "loci": 23, "tert_rank": 5, "tert_q": 9.544685537221654e-06, "q_tol": 1e-7},
-    "ebm": {"significant": 31, "loci": None, "tert_rank": 5, "tert_q": 3.07e-05, "q_tol": 5e-08},
+    "acat": {"significant": 23, "loci": 19, "tert_rank": 3, "tert_q": 3.41396138505966e-06, "q_tol": 1e-7},
+    "ebm": {"significant": 24, "loci": 19, "tert_rank": 4, "tert_q": 9.91e-06, "q_tol": 5e-08},
 }
 
 
@@ -77,7 +78,7 @@ def check_core(consensus, method, failures):
 
 
 def check_full(root, cohort, significant, failures):
-    variants_path = root / "candidates" / f"{cohort}.candidate_mutations.tsv"
+    variants_path = root / "candidates" / f"{cohort}.candidates.tsv"
     multiqc = root / "multiqc" / "multiqc_report.html"
     for path in (variants_path, multiqc):
         require(path.is_file() and path.stat().st_size > 0, f"missing or empty output: {path}", failures)

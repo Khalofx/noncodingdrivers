@@ -9,7 +9,111 @@ in `tests/regression/baseline.json`. The cohort data are not redistributed (the 
 PCAWG tables are unverified), so the regression runs are made on the Karakoram cluster, where the
 baseline folders are kept read-only. All runs are GRCh38.
 
+Since the Phase 2 fixes, the acceptance reference for current runs is
+`tests/regression/reference_phase2.json` (the re-baseline below, provenance in `PROVENANCE.md`).
+`baseline.json` stays the frozen pre-v1 baseline; the sections after the re-baseline describe runs made
+before those fixes, at the commit each names.
+
+## Re-baseline after Phase 2
+
+Runs of `fed4b01` on Karakoram (2026-11-19/20), after the Phase 2 fixes: one hypermutator filter
+applied before every caller (IntOGen rule) with ActiveDriverWGS's own filter off; one sample per donor
+when donor information is given; OncodriveFML simulating with the cohort's trinucleotide signature;
+ActiveDriverWGS testing the same bases as the other callers. Each run used the parameters of the run it
+replaces. The seven benchmark cohorts also ran the null calibration (3 replicates), and LIRI-JP and
+PACA-CA a donor map from the PCAWG sample sheet (`--donor_map`; WGS aliquot to ICGC donor). The truth
+sets, the matched negatives and the scoring scripts are those of the Phase 1 benchmark. The acceptance
+values of these runs are in `tests/regression/reference_phase2.json`.
+
+**Samples entering the callers**
+
+| Cohort           | Samples | Kept | Removed                                       |
+| ---------------- | ------- | ---- | --------------------------------------------- |
+| MELA-AU          | 70      | 65   | 5 hypermutators                               |
+| ESAD-UK          | 98      | 93   | 5 hypermutators                               |
+| CLLE-ES          | 95      | 95   | 0                                             |
+| MALY-DE          | 98      | 90   | 8 hypermutators                               |
+| PRAD-CA          | 116     | 114  | 2 hypermutators                               |
+| LIRI-JP          | 261     | 245  | 10 second samples of a donor, 6 hypermutators |
+| PACA-CA          | 147     | 129  | 2 second samples of a donor, 16 hypermutators |
+| Liver-HCC-public | 261     | 254  | 7 hypermutators                               |
+| SYNTH-NC         | 60      | 60   | 0                                             |
+
+**Null calibration.** λ over the null elements (those with ActiveDriverWGS expected count ≥ 1); in
+brackets, the largest number of null elements at q < 0.1 in any replicate. Band 0.8–1.2; λ below 0.8
+is reported as conservative.
+
+| Cohort  | Null elements | ActiveDriverWGS | OncodriveFML | EBM      |
+| ------- | ------------- | --------------- | ------------ | -------- |
+| MELA-AU | 173,097       | 0.41 (0)        | 0.98 (0)     | 0.48 (0) |
+| ESAD-UK | 57,095        | 0.45 (0)        | 0.95 (0)     | 0.52 (0) |
+| CLLE-ES | 479           | 0.44 (0)        | 1.10 (0)     | 0.61 (0) |
+| MALY-DE | 8,773         | 0.45 (1)        | 1.01 (0)     | 0.53 (1) |
+| PRAD-CA | 1,787         | 0.45 (0)        | 1.04 (0)     | 0.55 (0) |
+| LIRI-JP | 92,773        | 0.46 (0)        | 0.99 (0)     | 0.55 (0) |
+| PACA-CA | 8,897         | 0.45 (0)        | 0.97 (0)     | 0.55 (0) |
+
+**Rheinbay benchmark** (17 published elements in six cohorts, 20 matched negatives each; before, the
+Phase 1 runs; after, these runs):
+
+| Method               | Positives at q < 0.1 | Decile-matched negatives | Nearest-neighbour negatives |
+| -------------------- | -------------------- | ------------------------ | --------------------------- |
+| EBM (default)        | 7/17 → 6/17          | 2/340 → 1/340            | 7/340 → 5/340               |
+| ActiveDriverWGS only | 6/17 → 3/17          | 2/340 → 1/340            | 5/340 → 5/340               |
+| OncodriveFML only    | 1/17 → 1/17          | 0/340 → 0/340            | 0/340 → 0/340               |
+| ACAT                 | 6/17 → 4/17          | 2/340 → 1/340            | 5/340 → 4/340               |
+
+The five clean-tier elements give the same result as before: EBM recovers the MELA-AU TERT promoter
+(q 3.5e-6 → 3.4e-8, rank 1) and not the other four. Under EBM one element changed status, ESAD-UK
+TP53TG1; the other changes are for ActiveDriverWGS alone. Every change is in a tier Rheinbay et al.
+attributed to an artefact or a mutational process, and each element lost mutations that the new
+filters removed. The matched-element score takes the catalogue element matched to each positive; the
+any-overlap score takes the best q over all overlapping catalogue elements.
+
+| Element                  | Tier             | Change                                              | Score                                                          | Mutations removed in the element   |
+| ------------------------ | ---------------- | --------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| ESAD-UK TP53TG1 enhancer | process          | EBM q 0.0099 → 0.12; ActiveDriverWGS q 0.031 → 0.18 | both                                                           | 3 SNVs from 2 hypermutators        |
+| MALY-DE NEAT1 promoter   | process (AID)    | ActiveDriverWGS q 0.079 → 1; EBM still q 2.8e-4     | both                                                           | 79 SNVs from 7 hypermutators       |
+| MALY-DE WDR74 promoter   | mapping artefact | ActiveDriverWGS q 0.012 → 0.22; EBM still q 0.0048  | matched element only; its CTCF site stays significant for both | 7 SNVs from 4 hypermutators        |
+| LIRI-JP WDR74 CTCF site  | mapping artefact | ActiveDriverWGS q 0.014 → 0.12; EBM still q 5.8e-4  | any-overlap only                                               | 1 SNV from a donor's second sample |
+
+The PRAD-CA artefact elements are unchanged: 3 of 3 significant under EBM.
+
+**Significant elements per cohort** (q < 0.1; OncodriveFML only is Benjamini–Hochberg over every
+OncodriveFML-tested element, as in Phase 1)
+
+| Cohort  | EBM (default) | ActiveDriverWGS only | OncodriveFML only |
+| ------- | ------------- | -------------------- | ----------------- |
+| MELA-AU | 110 → 68      | 6 → 19               | 330 → 46          |
+| ESAD-UK | 111 → 27      | 36 → 17              | 52 → 5            |
+| CLLE-ES | 10 → 8        | 12 → 12              | 1 → 1             |
+| MALY-DE | 112 → 77      | 111 → 96             | 14 → 9            |
+| PRAD-CA | 6 → 5         | 6 → 8                | 1 → 1             |
+| LIRI-JP | 36 → 33       | 25 → 17              | 14 → 7            |
+| PACA-CA | 1 → 0         | 0 → 0                | 3 → 0             |
+
+ActiveDriverWGS alone rises in MELA-AU because it now reads all 65 donors instead of 41. Most of the
+drop in ESAD-UK and MELA-AU comes from OncodriveFML's signature and the hypermutator filter.
+
+**Regression gates** (`reference_phase2.json`)
+
+- **SYNTH-NC** (`test_full`): the same consensus set as the release run. EBM recovers 4 of 5 planted
+  drivers (E5 missed, q 0.301) and ACAT 5 of 5; the spectrum decoy E6 is significant under both, with 1
+  (EBM) and 2 (ACAT) further non-planted elements, as in `baseline.json`.
+- **Liver-HCC-public** (release parameters): 541,906 elements tested (541,936 before). EBM 24
+  significant at 19 loci (31 before), ACAT 23 at 19 loci (28 before); TERT promoter rank 4 under EBM
+  (q 9.91e-6) and 3 under ACAT (q 3.41e-6), 11 SNVs in 11 patients as before. Of the 7 elements no longer
+  significant under EBM, 5 lost mutations from the removed hypermutators and 2 were borderline
+  (q 0.094 → 0.10 and 0.088 → 0.11). `benchmarks/validate_liver_hcc.py` checks these values
+  (`--layer full`: 236 candidate rows, 11 TERT rows from 11 patients). The same run resumed with `--combination_method acat` passes the ACAT
+  checks (23 at 19 loci, 217 candidate rows).
+- **LIRI-JP**: EBM 33 (36 before), ACAT 18 (33 before). **PACA-CA**: EBM 0 (1 before), ACAT 0.
+  `benchmarks/compare_to_baseline.py --baseline tests/regression/reference_phase2.json` passes for the
+  three cohorts under both methods.
+
 ## Release runs (v1.0.0)
+
+These runs predate the Phase 2 fixes; the current values are in the re-baseline above.
 
 Pipeline commit `d171e8f` on Karakoram, with every container pinned by digest, ActiveDriverWGS in
 its image instead of a site R installation, and the updated nf-core modules (bcftools 1.25).
@@ -341,6 +445,8 @@ base per fragment is mapped, but it has no score and is dropped (43 of 231,472 S
 would drop the first base of every fragment from the background. The adapter is kept.
 
 ## Published-cohort validation (D42)
+
+Runs of `d6346d1`, before the Phase 2 fixes; the re-baseline above gives the current benchmark numbers.
 
 Pipeline commit `d6346d1`, default configuration (ActiveDriverWGS and OncodriveFML combined by EBM, the
 annotation layers, `--allow_hg19_liftover`); all layers on for MELA-AU and ESAD-UK. Input: the PCAWG open

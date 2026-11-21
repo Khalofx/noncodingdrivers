@@ -9,6 +9,11 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- Post-Phase-2 regression reference `tests/regression/reference_phase2.json` (re-baseline of
+  Liver-HCC-public, LIRI-JP, PACA-CA and SYNTH-NC at `fed4b01`), read by
+  `benchmarks/compare_to_baseline.py --baseline` and `benchmarks/validate_liver_hcc.py`;
+  `baseline.json` stays the frozen pre-v1 baseline. Re-baseline section in `docs/validation.md`
+  (null calibration and the Rheinbay benchmark on seven PCAWG cohorts).
 - Caller support next to `is_consensus` (`bin/combine_pvalues.R`): `n_nominal_callers` (combined
   callers with p < 0.05 on their own) and `caller_support` (`all_callers`, `some_callers`,
   `one_caller`, `no_caller`), carried into the driver evidence table (item `caller_support`) and
@@ -159,6 +164,8 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Fixed`
 
+- `benchmarks/validate_liver_hcc.py --layer full` reads `candidates/<cohort>.candidates.tsv`, the
+  current name of the candidate table.
 - ActiveDriverWGS element boundaries: the module passes BED start + 1 (ActiveDriverWGS reads closed
   1-based ranges), so it tests the same bases as the other callers; before, the base 5' of each
   fragment was counted too (46-386 elements per validation cohort counted more patients). The
