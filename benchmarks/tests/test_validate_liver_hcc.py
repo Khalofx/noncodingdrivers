@@ -14,14 +14,18 @@ SPEC.loader.exec_module(MOD)
 COLS = ["element_id", "chrom", "start", "end", "consensus_q", "consensus_rank", "is_consensus", "combination_method"]
 
 
-def _results(tmp_path, n_sig=28, tert_rank=5, tert_q=9.544685537221654e-06, method="acat"):
+EXP = MOD.EXPECTED["acat"]
+
+
+def _results(tmp_path, n_sig=EXP["significant"], tert_rank=EXP["tert_rank"], tert_q=EXP["tert_q"], method="acat"):
     out = tmp_path / "results" / "consensus"
     out.mkdir(parents=True)
     rows = []
-    # 23 loci: 5 pairs of overlapping elements plus 18 single elements on chr1 (n_sig = 28)
+    # EXP["loci"] loci: n_pairs pairs of overlapping elements on chr1, the others single (TERT on chr5 is one locus)
+    n_pairs = EXP["significant"] - EXP["loci"]
     pos = 1000
     for i in range(n_sig - 1):
-        overlap = i < 10 and i % 2 == 1
+        overlap = i < 2 * n_pairs and i % 2 == 1
         start = pos - 50 if overlap else pos + 10_000
         pos = start + 100
         rows.append({"element_id": f"el{i}", "chrom": "chr1", "start": start, "end": pos,
@@ -43,7 +47,7 @@ def test_core_passes_on_release_values(tmp_path):
 
 
 def test_core_fails_on_tert_rank(tmp_path):
-    res = _results(tmp_path, tert_rank=6)
+    res = _results(tmp_path, tert_rank=EXP["tert_rank"] + 1)
     with pytest.raises(SystemExit, match="TERT rank"):
         MOD.main(["--results", str(res), "--method", "acat"])
 

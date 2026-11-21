@@ -1,0 +1,77 @@
+{
+    "description": "Post-Phase-2 acceptance reference for khalofx/noncodingdrivers v1 runs: values of the re-baseline runs (pipeline fed4b01, 2026-11-19/20) after the Phase 2 fixes (one hypermutator filter before every caller, one sample per donor, OncodriveFML cohort signature, ActiveDriverWGS element boundaries). baseline.json stays the frozen pre-v1 baseline. Run settings and table checksums are in PROVENANCE.md.",
+    "pipeline_commit": "fed4b01",
+    "liver_hcc_public": {
+        "significant_annotations_acat": 23,
+        "loci": 19,
+        "tert": {
+            "element": "promoter_ENSR00000746745",
+            "rank": 3,
+            "snvs": 11,
+            "patients": 11,
+            "acat_q": 3.41396138505966e-6,
+            "adwgs_p": 9.44982787954423e-12,
+            "ofml_p": 0.21127,
+            "patient_rows": 11
+        }
+    },
+    "liri_jp": {
+        "candidates_acat": 18,
+        "loci": 16,
+        "min_acat_q": 8.21682913651657e-9
+    },
+    "paca_ca": {
+        "candidates_acat": 0,
+        "min_acat_q": 1.0
+    },
+    "synth_nc": {
+        "donors": 60,
+        "planted_drivers": 5,
+        "planted_decoys": 1,
+        "acat": {
+            "recovered": 5,
+            "decoy_significant": true,
+            "non_planted_significant": 2
+        },
+        "ebm": {
+            "recovered": 4,
+            "decoy_significant": true,
+            "non_planted_significant": 1,
+            "missed": ["E5 enhancer_ENSR00001173236 (3 donors)"]
+        }
+    },
+    "combination_check": {
+        "acat_package_significant": {
+            "liver_hcc_public": 23,
+            "liri_jp": 18,
+            "paca_ca": 0
+        },
+        "ebm_significant": {
+            "liver_hcc_public": 24,
+            "liri_jp": 33,
+            "paca_ca": 0
+        },
+        "ebm_shared_with_acat": {
+            "liver_hcc_public": 19,
+            "liri_jp": 16,
+            "paca_ca": 0
+        },
+        "acat_only": {
+            "liver_hcc_public": 4,
+            "liri_jp": 2,
+            "paca_ca": 0
+        },
+        "ebm_only": {
+            "liver_hcc_public": 5,
+            "liri_jp": 17,
+            "paca_ca": 0
+        },
+        "tert_liver_hcc": {
+            "ebm_q": 9.91145481770115e-6,
+            "ebm_rank": 4,
+            "acat_q": 3.41396138505966e-6,
+            "acat_rank": 3
+        }
+    },
+    "recovered_semantics": "recovered = planted true drivers (E1-E5) at q < 0.1; the decoy E6 is reported separately"
+}

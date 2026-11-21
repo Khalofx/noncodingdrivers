@@ -195,3 +195,29 @@ def test_cli_help():
         r = subprocess.run([sys.executable, os.path.join(ROOT, "benchmarks", script), "--help"],
                            capture_output=True, text=True)
         assert r.returncode == 0
+
+
+def test_compare_passes_on_phase2_reference(tmp_path):
+    # the post-Phase-2 reference (undated combination_check key) drives the same checks
+    ref_path = os.path.join(ROOT, "tests", "regression", "reference_phase2.json")
+    ref = json.load(open(ref_path))
+    cc, tert = ref["combination_check"], ref["liver_hcc_public"]["tert"]
+    n_ebm, n_acat = cc["ebm_significant"]["liver_hcc_public"], cc["acat_package_significant"]["liver_hcc_public"]
+    rows = []
+    for i in range(1, 41):
+        rows.append({"element_id": f"el{i}", "p_activedriverwgs": 1e-3 * i, "p_oncodrivefml": 0.5,
+                     "ebm_p": 1e-8 * i, "ebm_q": 0.001 if i < n_ebm else 0.5,
+                     "acat_p": 1e-8 * i, "acat_q": 0.001 if i < n_acat else 0.5})
+    # TERT sits at the reference rank under each method (between the neighbouring ranks)
+    rows.insert(0, {"element_id": tert["element"], "p_activedriverwgs": tert["adwgs_p"], "p_oncodrivefml": tert["ofml_p"],
+                    "ebm_p": 1e-8 * (cc["tert_liver_hcc"]["ebm_rank"] - 0.5), "ebm_q": cc["tert_liver_hcc"]["ebm_q"],
+                    "acat_p": 1e-8 * (tert["rank"] - 0.5), "acat_q": tert["acat_q"]})
+    t = tmp_path / "v1.tsv"
+    pd.DataFrame(rows).to_csv(t, sep="\t", index=False)
+    for method in ("ebm", "acat"):
+        out = tmp_path / f"report_{method}.tsv"
+        rc = compare_to_baseline.main(["--baseline", ref_path, "--cohort", "liver_hcc_public", "--method", method,
+                                       "--v1", str(t), "--out", str(out)])
+        rep = pd.read_csv(out, sep="\t")
+        assert rc == 0, rep.to_string()
+        assert f"n_significant_{method}" in set(rep["check"])

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Compare a v1 consensus table with the regression baseline (tests/regression/).
 
+--baseline is tests/regression/reference_phase2.json for current runs (the post-Phase-2 reference) or
+tests/regression/baseline.json (the frozen pre-v1 baseline).
+
 Gate tooling only: Nextflow never runs this script.
 
 Checks, one row each in the report:
@@ -46,7 +49,7 @@ def close(observed, expected, rtol):
 
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--baseline", required=True, help="tests/regression/baseline.json")
+    ap.add_argument("--baseline", required=True, help="tests/regression/reference_phase2.json (or baseline.json)")
     ap.add_argument("--cohort", required=True, choices=sorted(COHORT_KEYS))
     ap.add_argument("--v1", required=True, help="v1 consensus table (COMBINE_PVALUES output, TSV)")
     ap.add_argument("--method", default="ebm", choices=["ebm", "acat"])
@@ -98,7 +101,7 @@ def main(argv=None):
         rows.append({"check": name, "expected": expected, "observed": observed, "status": "PASS" if ok else "FAIL"})
 
     sig = set(v1.loc[v1[qcol] < a.fdr, "element_id"])
-    cc = base.get("combination_check_2026_10_06", {})
+    cc = base.get("combination_check", base.get("combination_check_2026_10_06", {}))
     expected_n = (cc.get("ebm_significant", {}) if a.method == "ebm" else cc.get("acat_package_significant", {})).get(a.cohort)
     if expected_n is None and a.method == "acat":
         expected_n = base[a.cohort].get(COHORT_KEYS[a.cohort])

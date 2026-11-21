@@ -112,3 +112,19 @@ motifbreakR image: `containers/motifbreakr/` (explicit conda lock, 285 packages)
 with `apptainer build --fakeroot` (Apptainer 1.5.3): `noncodingdrivers-motifbreakr-2.24.0.sif`, SHA-256
 `73f3101aea2ce5820a9ee136344822a96975a937996fa55bd2b7da32ad85b455`; installed packages equal the lock. In it, the
 universalmotif route reproduces the pilot matrices exactly with `convert_type(pseudocount = 3.2)` (0.8 per base; 0.8 differs by up to 0.126), and TERT C228T x ELK4 MA0076.3 gives ref p 9.994507e-04, alt p 2.288818e-05 with both parsers.
+
+## Post-Phase-2 reference (`reference_phase2.json`, 2026-11-20)
+
+The acceptance values for current runs. Pipeline `fed4b01` (a frozen worktree on Karakoram, containers
+pinned by digest), inputs as above, one run per cohort under `noncodingdrivers/runs/rebaseline/`.
+
+| Cohort                  | Parameters                                                                            | Consensus table SHA-256                                            |
+| ----------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Liver-HCC-public        | release parameters (`--combination_method ebm`, regulatory context, VEP, motifbreakR) | `3d80abed2159e526ede4f28a8ee0ea08317e42d7bc3002afd677feb3fd04aaee` |
+| Liver-HCC-public (ACAT) | the same run resumed with `--combination_method acat` (callers cached)                | `ed1f4fd5aebf51109dde44c80a5524e88cc2df9074ac9ca41fcd7b5e2489cfca` |
+| LIRI-JP                 | ActiveDriverWGS and OncodriveFML, EBM, null calibration (3 replicates), `--donor_map` | `23a29b57c33e8b9fbb55262d97501bcc3e94e90238c90014b176428c1d6ec497` |
+| PACA-CA                 | as LIRI-JP                                                                            | `6a62e868923062eb537c53bd88e9786f6066da2ca4ba030fc1003fd24b0c1207` |
+| SYNTH-NC                | `-profile test_full`                                                                  | `092a009a35a4645d98a8a02237099ce6edfa4ba027ba6f7fa1199a6962e9ed77` |
+
+The donor map is built from the PCAWG sample sheet (`pcawg_sample_sheet.tsv`, WGS rows: `aliquot_id` to
+`icgc_donor_id`; 5,789 aliquots, 2,834 donors; MD5 `3841d30f3c25e0aa9a16cb602b33c71d`).
