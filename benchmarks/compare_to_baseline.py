@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Compare a v1 consensus table with the regression baseline (tests/regression/).
 
---baseline is tests/regression/reference_phase2.json for current runs (the post-Phase-2 reference) or
-tests/regression/baseline.json (the frozen pre-v1 baseline).
+--baseline is tests/regression/reference_pcawg_style.json for current runs (the PCAWG-style element
+catalogue, datasheet 1.3.0), tests/regression/reference_phase2.json for runs on the Regulatory Build
+catalogue, or tests/regression/baseline.json (the frozen pre-v1 baseline). The --frozen, --comparison and
+--discordant checks compare element by element with tables of the Regulatory Build catalogue and apply
+to baseline.json only.
 
 Gate tooling only: Nextflow never runs this script.
 
@@ -49,7 +52,7 @@ def close(observed, expected, rtol):
 
 def parse_args(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--baseline", required=True, help="tests/regression/reference_phase2.json (or baseline.json)")
+    ap.add_argument("--baseline", required=True, help="tests/regression/reference_pcawg_style.json (or reference_phase2.json, baseline.json)")
     ap.add_argument("--cohort", required=True, choices=sorted(COHORT_KEYS))
     ap.add_argument("--v1", required=True, help="v1 consensus table (COMBINE_PVALUES output, TSV)")
     ap.add_argument("--method", default="ebm", choices=["ebm", "acat"])

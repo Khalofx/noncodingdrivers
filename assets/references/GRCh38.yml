@@ -9,7 +9,7 @@
 # Asset recipes for every derived file: docs/references.md.
 - genome: GRCh38
   assembly: GRCh38
-  datasheet_version: "1.2.0"
+  datasheet_version: "1.3.0"
   species: homo_sapiens
   chr_style: ucsc
   native: true
@@ -22,11 +22,11 @@
   fasta_dict_md5: eee72059c0f8b6407202baa38ba3be8a
   contig_count: 25
   rename_map: assets/references/GRCh38.rename_chrs.map
-  element_catalogue: ${reference_base}/GRCh38_regulatory_build.ccre.noncoding.v50.bed
-  element_catalogue_md5: 39f838e6c81fdb0b152504f2d51939b5
-  element_catalogue_rows: 595725
-  element_catalogue_ids: 544737
-  element_catalogue_source: "Ensembl Regulatory Build release 110 (build 20221007), CDS removed against GENCODE v50 basic, fragments >= 50 bp"
+  element_catalogue: ${reference_base}/GRCh38_pcawg_style.gencode_v50.bed
+  element_catalogue_md5: 84c7a33b4d90e735095aabc99f9da559
+  element_catalogue_rows: 2050985
+  element_catalogue_ids: 642261
+  element_catalogue_source: "PCAWG-style elements after Rheinbay et al. 2020 (Supplementary Information section 4), built natively on GRCh38: GENCODE v50 comprehensive (protein-coding promoter core, 5'UTR, 3'UTR and splice sites; lncRNA exons, promoters and splice sites; small RNAs; miRNA precursors), GENCODE v50 predicted tRNAs, miRBase v23.1 mature miRNAs, Regulatory Build 110 enhancers trimmed to the SCREEN V4 cCREs inside them, and Regulatory Build 110 CTCF, open chromatin and TF sites"
   element_catalogue_provenance: native
   regbuild_url: https://ftp.ensembl.org/pub/release-110/regulation/homo_sapiens/homo_sapiens.GRCh38.Regulatory_Build.regulatory_features.20221007.gff.gz
   regbuild_md5: ee3b05c9020f7da4244d563995a579bb

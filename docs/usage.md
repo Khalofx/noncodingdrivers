@@ -489,8 +489,7 @@ CA-CTCF, CA-TF, CA, TF) and overlap, and a summary with the covered fraction and
 most bases. The cell-type-agnostic registry (ENCODE ENCFF420VPZ, datasheet `ccre_v4_bed`, checked
 against its MD5) is used by default; `--ccre_celltype_tissues liver` adds the biosample-specific
 classes of the files staged under `--ccre_celltype_dir/<tissue>/` (staged: HepG2 ENCFF762XMN and
-liver ENCFF253OXM). This is annotation only: the element universe stays the Regulatory Build
-catalogue.
+liver ENCFF253OXM). This is annotation only: the element universe stays the element catalogue.
 
 ### Data licences of the context layers
 
@@ -599,8 +598,9 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   - A profile with a complete configuration for automated testing
   - Includes links to test data so needs no other parameters
 - `test_full`
-  - SYNTH-NC, a synthetic genome-wide cohort (60 donors, 231,472 SNVs, five planted drivers and
-    one spectrum decoy) from the test-datasets repository
+  - SYNTH-NC v2, a synthetic genome-wide cohort (60 donors, 230,047 SNVs, five planted drivers and
+    one spectrum decoy in elements of the default catalogue) from the test-datasets repository;
+    `benchmarks/score_synth_nc.py` scores a run against its answer key
   - Needs the full-size references: `--reference_base` and `--oncodrivefml_score`, or a site
     profile that sets them (`-profile test_full,karakoram`)
 - `karakoram`

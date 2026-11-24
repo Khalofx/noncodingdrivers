@@ -26,7 +26,9 @@ added files.
    vcf_assembly_checker), contig renaming, MAF conversion (maf2vcf.pl), an opt-in GRCh37/hg19 to
    GRCh38 liftover (Picard LiftoverVcf), normalisation and PASS filtering (bcftools), and one
    mutation table per cohort.
-2. Driver discovery on a CDS-excluded catalogue of Ensembl Regulatory Build elements:
+2. Driver discovery on a PCAWG-style catalogue of non-coding elements rebuilt on GRCh38 (GENCODE
+   promoters, UTRs, splice sites, lncRNAs and small RNAs, miRBase miRNAs, and Ensembl Regulatory
+   Build enhancers, CTCF, open chromatin and TF sites):
    ActiveDriverWGS (default) and OncodriveFML (opt-in, licence-gated, with user-supplied CADD
    scores); OncodriveCLUSTL (opt-in, positional clustering, reported alongside the consensus unless
    named in `--consensus_callers`); MutEnricher as a QC-only caller.
