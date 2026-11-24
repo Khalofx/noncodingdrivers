@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install bedtools (element-catalogue recipe test)
+        run: sudo apt-get update && sudo apt-get install -y bedtools
+
       - name: Install test dependencies (same list a laptop or Karakoram user installs)
         run: |
           python -m pip install --upgrade pip
@@ -44,4 +47,4 @@ jobs:
         with:
           python-version: "3.11"
       - run: python -m pip install ruff
-      - run: ruff check bin/ tests/ benchmarks/
+      - run: ruff check bin/ tests/ benchmarks/ assets/recipes/

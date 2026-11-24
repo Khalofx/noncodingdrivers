@@ -9,6 +9,18 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
 
 ### `Added`
 
+- PCAWG-style element catalogue as the default `element_catalogue` (datasheet `1.3.0`):
+  `GRCh38_pcawg_style.gencode_v50.bed` (642,261 elements), the element definitions of Rheinbay et
+  al. 2020 rebuilt natively on GRCh38 from GENCODE v50 (promoter core, UTRs, splice sites, lncRNAs,
+  small RNAs, miRNA precursors, predicted tRNAs), miRBase v23.1 mature miRNAs, Regulatory Build 110
+  enhancers trimmed to SCREEN V4 cCREs, and Regulatory Build 110 CTCF, open chromatin and TF sites.
+  Recipe script `assets/recipes/build_pcawg_style_catalogue.py` with its unit test; recipe and
+  departures from Rheinbay et al. in `docs/references.md`; the catalogue benchmark against the
+  Regulatory Build catalogue in `docs/validation.md`. The Regulatory Build catalogue stays available
+  with `--elements_bed`. New acceptance reference `tests/regression/reference_pcawg_style.json`
+  (Liver-HCC-public, LIRI-JP, PACA-CA and SYNTH-NC on the new catalogue). `test_full` runs SYNTH-NC
+  v2 (the six designs planted in elements of the new catalogue; test-datasets `data/synth_nc_v2/`),
+  scored by the new `benchmarks/score_synth_nc.py`.
 - Post-Phase-2 regression reference `tests/regression/reference_phase2.json` (re-baseline of
   Liver-HCC-public, LIRI-JP, PACA-CA and SYNTH-NC at `fed4b01`), read by
   `benchmarks/compare_to_baseline.py --baseline` and `benchmarks/validate_liver_hcc.py`;
@@ -53,7 +65,7 @@ Initial release of khalofx/noncodingdrivers, created with the [nf-core](https://
   (Step 7A keys); licence keys for CADD, COSMIC, ENCODE data, AlphaGenome AVI and the user-staged
   UCSC hg19ToHg38 liftover chain (`liftover_chain_licence`: non-commercial use by independent
   researchers and nonprofits, redistribution with UCSC's README), summarised in `licence_summary`.
-- Driver discovery (`DRIVER_DISCOVERY`) on a CDS-excluded Ensembl Regulatory Build catalogue:
+- Driver discovery (`DRIVER_DISCOVERY`) on a CDS-excluded element catalogue (the PCAWG-style catalogue above):
   ActiveDriverWGS 1.2.1 (sharded, FDR over all shards) and OncodriveFML 2.5.0 with CADD v1.7
   (licence-gated: `--accept_oncodrivefml_licence`); MutEnricher 1.3.3 as a QC-only caller
   (`--run_mutenricher`). Element coordinates as fragment spans with `n_fragments`. OncodriveFML's

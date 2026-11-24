@@ -211,11 +211,15 @@ def test_report_contains_no_candidate_ranking_or_driver_language(tmp_path):
          "vote_count": 2, "n_tested_callers": 2},
         {"element_id": "enhancer_ENSR00001267691", "consensus_q": 0.004,
          "vote_count": 1, "n_tested_callers": 2},
+        # an id of the default PCAWG-style catalogue (<class>__<gene name>__<gene id>)
+        {"element_id": "promCore__TERT__ENSG00000164362.23", "consensus_q": 1e-6,
+         "vote_count": 2, "n_tested_callers": 2},
     ]
     proc, files = _run(tmp_path, _consensus(tmp_path, rows))
     assert proc.returncode == 0, proc.stderr
     blob = "\n".join(files.values())
     assert "ENSR" not in blob, "an element id leaked into the QC report"
+    assert "ENSG" not in blob and "promCore__" not in blob, "an element id leaked into the QC report"
     # Check the PROSE fields only. "driver" is an unavoidable substring elsewhere:
     # the pipeline is named noncodingdrivers, the section ids derive from that, and
     # `activedriverwgs` is a caller's actual name — none of which is a claim about

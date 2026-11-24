@@ -80,7 +80,7 @@
                     "pattern": "^\\S+\\.bed(\\.gz)?$",
                     "fa_icon": "fas fa-map",
                     "description": "Element catalogue: headerless BED with chrom, start, end and element id (>= 4 columns), GRCh38 chr-named.",
-                    "help_text": "Use the coding-sequence-excluded catalogue (Ensembl Regulatory Build with GENCODE CDS removed); a CDS-included catalogue leaks coding selection into the non-coding test. Rows sharing an element id are fragments of one element: they are tested together and reported as one span with n_fragments."
+                    "help_text": "Defaults to the datasheet element_catalogue (the PCAWG-style GRCh38 catalogue, docs/references.md). Coding sequence must be excluded: a CDS-included catalogue leaks coding selection into the non-coding test. Rows sharing an element id are fragments of one element: they are tested together and reported as one span with n_fragments."
                 },
                 "fasta": {
                     "type": "string",

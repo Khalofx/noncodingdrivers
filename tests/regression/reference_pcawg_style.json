@@ -1,0 +1,87 @@
+{
+    "description": "Acceptance reference for khalofx/noncodingdrivers runs on the PCAWG-style element catalogue (datasheet 1.3.0): values of the R4.B1 re-baseline runs (pipeline fed4b01 with --elements_bed GRCh38_pcawg_style.gencode_v50.bed, 2026-11-23/24) of Liver-HCC-public, LIRI-JP, PACA-CA and SYNTH-NC v2. reference_phase2.json holds the values on the Regulatory Build catalogue; baseline.json stays the frozen pre-v1 baseline.",
+    "pipeline_commit": "fed4b01",
+    "element_catalogue": {
+        "file": "GRCh38_pcawg_style.gencode_v50.bed",
+        "md5": "84c7a33b4d90e735095aabc99f9da559",
+        "rows": 2050985,
+        "ids": 642261,
+        "datasheet_version": "1.3.0"
+    },
+    "liver_hcc_public": {
+        "significant_annotations_acat": 28,
+        "loci": 23,
+        "tert": {
+            "element": "promCore__TERT__ENSG00000164362.23",
+            "rank": 3,
+            "snvs": 10,
+            "patients": 10,
+            "acat_q": 2.36051422129596e-8,
+            "adwgs_p": 5.5343532104903805e-14,
+            "ofml_p": 0.37727,
+            "patient_rows": 10
+        }
+    },
+    "liri_jp": {
+        "candidates_acat": 20,
+        "loci": 19,
+        "min_acat_q": 3.9961766312631197e-13
+    },
+    "paca_ca": {
+        "candidates_acat": 0,
+        "min_acat_q": 0.107597077781721
+    },
+    "synth_nc": {
+        "version": 2,
+        "truth": "data/synth_nc_v2/SYNTH-NC.truth.json (test-datasets)",
+        "donors": 60,
+        "planted_drivers": 5,
+        "planted_decoys": 1,
+        "acat": {
+            "recovered": 5,
+            "decoy_significant": true,
+            "non_planted_significant": 0,
+            "missed": []
+        },
+        "ebm": {
+            "recovered": 5,
+            "decoy_significant": true,
+            "non_planted_significant": 0,
+            "missed": []
+        }
+    },
+    "combination_check": {
+        "acat_package_significant": {
+            "liver_hcc_public": 28,
+            "liri_jp": 20,
+            "paca_ca": 0
+        },
+        "ebm_significant": {
+            "liver_hcc_public": 38,
+            "liri_jp": 37,
+            "paca_ca": 2
+        },
+        "ebm_shared_with_acat": {
+            "liver_hcc_public": 24,
+            "liri_jp": 18,
+            "paca_ca": 0
+        },
+        "acat_only": {
+            "liver_hcc_public": 4,
+            "liri_jp": 2,
+            "paca_ca": 0
+        },
+        "ebm_only": {
+            "liver_hcc_public": 14,
+            "liri_jp": 19,
+            "paca_ca": 2
+        },
+        "tert_liver_hcc": {
+            "ebm_q": 1.17711121839896e-7,
+            "ebm_rank": 5,
+            "acat_q": 2.36051422129596e-8,
+            "acat_rank": 3
+        }
+    },
+    "recovered_semantics": "recovered = planted true drivers (E1-E5) at q < 0.1; the decoy E6 is reported separately; non_planted_significant = significant elements other than the planted ones (benchmarks/score_synth_nc.py)"
+}

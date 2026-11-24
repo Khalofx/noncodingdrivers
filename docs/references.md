@@ -11,7 +11,9 @@ datasheet records every file with its checksum and source; the same checksums ar
 `datasheet_version` records changes of the datasheet: `1.0.0` is the Step 5-6 reference set;
 `1.1.0` adds the Step 7A keys (OncodriveFML/OncodriveCLUSTL bgdata genome manifest, AlphaGenome AVI,
 ENCODE-rE2G and SCREEN V4 keys, and the licence keys including `liftover_chain_licence`);
-`1.2.0` adds the AlphaGenome AVI file name, its three MD5s and the download date (download of 2026-11-07).
+`1.2.0` adds the AlphaGenome AVI file name, its three MD5s and the download date (download of 2026-11-07);
+`1.3.0` adds the PCAWG-style element catalogue as the default `element_catalogue` (the Regulatory Build
+catalogue becomes an input of its recipe and an alternative for `--elements_bed`).
 `tests/test_references_datasheet.py` checks that the version in the datasheet is the last one listed here.
 
 - Paths that start with `${reference_base}` are completed with `--reference_base <dir>`. Without
@@ -39,7 +41,7 @@ MD5s of the archive, the score file and its index from the download of 2026-11-0
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------- |
 | `fasta`, `fasta_fai`                                 | `hg38.chr.fa`, `hg38.chr.fa.fai` (25 contigs, UCSC names)                                                                                      | `838cd9f56ca7d7dd345cb025d188c991`, `963c862ff26b0d914956faaf7192e54b` | vcf, sarek and maf rows                |
 | `fasta_dict`                                         | `derived/hg38.chr.dict`                                                                                                                        | `eee72059c0f8b6407202baa38ba3be8a`                                     | Picard LiftoverVcf                     |
-| `element_catalogue`                                  | `GRCh38_regulatory_build.ccre.noncoding.v50.bed` (595,725 rows, 544,737 ids)                                                                   | `39f838e6c81fdb0b152504f2d51939b5`                                     | all callers                            |
+| `element_catalogue`                                  | `GRCh38_pcawg_style.gencode_v50.bed` (2,050,985 rows, 642,261 ids; recipe below)                                                               | `84c7a33b4d90e735095aabc99f9da559`                                     | all callers                            |
 | `gtf`                                                | `gencode/gencode.v50.basic.annotation.gtf.gz`                                                                                                  | `11e77cf1d4b78b43f57d608e3f7f2202`                                     | nearest-gene table                     |
 | `vep_cache`                                          | `vep_cache_116` (archive `homo_sapiens_vep_116_GRCh38.tar.gz`)                                                                                 | archive `6e10959391069a9eebb8d8d165fd29be`                             | `--run_vep`                            |
 | `oncodrivefml_genome`                                | `oncodrivefml_genome/datasets/genomereference/hg38-20161209`                                                                                   | manifest `afe063fb3a742af2c16083e9a7e05d8a` (below)                    | OncodriveFML, OncodriveCLUSTL          |
@@ -71,6 +73,76 @@ samtools commands with samtools 1.23.1.
 
 ### Element catalogue
 
+The default catalogue, `GRCh38_pcawg_style.gencode_v50.bed`, follows the element definitions and
+the subtraction order of Rheinbay et al. (2020, Supplementary Information section 4), rebuilt
+natively on GRCh38 (no liftover) by
+[`assets/recipes/build_pcawg_style_catalogue.py`](../assets/recipes/build_pcawg_style_catalogue.py).
+Element ids are `<class>__<gene name>__<gene id>` for the gene-anchored classes and the Regulatory
+Build ids for the regulatory classes; rows sharing an id are fragments of one element.
+
+| Class                                                           | Definition                                                                                                                                                               | Elements                   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| `promCore`                                                      | ±200 bp around the transcription start sites of protein-coding transcripts, minus CDS and splice sites (it overlaps 5′UTRs, as in Rheinbay et al.)                       | 19,726                     |
+| `5utr`                                                          | 5′UTR exons of protein-coding transcripts, minus CDS and splice sites                                                                                                    | 19,267                     |
+| `3utr`                                                          | 3′UTR exons of protein-coding transcripts, minus CDS, splice sites and 5′UTRs                                                                                            | 19,551                     |
+| `ss`                                                            | intronic splice-site windows of protein-coding transcripts (6 bp at donors, 20 bp at acceptors), minus CDS                                                               | 18,704                     |
+| `lncrna`, `lncrnaPromCore`, `lncrnaSS`                          | exons, ±200 bp start-site windows and splice-site windows of the selected lncRNA transcripts, minus the protein-coding elements (and minus `lncrnaSS` for the first two) | 27,649 / 26,928 / 25,134   |
+| `smallrna`                                                      | GENCODE snRNA, snoRNA, misc_RNA, rRNA, scaRNA and ribozyme genes, minus the protein-coding elements                                                                      | 5,029                      |
+| `mirna`                                                         | GENCODE miRNA genes (precursors), minus the protein-coding elements                                                                                                      | 1,662                      |
+| `mirnaMature`                                                   | miRBase v23.1 mature miRNAs, one element per accession across loci, minus the protein-coding elements                                                                    | 2,405                      |
+| `trna`                                                          | GENCODE predicted tRNA genes (tRNAscan-SE; `Pseudo_tRNA` predictions excluded), minus the protein-coding elements                                                        | 514                        |
+| `enhancer`                                                      | Regulatory Build 110 enhancers trimmed to the SCREEN V4 cCREs inside them                                                                                                | 235,207                    |
+| `CTCF_binding_site`, `open_chromatin_region`, `TF_binding_site` | Regulatory Build 110 elements, unchanged                                                                                                                                 | 100,920 / 109,715 / 29,850 |
+
+Selected lncRNA transcripts are GENCODE `lncRNA` transcripts of `lncRNA` genes with a spliced
+length above 200 bases, no protein-coding gene within 5 kb on the same strand, and no exon in a
+UCSC chainSelf chain with normScore ≥ 90 (self-diagonal removed). All gene-anchored classes are
+collapsed per gene id; only the 24 primary chromosomes are kept.
+
+Departures from Rheinbay et al.: no coding-sequence elements (the pipeline tests non-coding
+elements only); no MiTranscriptome lncRNAs and no conservation-or-expression filter for lncRNAs, so
+the lncRNA set is broader; no separate Rfam or snoRNAdb small-RNA import and no candidate novel
+miRNAs; no promoter elements for small-RNA genes (Rheinbay et al. had an RMRP promoter because
+GENCODE v19 annotated RMRP as a lincRNA; GENCODE v50 annotates it as a small RNA); enhancers come
+from the Regulatory Build trimmed to cCREs rather than from Roadmap ChromHMM enhancers and DNase I
+peaks. The choice of this catalogue over the Regulatory Build catalogue, and its benchmark, are in
+`docs/validation.md`.
+
+Built on Karakoram with Python 3.11, pandas 3.0.6 and bedtools 2.31.1 on 23 November 2026; a second
+build from the repository copy of the script gave the same MD5.
+
+```bash
+REF=/storage/projects/khalifa.juma/noncodingdrivers/data/refs
+G=https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_50
+mkdir -p $REF/gencode_v50 $REF/mirbase $REF/ucsc_hg38
+curl -fL -o $REF/gencode_v50/gencode.v50.annotation.gtf.gz $G/gencode.v50.annotation.gtf.gz   # MD5 2d273848c6068682fabea72fae4896a9
+curl -fL -o $REF/gencode_v50/gencode.v50.tRNAs.gtf.gz $G/gencode.v50.tRNAs.gtf.gz             # MD5 f25f0f9bd705f8374a9993382cb424b3
+# miRBase v23.1 (GRCh38) and UCSC chainSelf are served as the current file at these URLs:
+# check the MD5, a different file gives a different catalogue
+curl -fL -o $REF/mirbase/hsa.gff3 https://www.mirbase.org/download/hsa.gff3                   # MD5 204c344a64e0a37a1d945ee540682492
+curl -fL -o $REF/ucsc_hg38/chainSelf.txt.gz \
+  https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/chainSelf.txt.gz                   # MD5 01e621a71246bfceec162cc4f22314ad (2026-11-21)
+md5sum $REF/gencode_v50/*.gtf.gz $REF/mirbase/hsa.gff3 $REF/ucsc_hg38/chainSelf.txt.gz
+# inputs built by other recipes: the Regulatory Build catalogue (next section, MD5 39f838e6...)
+# and the SCREEN V4 cCREs (datasheet ccre_v4_bed, MD5 ea1820bd...)
+python3 assets/recipes/build_pcawg_style_catalogue.py \
+  --gtf $REF/gencode_v50/gencode.v50.annotation.gtf.gz \
+  --trna $REF/gencode_v50/gencode.v50.tRNAs.gtf.gz \
+  --mirbase $REF/mirbase/hsa.gff3 \
+  --catalogue $REF/GRCh38_regulatory_build.ccre.noncoding.v50.bed \
+  --ccre $REF/screen_v4/GRCh38-cCREs.V4.ENCFF420VPZ.bed.gz \
+  --chainself $REF/ucsc_hg38/chainSelf.txt.gz \
+  --out GRCh38_pcawg_style.gencode_v50.bed
+md5sum GRCh38_pcawg_style.gencode_v50.bed   # 84c7a33b4d90e735095aabc99f9da559
+```
+
+The script also writes `<out>.summary.tsv` (elements, fragments and bases per class) and
+`<out>.lncrna_filters.tsv` (the lncRNA filter outcome per transcript).
+
+### Regulatory Build catalogue
+
+`GRCh38_regulatory_build.ccre.noncoding.v50.bed` is the input of the regulatory classes above, and
+the default catalogue before datasheet `1.3.0`; pass it with `--elements_bed` to run on it.
 Ensembl Regulatory Build release 110 (build 20221007), primary chromosomes, element id from the
 GFF `ID` attribute with `:` replaced by `_`, 0-based BED. Coding sequence (GENCODE v50 basic `CDS`
 features, merged) is subtracted and remnants shorter than 50 bp are dropped. Rebuilt on

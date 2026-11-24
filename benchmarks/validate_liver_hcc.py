@@ -3,14 +3,18 @@
 
 Layer "core" (driver core) reads consensus/<cohort>.consensus.tsv and checks the significant set
 (is_consensus, which follows --combination_method and --fdr_threshold), its locus count, and the
-TERT promoter element (promoter_ENSR00000746745): significant, consensus rank and consensus q.
-Layer "full" adds the explanation-layer outputs: the candidate-mutation table (only significant
-elements; 11 TERT rows from 11 patients) and the MultiQC report.
+TERT promoter core element of the PCAWG-style catalogue (promCore__TERT__ENSG00000164362.23):
+significant, consensus rank and consensus q. Layer "full" adds the explanation-layer outputs: the
+candidate-mutation table (only significant elements; 10 TERT rows from 10 patients) and the MultiQC
+report.
 
-Expected values are those of the post-Phase-2 reference (tests/regression/reference_phase2.json):
-under ACAT, 23 significant annotations at 19 loci with TERT at rank 3 (q 3.41e-06); under EBM,
-24 significant at 19 loci with TERT at rank 4 (q 9.91e-06, recorded to three significant digits).
-The frozen pre-v1 baseline (tests/regression/baseline.json) had ACAT 28 at 23 loci and EBM 31, TERT rank 5.
+Expected values are those of the PCAWG-style catalogue reference
+(tests/regression/reference_pcawg_style.json, datasheet 1.3.0): under ACAT, 28 significant
+annotations at 23 loci with TERT at rank 3 (q 2.36e-08); under EBM, 38 significant at 28 loci with
+TERT at rank 5 (q 1.18e-07, recorded to three significant digits). On the Regulatory Build catalogue
+(tests/regression/reference_phase2.json) the values were ACAT 23 at 19 loci and EBM 24 at 19 loci
+(TERT promoter_ENSR00000746745, 11 rows); the frozen pre-v1 baseline (tests/regression/baseline.json)
+had ACAT 28 at 23 loci and EBM 31, TERT rank 5.
 """
 
 import argparse
@@ -19,10 +23,11 @@ import json
 from pathlib import Path
 
 
-TERT_ELEMENT = "promoter_ENSR00000746745"
+TERT_ELEMENT = "promCore__TERT__ENSG00000164362.23"
+TERT_ROWS = 10  # candidate rows (= distinct patients) of the TERT element in the full layer
 EXPECTED = {
-    "acat": {"significant": 23, "loci": 19, "tert_rank": 3, "tert_q": 3.41396138505966e-06, "q_tol": 1e-7},
-    "ebm": {"significant": 24, "loci": 19, "tert_rank": 4, "tert_q": 9.91e-06, "q_tol": 5e-08},
+    "acat": {"significant": 28, "loci": 23, "tert_rank": 3, "tert_q": 2.36051422129596e-08, "q_tol": 1e-9},
+    "ebm": {"significant": 38, "loci": 28, "tert_rank": 5, "tert_q": 1.18e-07, "q_tol": 5e-10},
 }
 
 
@@ -89,9 +94,9 @@ def check_full(root, cohort, significant, failures):
     require(all(row.get("element_id") in sig_ids for row in variants),
             "candidate table contains a non-significant element", failures)
     tert_variants = [row for row in variants if row["element_id"] == TERT_ELEMENT]
-    require(len(tert_variants) == 11, f"expected 11 TERT mutation rows, found {len(tert_variants)}", failures)
-    require(len({row["sample"] for row in tert_variants}) == 11,
-            "expected 11 distinct TERT patients", failures)
+    require(len(tert_variants) == TERT_ROWS, f"expected {TERT_ROWS} TERT mutation rows, found {len(tert_variants)}", failures)
+    require(len({row["sample"] for row in tert_variants}) == TERT_ROWS,
+            f"expected {TERT_ROWS} distinct TERT patients", failures)
     require(multiqc.stat().st_size > 100_000, "MultiQC report is unexpectedly small", failures)
     return len(variants)
 
